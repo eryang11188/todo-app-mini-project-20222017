@@ -1,15 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
-import './App.css' // 2학년 때 썼던 style.css 내용을 여기 넣으세요!
+import './App.css' 
 
 function App() {
   const [todos, setTodos] = useState([])
   const [title, setTitle] = useState('')
   const [deadline, setDeadline] = useState('')
-  const [isMarketMode, setIsMarketMode] = useState(true) // 기본을 중고마켓으로!
-  const [viewType, setViewType] = useState('card') // 'card' or 'table'
-  const [filter, setFilter] = useState('all') // 'all', 'unsold', 'sold'
-  const [sortOrder, setSortOrder] = useState('asc') // 'asc', 'desc'
+  const [isMarketMode, setIsMarketMode] = useState(true) 
+  const [viewType, setViewType] = useState('card') 
+  const [filter, setFilter] = useState('all') 
+  const [sortOrder, setSortOrder] = useState('asc') 
   const [searchQuery, setSearchQuery] = useState('')
 
   const API_URL = '/api/todos'
@@ -33,7 +33,21 @@ function App() {
     } catch (err) { alert('등록 실패') }
   }
 
-  // 데이터 가공 로직 (2학년 script.js의 정수!)
+  // ✅ 추가된 부분: 상태 전환 및 삭제 기능
+  const toggleTodo = async (id, completed) => {
+    try {
+      const res = await axios.put(`${API_URL}/${id}`, { completed: !completed })
+      setTodos(todos.map(todo => todo._id === id ? res.data : todo))
+    } catch (err) { console.error('수정 실패:', err) }
+  }
+
+  const deleteTodo = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`)
+      setTodos(todos.filter(todo => todo._id !== id))
+    } catch (err) { console.error('삭제 실패:', err) }
+  }
+
   const processedTodos = useMemo(() => {
     return todos
       .filter(t => {
@@ -51,7 +65,6 @@ function App() {
 
   return (
     <div className={`min-h-screen ${isMarketMode ? 'market-theme-bg' : 'bg-slate-100'} p-5`}>
-      {/* 🚀 상단 제어바 */}
       <div className="max-w-4xl mx-auto mb-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
         <button 
           onClick={() => setIsMarketMode(!isMarketMode)}
@@ -67,7 +80,6 @@ function App() {
       </div>
 
       <div className="max-w-4xl mx-auto">
-        {/* 🏪 중고마켓 헤더 (2학년 감성) */}
         {isMarketMode && (
           <div className="header text-center mb-10">
             <h1 className="text-4xl font-extrabold text-[#002f6c] mb-2">CWNU 중고마켓 v5</h1>
@@ -75,7 +87,6 @@ function App() {
           </div>
         )}
 
-        {/* 📝 입력 폼 */}
         <form onSubmit={addTodo} className="bg-white p-6 rounded-2xl shadow-md mb-8 flex flex-wrap gap-4 justify-center items-end">
           <div className="flex flex-col">
             <label className="text-sm font-bold mb-1">물품명</label>
@@ -88,7 +99,6 @@ function App() {
           <button className="bg-blue-600 text-white px-6 py-2 rounded-md font-bold hover:scale-105 transition">등록</button>
         </form>
 
-        {/* 🎛️ 필터/정렬/뷰 버튼 그룹 */}
         <div className="flex justify-center gap-4 mb-6">
           <select onChange={(e)=>setFilter(e.target.value)} className="p-2 rounded border">
             <option value="all">전체 상태</option>
@@ -104,7 +114,6 @@ function App() {
           </button>
         </div>
 
-        {/* 📦 리스트 출력 영역 */}
         {viewType === 'card' ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {processedTodos.map(todo => (
@@ -149,3 +158,5 @@ function App() {
     </div>
   )
 }
+
+export default App;
