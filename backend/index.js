@@ -7,16 +7,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI).then(() => console.log('✅ MongoDB 연결 성공 (3단계)'));
+mongoose.connect(process.env.MONGODB_URI).then(() => console.log('✅ MongoDB 연결 성공 (4단계)'));
 
 const itemSchema = new mongoose.Schema({
   title: { type: String, required: true },
   completed: { type: Boolean, default: false },
   price: { type: Number, default: 0 },
   deadline: { type: String, default: "" }, 
+  todoDeadline: { type: String, default: "" }, // ⏰ 투두 마감시간 필드 추가!
   importance: { type: String, default: "보통" },
   type: { type: String, required: true, enum: ['todo', 'market'] },
-  // 📝 인적사항 필드 추가됨!
   studentId: { type: String, default: "" },
   sellerName: { type: String, default: "" },
   phone: { type: String, default: "" }
