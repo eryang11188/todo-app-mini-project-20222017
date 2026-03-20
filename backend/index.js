@@ -1,4 +1,4 @@
-// 1. 환경 변수 설정 (Vercel 환경 고려)
+// backend/index.js 최종 진화형 (Dual App 지원)
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -8,84 +8,87 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
-
-// 미들웨어 설정
 app.use(cors());
 app.use(express.json());
 
-// 2. MongoDB 연결
+// 1. MongoDB 연결
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB 연결 성공 (Market v5)'))
+  .then(() => console.log('✅ MongoDB 연결 성공 (Dual App Mode)'))
   .catch(err => console.error('❌ MongoDB 연결 실패:', err));
 
-// 3. Todo 데이터 모델(Schema) 정의 - deadline 필드 추가
-const todoSchema = new mongoose.Schema({
+// 2. 통합 데이터 모델 정의 (Todo와 Market의 필드를 모두 수용)
+const itemSchema = new mongoose.Schema({
   title: { type: String, required: true },
   completed: { type: Boolean, default: false },
-  deadline: { type: String, default: "" } // 마감일 저장용 필드
+  // Market 전용 필드
+  deadline: { type: String, default: "" }, 
+  // Todo 전용 필드 (L: Low, M: Medium, H: High)
+  importance: { type: String, default: "M" },
+  // ⭐ 핵심: 데이터 타입 구분 (todo 또는 market)
+  type: { type: String, required: true, enum: ['todo', 'market'] }
 });
-const Todo = mongoose.model('Todo', todoSchema);
+const Item = mongoose.model('Item', itemSchema);
 
-// 4. API 엔드포인트 (CRUD)
+// 3. API 엔드포인트 설계 (독립적인 라우팅)
 
-// [GET] 목록 가져오기
-app.get('/api/todos', async (req, res) => {
+// --- [MARKET API] ---
+app.get('/api/market', async (req, res) => {
   try {
-    const todos = await Todo.find();
-    res.json(todos);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// [POST] 새로운 물품 추가 - deadline 필드 반영
-app.post('/api/todos', async (req, res) => {
-  try {
-    const newTodo = new Todo({ 
-      title: req.body.title,
-      deadline: req.body.deadline // 프론트엔드에서 보낸 날짜 데이터
-    });
-    await newTodo.save();
-    res.json(newTodo);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+    const marketItems = await Item.find({ type: 'market' }); // 마켓 데이터만 추출
+    res.json(marketItems);
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// [PUT] 상태 수정 (완료 여부 체크)
-app.put('/api/todos/:id', async (req, res) => {
+app.post('/api/market', async (req, res) => {
+  const newItem = new Item({
+    title: req.body.title,
+    deadline: req.body.deadline,
+    type: 'market' // 강제로 market 타입 지정
+  });
   try {
-    const todo = await Todo.findByIdAndUpdate(
-      req.params.id, 
-      { completed: req.body.completed }, 
-      { returnDocument: 'after' } 
-    );
-    res.json(todo);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+    await newItem.save();
+    res.json(newItem);
+  } catch (err) { res.status(400).json({ message: err.message }); }
 });
 
-// [DELETE] 삭제하기
-app.delete('/api/todos/:id', async (req, res) => {
+// --- [TODO API] ---
+app.get('/api/todo', async (req, res) => {
   try {
-    await Todo.findByIdAndDelete(req.params.id);
+    const todoItems = await Item.find({ type: 'todo' }); // 투두 데이터만 추출
+    res.json(todoItems);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+app.post('/api/todo', async (req, res) => {
+  const newItem = new Item({
+    title: req.body.title,
+    importance: req.body.importance,
+    type: 'todo' // 강제로 todo 타입 지정
+  });
+  try {
+    await newItem.save();
+    res.json(newItem);
+  } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+// --- [공통 API: 수정/삭제] ---
+app.put('/api/items/:id', async (req, res) => {
+  try {
+    const item = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(item);
+  } catch (err) { res.status(400).json({ message: err.message }); }
+});
+
+app.delete('/api/items/:id', async (req, res) => {
+  try {
+    await Item.findByIdAndDelete(req.params.id);
     res.json({ message: '삭제 완료' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// 루트 경로 테스트
-app.get('/', (req, res) => {
-  res.send('CWNU Market Backend is Running! 🚀');
-});
-
-// 5. 서버 실행 설정 (Vercel 서버리스 대응)
+// 서버 실행
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`🚀 서버 실행 중: http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🚀 서버 실행: http://localhost:${PORT}`));
 }
-
-// Vercel용 export
 module.exports = app;
