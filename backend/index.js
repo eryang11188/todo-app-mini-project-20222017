@@ -7,19 +7,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI).then(() => console.log('✅ MongoDB 연결 성공 (4단계)'));
+mongoose.connect(process.env.MONGODB_URI).then(() => console.log('✅ MongoDB 연결 성공 (최종)'));
 
 const itemSchema = new mongoose.Schema({
   title: { type: String, required: true },
   completed: { type: Boolean, default: false },
   price: { type: Number, default: 0 },
-  deadline: { type: String, default: "" }, 
-  todoDeadline: { type: String, default: "" }, // ⏰ 투두 마감시간 필드 추가!
+  deadline: { type: String, default: "" },      
+  todoDeadline: { type: String, default: "" },  
   importance: { type: String, default: "보통" },
   type: { type: String, required: true, enum: ['todo', 'market'] },
   studentId: { type: String, default: "" },
   sellerName: { type: String, default: "" },
-  phone: { type: String, default: "" }
+  phone: { type: String, default: "" },
+  location: { type: String, default: "" },
+  description: { type: String, default: "" },
+  likes: { type: Number, default: 0 }
 });
 const Item = mongoose.model('Item', itemSchema);
 
@@ -27,6 +30,7 @@ app.get('/api/market', async (req, res) => { res.json(await Item.find({ type: 'm
 app.get('/api/todo', async (req, res) => { res.json(await Item.find({ type: 'todo' })); });
 app.post('/api/market', async (req, res) => { const newItem = new Item({ ...req.body, type: 'market' }); await newItem.save(); res.json(newItem); });
 app.post('/api/todo', async (req, res) => { const newItem = new Item({ ...req.body, type: 'todo' }); await newItem.save(); res.json(newItem); });
+app.patch('/api/items/:id/like', async (req, res) => { const item = await Item.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } }, { new: true }); res.json(item); });
 app.put('/api/items/:id', async (req, res) => { const item = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true }); res.json(item); });
 app.delete('/api/items/:id', async (req, res) => { await Item.findByIdAndDelete(req.params.id); res.json({ message: '삭제' }); });
 
