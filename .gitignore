@@ -1,0 +1,32 @@
+# 1. 라이브러리
+# npm install 실행 시 생성되는 폴더
+# package.json만 있으면 어디서든 다시 설치할 수 있으므로 저장소에 올리지 않음
+node_modules/
+
+# 2. 보안 및 환경 변수
+# 데이터베이스 주소(MONGODB_URI)와 비밀번호 등 민감한 정보가 들어있는 파일
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 3. 빌드 결과물 
+# 배포를 위해 소스 코드를 변환한 결과물
+# Vercel이 배포 과정에서 자동으로 생성, 원본 코드로 언제든 다시 만들 수 있으므로 제외
+build/
+.vercel
+
+# 4. 운영체제 및 에디터 설정 파일 
+# 코딩과 무관한 운영체제(Windows, Mac)의 폴더 설정이나 미리보기 파일
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 5. 기타 로그 및 캐시 
+# 실행 중에 생성되는 임시 기록이나 캐시 파일
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
