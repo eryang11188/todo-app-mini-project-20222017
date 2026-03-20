@@ -4,7 +4,11 @@ import axios from 'axios'
 function App() {
   const [todos, setTodos] = useState([])
   const [title, setTitle] = useState('')
-  const API_URL = 'http://localhost:5000/api/todos'
+  /* [수정 전]
+  const API_URL = 'http://localhost:5000/api/todos'*/
+  
+  // [수정 후] - 이렇게 바꿔야 배포된 서버 주소를 알아서 찾아갑니다.
+  const API_URL = '/api/todos'
 
   useEffect(() => { fetchTodos() }, [])
 

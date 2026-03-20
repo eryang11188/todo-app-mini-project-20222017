@@ -1,16 +1,20 @@
-require('dotenv').config();
+// 1. dotenv는 로컬(개발 환경)에서만 실행하고, Vercel(production)에서는 무시하도록 설정
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
 
-// 1. 미들웨어 설정
+// 미들웨어 설정
 app.use(cors());
 app.use(express.json());
 
 // 2. MongoDB 연결
-// .env에 있는 MONGODB_URI를 사용하여 클라우드 DB에 접속합니다.
+// Vercel에서는 환경 변수(Environment Variables) 설정에 넣은 MONGODB_URI를 읽어옵니다.
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB 연결 성공'))
   .catch(err => console.error('❌ MongoDB 연결 실패:', err));
@@ -51,7 +55,7 @@ app.put('/api/todos/:id', async (req, res) => {
     const todo = await Todo.findByIdAndUpdate(
       req.params.id, 
       { completed: req.body.completed }, 
-      { returnDocument: 'after' } // <-- 경고에서 시킨 대로 수정!
+      { returnDocument: 'after' } 
     );
     res.json(todo);
   } catch (err) {
@@ -75,7 +79,6 @@ app.get('/', (req, res) => {
 });
 
 // 5. 서버 실행 설정 (Vercel 서버리스 대응)
-// 로컬 환경(development)에서만 app.listen이 실행되도록 합니다.
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`🚀 서버 실행 중: http://localhost:${PORT}`));
