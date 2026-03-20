@@ -3,24 +3,17 @@ import axios from 'axios'
 
 function MarketPage() {
   const [items, setItems] = useState([])
-  const [title, setTitle] = useState(''); const [price, setPrice] = useState(''); const [deadline, setDeadline] = useState('')
-  const [editingId, setEditingId] = useState(null)
-  const [editTitle, setEditTitle] = useState(''); const [editPrice, setEditPrice] = useState('')
-
+  const [form, setForm] = useState({ title: '', price: '', deadline: '', studentId: '', sellerName: '', phone: '' })
+  
   const API_URL = '/api/market'; const COMMON_URL = '/api/items'
 
   useEffect(() => { fetchItems() }, [])
   const fetchItems = async () => { const res = await axios.get(API_URL); setItems(res.data) }
 
   const addItem = async (e) => {
-    e.preventDefault(); if (!title) return
-    const res = await axios.post(API_URL, { title, price, deadline })
-    setItems([...items, res.data]); setTitle(''); setPrice(''); setDeadline('')
-  }
-
-  const saveEdit = async (id) => {
-    const res = await axios.put(`${COMMON_URL}/${id}`, { title: editTitle, price: editPrice })
-    setItems(items.map(item => item._id === id ? res.data : item)); setEditingId(null)
+    e.preventDefault(); if (!form.title) return
+    const res = await axios.post(API_URL, form)
+    setItems([...items, res.data]); setForm({ title: '', price: '', deadline: '', studentId: '', sellerName: '', phone: '' })
   }
   const toggleStatus = async (id, completed) => {
     const res = await axios.put(`${COMMON_URL}/${id}`, { completed: !completed })
@@ -29,34 +22,28 @@ function MarketPage() {
   const deleteItem = async (id) => { await axios.delete(`${COMMON_URL}/${id}`); setItems(items.filter(item => item._id !== id)) }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <div className="text-center mb-10"><h2 className="text-4xl font-extrabold text-[#002f6c]">CWNU 마켓 v2</h2></div>
-      <form onSubmit={addItem} className="bg-white p-6 rounded-2xl shadow-md mb-8 flex gap-4">
-        <input placeholder="물품명" value={title} onChange={(e)=>setTitle(e.target.value)} className="border p-2"/>
-        <input type="number" placeholder="가격" value={price} onChange={(e)=>setPrice(e.target.value)} className="border p-2"/>
-        <input type="date" value={deadline} onChange={(e)=>setDeadline(e.target.value)} className="border p-2"/>
-        <button className="bg-blue-600 text-white px-6 py-2">등록</button>
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="text-center mb-10"><h2 className="text-5xl font-black text-[#002f6c] mb-2">CWNU MARKET <span className="text-red-500">v5_super.ver</span></h2></div>
+      
+      <form onSubmit={addItem} className="bg-white p-8 rounded-3xl shadow-xl mb-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input placeholder="물품명" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="border p-3 rounded-xl"/>
+        <input placeholder="가격(원)" type="number" value={form.price} onChange={e=>setForm({...form, price: e.target.value})} className="border p-3 rounded-xl"/>
+        <input type="date" value={form.deadline} onChange={e=>setForm({...form, deadline: e.target.value})} className="border p-3 rounded-xl"/>
+        <input placeholder="학번" value={form.studentId} onChange={e=>setForm({...form, studentId: e.target.value})} className="border p-3 rounded-xl"/>
+        <input placeholder="판매자" value={form.sellerName} onChange={e=>setForm({...form, sellerName: e.target.value})} className="border p-3 rounded-xl"/>
+        <input placeholder="전화번호" value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="border p-3 rounded-xl"/>
+        <button className="md:col-span-3 bg-[#002f6c] text-white p-4 rounded-xl font-black">등록하기</button>
       </form>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {items.map(item => (
-          <div key={item._id} className="p-6 rounded-3xl shadow-sm border-2 bg-white">
-            {editingId === item._id ? (
-              <div className="flex flex-col gap-2">
-                <input className="border p-1" value={editTitle} onChange={(e)=>setEditTitle(e.target.value)} />
-                <input className="border p-1" type="number" value={editPrice} onChange={(e)=>setEditPrice(e.target.value)} />
-                <button onClick={()=>saveEdit(item._id)} className="bg-green-500 text-white rounded py-1">저장</button>
-              </div>
-            ) : (
-              <>
-                <h3 className={`text-xl font-bold ${item.completed ? 'line-through text-gray-400' : ''}`}>{item.title}</h3>
-                <p className="text-blue-600 font-bold">{Number(item.price).toLocaleString()}원</p>
-                <p>마감: {item.deadline}</p>
-              </>
-            )}
-            <div className="flex gap-2 mt-4">
-              <button onClick={() => toggleStatus(item._id, item.completed)} className="bg-gray-200 px-2 rounded">상태변경</button>
-              <button onClick={() => {setEditingId(item._id); setEditTitle(item.title); setEditPrice(item.price)}} className="text-blue-400">수정</button>
-              <button onClick={() => deleteItem(item._id)} className="text-red-400">삭제</button>
+          <div key={item._id} className={`p-6 rounded-[2.5rem] border-4 transition-all hover:-translate-y-2 hover:shadow-2xl ${item.completed ? 'border-red-500 bg-red-50' : 'border-blue-100 bg-white'}`}>
+            <h3 className={`text-2xl font-black ${item.completed ? 'text-red-600 line-through' : ''}`}>{item.title}</h3>
+            <p className="text-3xl font-black text-blue-700 my-2">{Number(item.price).toLocaleString()}원</p>
+            <div className="text-sm text-gray-500 mb-4"><p>👤 {item.sellerName}</p><p>📞 {item.phone}</p></div>
+            <div className="flex gap-2">
+              <button onClick={() => toggleStatus(item._id, item.completed)} className="bg-gray-200 p-2 rounded flex-grow font-bold">{item.completed ? "취소" : "거래완료"}</button>
+              <button onClick={() => deleteItem(item._id)} className="bg-red-100 text-red-500 p-2 rounded">삭제</button>
             </div>
           </div>
         ))}
