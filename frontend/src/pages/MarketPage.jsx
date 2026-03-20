@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 
-// 🚀 9. 명언 이모지 제거 및 텍스트 문구 추가
 const MARKET_QUOTES = [
   "안 쓰는 물건, 누군가에겐 보물입니다.", "빠른 쿨거래가 창대인의 매너를 만듭니다.",
   "네고는 둥글게, 거래는 확실하게!", "오늘 비운 공간, 내일의 여유가 됩니다.",
@@ -16,14 +15,12 @@ const MARKET_QUOTES = [
   "판매자에겐 용돈을, 구매자에겐 득템을!", "서로 돕고 사는 훈훈한 창대 라이프"
 ];
 
-// 🚀 7. 재치있는 등록 버튼 멘트 대량 추가
 const SUBMIT_MENTIONS = [
   "🚀 내 물건 마켓에 올리기", "✨ 신상 등록하고 용돈 벌기", "📦 박스 속 물건 새 주인 찾기", 
   "💸 치킨값 벌러 물건 올리기", "♻️ 가치 있는 나눔의 시작", "🤝 쿨거래 페이스메이커로 등록", 
   "🏫 창대인에게 득템 기회 제공", "🔥 인기 물품 대열에 합류!"
 ];
 
-// 🚀 4. 요소 이동형 도움말 데이터 (targetId 포함)
 const TOUR_STEPS = [
   { title: "👋 환영합니다!", desc: "CWNU 마켓의 핵심 기능을 빠르게 안내해 드릴게요. (화면이 자동으로 이동합니다)", targetId: "tour-header" },
   { title: "🎁 무료 나눔 & 가격", desc: "이곳에서 가격을 정하거나 '무료 나눔' 버튼을 누르면 기분 좋은 폭죽이 터집니다!", targetId: "tour-freebie" },
@@ -47,49 +44,43 @@ function MarketPage() {
   const [quote, setQuote] = useState(MARKET_QUOTES[0])
   const [selectedDesc, setSelectedDesc] = useState(null)
   const [showVersionInfo, setShowVersionInfo] = useState(false)
-  
-  // 🚀 7. 등록 버튼 멘트 애니메이션 상태
   const [submitMentionIndex, setSubmitMentionIndex] = useState(0);
 
-  // 🚀 4. 투어 상태 및 위치 추적
   const [tourIndex, setTourIndex] = useState(-1) 
   const [tourPos, setTourPos] = useState({ top: 0, left: 0 })
   const [showConfetti, setShowConfetti] = useState(false)
+  const [showModalConfetti, setShowModalConfetti] = useState(false)
 
   const API_URL = '/api/market'; const COMMON_URL = '/api/items'
 
   useEffect(() => { fetchItems(); setQuote(MARKET_QUOTES[Math.floor(Math.random() * MARKET_QUOTES.length)]); }, [])
   const fetchItems = async () => { try { const res = await axios.get(API_URL); setItems(res.data) } catch(e){} }
 
-  // 🚀 7. 6초마다 등록 버튼 멘트 변경 인터벌
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setSubmitMentionIndex(prev => (prev + 1) % SUBMIT_MENTIONS.length);
-    }, 6000); 
+    const intervalId = setInterval(() => setSubmitMentionIndex(prev => (prev + 1) % SUBMIT_MENTIONS.length), 6000); 
     return () => clearInterval(intervalId);
   }, []);
 
-  // 🚀 4. 도움말 팝업 위치 자동 계산 로직 (안정화)
+  useEffect(() => {
+    if (showVersionInfo) {
+      setShowModalConfetti(true);
+      setTimeout(() => setShowModalConfetti(false), 2500);
+    }
+  }, [showVersionInfo]);
+
   useEffect(() => {
     if (tourIndex >= 0) {
       const step = TOUR_STEPS[tourIndex];
       const el = document.getElementById(step.targetId);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // 스크롤 이동 시간 벌어주기
-        setTimeout(() => {
-          const rect = el.getBoundingClientRect();
-          setTourPos({ 
-            top: rect.bottom + window.scrollY + 15, 
-            left: Math.max(20, rect.left + window.scrollX - 20) 
-          });
-          // 하이라이트 효과 임시 부여
-          el.classList.add('ring-4', 'ring-yellow-400', 'z-50', 'relative', 'bg-white', 'transition-all');
-          setTimeout(() => el.classList.remove('ring-4', 'ring-yellow-400', 'z-50', 'relative', 'bg-white', 'transition-all'), 3000);
-        }, 400);
-      } else {
-        // 요소를 못 찾으면 화면 중앙
-        setTourPos({ top: window.scrollY + window.innerHeight / 2 - 100, left: window.innerWidth / 2 - 150 });
+        
+        const highlightClasses = ['ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'z-[80]', 'transition-all', 'rounded-2xl'];
+        el.classList.add(...highlightClasses);
+        
+        return () => {
+          el.classList.remove(...highlightClasses);
+        };
       }
     }
   }, [tourIndex]);
@@ -147,30 +138,22 @@ function MarketPage() {
   return (
     <div className="max-w-7xl mx-auto p-6 flex flex-col min-h-screen relative">
       <style>{`
-        @keyframes pop { 0% { transform: scale(0.8) translateY(10px); opacity: 0; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1) translateY(-30px); opacity: 0; } }
-        .emoji-burst { position: absolute; animation: pop 1s ease-out forwards; font-size: 2.5rem; pointer-events: none; z-index: 50; }
-        .tour-popup { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        
-        /* 🚀 텍스트 페이드 애니메이션 */
+        @keyframes shoot-up { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 50% { transform: translateY(-100px) scale(1.2); opacity: 1; } 100% { transform: translateY(-150px) scale(1); opacity: 0; } }
+        .emoji-burst { position: absolute; animation: shoot-up 1.5s ease-out forwards; z-index: 9999; pointer-events: none; }
+        @keyframes slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
+        .tour-popup { animation: slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .text-fade-enter { opacity: 0; transform: translateY(5px); }
         .text-fade-enter-active { opacity: 1; transform: translateY(0); transition: all 0.5s ease-out; }
         .text-fade-exit { opacity: 1; transform: translateY(0); }
         .text-fade-exit-active { opacity: 0; transform: translateY(-5px); transition: all 0.5s ease-in; }
-        
-        /* 🚀 Sold Out 테이블 스타일 */
         tr.sold-out { background-color: rgba(239, 68, 68, 0.03); }
         tr.sold-out td { opacity: 0.8; }
-        tr.sold-out td.status-col span { background-color: #ef4444; color: white; padding: 3px 8px; rounded: 9999px; font-weight: 900; }
       `}</style>
 
-      {/* 🚀 4. 타겟 추적형 팝업 (도움말 투어) */}
       {tourIndex >= 0 && (
         <>
-          {/* 흐림 효과 제거, pointer-events-none 적용 */}
-          <div className="fixed inset-0 bg-black/5 z-[90] pointer-events-none transition-opacity duration-300"></div>
-          <div className="absolute z-[100] bg-white p-6 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border-2 border-blue-400 w-80 tour-popup transition-all duration-500 ease-in-out"
-               style={{ top: tourPos.top, left: tourPos.left }}>
-            <div className="absolute -top-3 left-6 w-5 h-5 bg-white border-t-2 border-l-2 border-blue-400 rotate-45"></div>
+          <div className="fixed inset-0 z-[90] pointer-events-none bg-black/10 transition-opacity duration-300"></div>
+          <div className="fixed z-[100] bg-white p-6 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.4)] border-[3px] border-blue-400 w-[350px] bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
             <h3 className="text-blue-600 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{TOUR_STEPS.length})</h3>
             <h2 className="text-xl font-black text-gray-800 mb-3">{TOUR_STEPS[tourIndex].title}</h2>
             <p className="text-gray-600 text-sm font-medium leading-relaxed mb-5">{TOUR_STEPS[tourIndex].desc}</p>
@@ -184,13 +167,18 @@ function MarketPage() {
         </>
       )}
 
-      {/* 🚀 1. 직관적인 A->B 비교 버전 모달 (유료 드립 및 todos_v4 언급 추가) */}
       {showVersionInfo && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 Backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
+          {showModalConfetti && (
+            <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center">
+              <span className="emoji-burst text-6xl" style={{ left: '30%', top: '50%' }}>🎉</span>
+              <span className="emoji-burst text-7xl" style={{ animationDelay: '0.1s', left: '50%', top: '40%' }}>✨</span>
+              <span className="emoji-burst text-6xl" style={{ animationDelay: '0.2s', left: '70%', top: '50%' }}>🎊</span>
+            </div>
+          )}
           <div className="bg-white p-8 rounded-[2rem] max-w-2xl w-full shadow-2xl transform transition-all border-4 border-blue-50" onClick={e=>e.stopPropagation()}>
             <h3 className="text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 text-center">🚀 V5_super_2.0 ver 업데이트 내역</h3>
             <p className="text-center text-gray-500 font-bold mb-8 text-xs">웹프로그래밍 과제 25-2 기말대체 `todos_v4`의 최종 진화형!</p>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               <div className="bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-gray-200">
                 <h4 className="text-gray-500 font-black text-lg mb-4 text-center">🤔 이전 버전 (todos_v4)</h4>
@@ -209,12 +197,10 @@ function MarketPage() {
                 </ul>
               </div>
             </div>
-            
-            <div className="bg-green-50 p-6 rounded-3xl border-2 border-green-200 text-center mb-8 shadow-inner">
+            <div className="bg-green-50 p-6 rounded-3xl border-2 border-green-200 text-center mb-8 shadow-inner relative overflow-hidden">
                 <h4 className="text-2xl font-black text-green-800 mb-2">🎁 "근데 이거 유료라고요?"</h4>
                 <p className="text-green-700 font-bold text-sm">아닙니다! 창대인을 위한 <span className="font-black text-lg">완전 무료</span> 서비스입니다!<br/> 쿨거래로 학우 간 따뜻한 정을 나눠보세요!</p>
             </div>
-
             <button onClick={() => setShowVersionInfo(false)} className="w-full bg-gray-900 text-white py-4 rounded-xl font-black text-lg hover:bg-black transition shadow-lg tracking-widest uppercase">확인 완료! 직접 써보기</button>
           </div>
         </div>
@@ -251,11 +237,11 @@ function MarketPage() {
             )}
             <button type="button" onClick={handleFreebie} className="bg-green-500 text-white font-black text-xs px-4 rounded-2xl hover:bg-green-600 transition shadow-lg whitespace-nowrap">무료<br/>나눔</button>
             {showConfetti && (
-              <>
-                <span className="emoji-burst" style={{ left: '0%' }}>🎉</span>
-                <span className="emoji-burst" style={{ left: '40%', animationDelay: '0.1s' }}>💖</span>
-                <span className="emoji-burst" style={{ right: '10%', animationDelay: '0.2s' }}>🎊</span>
-              </>
+              <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center">
+                <span className="emoji-burst text-5xl" style={{ left: '20%', top: '60%' }}>🎉</span>
+                <span className="emoji-burst text-6xl" style={{ animationDelay: '0.1s', left: '50%', top: '50%' }}>💖</span>
+                <span className="emoji-burst text-5xl" style={{ animationDelay: '0.2s', left: '80%', top: '60%' }}>🎊</span>
+              </div>
             )}
           </div>
 
@@ -267,9 +253,8 @@ function MarketPage() {
           <textarea placeholder="판매에 대한 상세한 설명을 적어주세요. (클릭 시 팝업되어 넓게 볼 수 있습니다)" value={form.description} onChange={e=>setForm({...form, description: e.target.value})} 
             className="border-2 border-gray-100 p-4 rounded-2xl md:col-span-3 outline-none focus:border-blue-400 h-16 focus:h-40 transition-all duration-300 resize-none leading-relaxed font-medium"></textarea>
           
-          {/* 🚀 7. 재치있는 등록 버튼 멘트 애니메이션 (TransitionGroup 사용 불가로 CSS 애니메이션만 적용) */}
-          <button className="md:col-span-3 bg-[#002f6c] text-white p-5 rounded-2xl font-black text-lg hover:bg-blue-800 transition-all shadow-xl mt-2 tracking-widest uppercase overflow-hidden relative">
-            <span key={SUBMIT_MENTIONS[submitMentionIndex]} className="inline-block animate-submit-text-fade">
+          <button className="md:col-span-3 bg-[#002f6c] text-white p-5 rounded-2xl font-black text-lg hover:bg-blue-800 transition-all shadow-xl mt-2 tracking-widest uppercase overflow-hidden relative h-16 flex justify-center items-center">
+            <span key={SUBMIT_MENTIONS[submitMentionIndex]} className="inline-block animate-submit-text-fade absolute">
               {SUBMIT_MENTIONS[submitMentionIndex]}
             </span>
           </button>
@@ -293,7 +278,6 @@ function MarketPage() {
           <div id="tour-card" className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 w-full transition-all">
             {currentItems.map(item => (
               <div key={item._id} className={`p-8 rounded-[3rem] border-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl flex flex-col relative overflow-hidden ${item.completed ? 'border-red-500 bg-red-50' : 'border-blue-50 bg-white'}`}>
-                {/* 🚀 2. Sold Out 리본 유지 (겹침 해결 위해 하트 위치 조정) */}
                 {item.completed && <div className="absolute -right-10 top-10 bg-red-500 text-white font-black text-xs py-1 px-12 rotate-45 shadow-lg z-10">SOLD OUT</div>}
                 
                 {editingId === item._id ? (
@@ -317,7 +301,6 @@ function MarketPage() {
                         <p className={`text-4xl font-black ${item.completed ? 'text-red-400 opacity-70' : 'text-blue-700'}`}>
                           {item.price === 0 ? "🎁 무료 나눔!" : `${Number(item.price).toLocaleString()}원`}
                         </p>
-                        {/* 🚀 2. 하트를 가격 옆으로 이동시킴 (Sold Out 리본과 안 겹침) */}
                         <button onClick={() => handleLike(item._id)} className={`flex flex-col items-center hover:scale-125 transition-transform ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-200'}`}>
                             <span className="text-3xl drop-shadow-md">♥</span>
                             <span className="text-[10px] font-black mt-[-4px]">{item.likes}</span>
@@ -347,19 +330,22 @@ function MarketPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border-2 border-gray-100 mb-10 w-full 푸터_노출_확인">
+          <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border-2 border-gray-100 mb-10 w-full">
             <table className="w-full text-center">
               <thead className="bg-[#002f6c] text-white text-sm font-bold tracking-widest uppercase">
                 <tr><th className="p-5">Item</th><th className="p-5">Price</th><th className="p-5">Seller</th><th className="p-5">Status</th><th className="p-5">Action</th></tr>
               </thead>
               <tbody>
                 {currentItems.map(item => (
-                  // 🚀 3. 거래 완료 시 sold-out 클래스 추가 (tr.sold-out CSS 사용)
                   <tr key={item._id} className={`border-b hover:bg-blue-50 transition-colors ${item.completed ? 'sold-out text-red-500' : ''}`}>
-                    <td className={`p-5 font-black text-lg ${item.completed ? 'line-through' : 'text-gray-800'}`}>{item.title} <span className="text-red-400 text-xs ml-2">♥{item.likes}</span></td>
+                    <td className={`p-5 font-black text-lg relative ${item.completed ? 'opacity-70' : 'text-gray-800'}`}>
+                      {/* 🚀 1. 테이블 모드 좌측 상단 SOLD OUT 뱃지 추가 */}
+                      {item.completed && <div className="absolute top-0 left-0 bg-red-500 text-white font-black text-[9px] px-2 py-1 rounded-br-xl shadow-sm tracking-widest z-10">SOLD OUT</div>}
+                      <span className={item.completed ? 'line-through text-red-500' : ''}>{item.title}</span> <span className="text-red-400 text-xs ml-2">♥{item.likes}</span>
+                    </td>
                     <td className="p-5 font-black text-blue-600">{item.price === 0 ? "🎁 무료 나눔!" : `${Number(item.price).toLocaleString()}원`}</td>
                     <td className="p-5 font-bold text-gray-500 text-sm leading-relaxed">{item.sellerName} <br/><span className="text-xs text-gray-400">{item.phone}</span></td>
-                    <td className="p-5 status-col"> {/* 🚀 3. 테이블 모드 Sold Out 표시 */}
+                    <td className="p-5 status-col">
                       <div className="text-xs font-bold mb-2 text-gray-600">{item.deadline}</div>
                       <span className={`px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-red-500 text-white' : 'bg-blue-600 text-white'}`}>{item.completed ? "거래완료" : "판매중"}</span>
                     </td>
@@ -383,15 +369,13 @@ function MarketPage() {
         )}
       </div>
 
-      {/* 🚀 10. 마켓 모드 푸터 복구 */}
       <footer className="py-12 text-center border-t border-gray-200 mt-10 z-10">
         <p className="text-gray-500 font-black text-base tracking-[0.2em] mb-2 uppercase">Software Engineering Project: CWNU Portal System</p>
         <p className="text-gray-400 text-sm font-bold tracking-widest">@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works</p>
       </footer>
 
-      {/* 상세 설명 모달 */}
       {selectedDesc && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 Backdrop-blur-sm" onClick={() => setSelectedDesc(null)}>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setSelectedDesc(null)}>
           <div className="bg-white p-10 rounded-[2.5rem] max-w-xl w-full shadow-2xl transform transition-all border-4 border-blue-50" onClick={e => e.stopPropagation()}>
             <h3 className="text-3xl font-black text-blue-800 mb-6 flex items-center gap-3"><span className="text-4xl">📝</span> 상세 설명</h3>
             <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
