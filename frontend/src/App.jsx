@@ -1,120 +1,116 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, Link, useLocation } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import MarketPage from './pages/MarketPage';
 import TodoPage from './pages/TodoPage';
 import GpaPage from './pages/GpaPage';
 
-function Navbar({ isDarkMode, toggleDarkMode }) {
-  const location = useLocation();
-  const isMain = location.pathname === '/';
-  
-  return (
-    /* 모바일 터치 영역 확보를 위해 p-3 md:p-4 적용 */
-    <nav className="bg-[#002f6c] dark:bg-gray-900 p-3 md:p-4 text-white shadow-xl sticky top-0 z-[200] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        
-        {/* 좌측 로고 및 외부 링크 영역 */}
-        <div className="flex items-center gap-2 md:gap-4 min-w-0">
-          <Link to="/" className="hover:opacity-80 transition-opacity flex-shrink-0">
-            <h1 className="font-black text-lg md:text-2xl italic tracking-tighter whitespace-nowrap">
-              CWNU PORTAL <span className="text-red-400 px-1 md:px-2 text-xs md:text-base align-baseline font-bold">V5_super_4.0</span>
-            </h1>
-          </Link>
-          
-          {/* 3. 와글 및 학식 링크 (모바일에서도 보이도록 수정) */}
-          <div className="flex items-center gap-1.5 md:gap-3 border-l border-blue-800/50 ml-2 md:ml-4 pl-2 md:pl-4">
-            <a href="https://www.changwon.ac.kr/portal/main.do#" target="_blank" rel="noreferrer" 
-               className="bg-blue-800/40 hover:bg-blue-700 p-1.5 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-[11px] font-bold transition-all border border-blue-700/50 flex items-center gap-1"
-               title="와글 광장">
-               <span>🌐</span><span className="hidden md:inline">와글 광장</span>
-            </a>
-            <a href="https://app.changwon.ac.kr/campus/campus_001.do" target="_blank" rel="noreferrer" 
-               className="bg-orange-500/40 hover:bg-orange-600 p-1.5 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-[11px] font-bold transition-all border border-orange-400/50 flex items-center gap-1"
-               title="오늘 학식">
-               <span>🍱</span><span className="hidden md:inline">오늘 학식</span>
-            </a>
-          </div>
-        </div>
-
-        {/* 우측 서비스 메뉴 영역 */}
-        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
-          {!isMain && (
-            <div className="flex gap-2 md:gap-6 font-black text-[11px] md:text-sm items-center">
-              <Link to="/market" className="hover:text-blue-300 transition-colors flex items-center gap-1">
-                <span className="text-lg md:text-base">🏪</span><span className="hidden sm:inline">CWNU 장터 ↗</span>
-              </Link>
-              <Link to="/todo" className="hover:text-blue-300 transition-colors flex items-center gap-1">
-                <span className="text-lg md:text-base">📝</span><span className="hidden sm:inline">ToDo ↗</span>
-              </Link>
-              <Link to="/gpa" className="hover:text-blue-300 transition-colors flex items-center gap-1">
-                <span className="text-lg md:text-base">🎓</span><span className="hidden sm:inline">학점 계산기 ↗ </span>
-              </Link>
-            </div>
-          )}
-          
-          <button
-            onClick={toggleDarkMode}
-            className="p-1.5 md:p-2 rounded-full bg-blue-800/50 hover:bg-blue-700 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-300 border border-blue-700/50 dark:border-gray-600 text-sm md:text-base flex-shrink-0"
-          >
-            {isDarkMode ? '🌙' : '☀️'}
-          </button>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation(); // 현재 페이지 위치 파악
+
+  // 1. 다크모드 상태 관리
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('cwnu_dark_mode') === 'true';
+  });
 
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('cwnu_dark_mode', 'true');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('cwnu_dark_mode', 'false');
     }
   }, [isDarkMode]);
 
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-
-  /* 전역 타이머/스톱워치 상태 관리 */
-  const [timerMode, setTimerMode] = useState('timer');
+  // TodoPage와 공유할 전역 타이머 상태
+  const [timerMode, setTimerMode] = useState('timer'); 
   const [timerTime, setTimerTime] = useState(0);
   const [timerIsRunning, setTimerIsRunning] = useState(false);
-  const timerRef = useRef(null);
 
   useEffect(() => {
+    let interval;
     if (timerIsRunning) {
-      timerRef.current = setInterval(() => {
-        setTimerTime(prev => {
+      interval = setInterval(() => {
+        setTimerTime((prev) => {
           if (timerMode === 'timer') {
-            if (prev <= 10) { setTimerIsRunning(false); return 0; }
+            if (prev <= 10) {
+              setTimerIsRunning(false);
+              return 0;
+            }
             return prev - 10;
+          } else {
+            return prev + 10;
           }
-          return prev + 10;
         });
       }, 10);
-    } else { clearInterval(timerRef.current); }
-    return () => clearInterval(timerRef.current);
+    }
+    return () => clearInterval(interval);
   }, [timerIsRunning, timerMode]);
 
-  const timerProps = { timerMode, setTimerMode, timerTime, setTimerTime, timerIsRunning, setTimerIsRunning };
+  // 메뉴 활성화 스타일을 위한 함수
+  const getMenuClass = (path) => {
+    const baseClass = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-[11px] md:text-sm transition-all ";
+    return baseClass + (location.pathname === path 
+      ? "bg-white/20 text-white shadow-inner" 
+      : "text-white/70 hover:text-white hover:bg-white/10");
+  };
 
   return (
-    <Router>
-      <div className="min-h-screen bg-slate-50 dark:bg-gray-900 text-black dark:text-white transition-colors duration-300 flex flex-col">
-        <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-        <div className="flex-grow">
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/market" element={<MarketPage />} />
-            <Route path="/todo" element={<TodoPage {...timerProps} />} />
-            <Route path="/gpa" element={<GpaPage />} />
-          </Routes>
+    <div className={`min-h-screen ${isDarkMode ? 'dark' : ''} bg-white dark:bg-gray-900 transition-colors`}>
+      {/* 상단 네비게이션 헤더 영역 */}
+      <header className="bg-[#002f6c] dark:bg-gray-950 text-white p-3 md:p-5 shadow-lg flex flex-col md:flex-row justify-between items-center transition-colors sticky top-0 z-[100] gap-3 md:gap-0">
+        
+        {/* 왼쪽: 로고 */}
+        <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
+          <h1 className="text-xl md:text-2xl font-black tracking-tighter cursor-pointer" onClick={() => navigate('/')}>
+            CWNU PORTAL <span className="text-red-500 italic ml-1 md:ml-2 text-sm md:text-base animate-pulse">V5_super_4.0</span>
+          </h1>
+          
+          {/* 모바일에서만 보이는 다크모드 버튼 */}
+          <button onClick={() => setIsDarkMode(!isDarkMode)} className="md:hidden p-2 bg-white/10 rounded-full">{isDarkMode ? '☀️' : '🌙'}</button>
         </div>
-      </div>
-    </Router>
+
+        {/* 가운데: 핵심 서비스 바로가기 메뉴 */}
+        <nav className="flex items-center gap-1 md:gap-4 bg-black/20 p-1 md:p-1.5 rounded-2xl">
+          <Link to="/market" className={getMenuClass('/market')}>🏪 <span className="hidden sm:inline">CWNU 장터</span><span className="sm:hidden text-[10px]">장터</span></Link>
+          <Link to="/todo" className={getMenuClass('/todo')}>📝 <span className="hidden sm:inline">ToDo</span><span className="sm:hidden text-[10px]">ToDo</span></Link>
+          <Link to="/gpa" className={getMenuClass('/gpa')}>🎓 <span className="hidden sm:inline">학점 계산기</span><span className="sm:hidden text-[10px]">학점</span></Link>
+        </nav>
+
+        {/* 오른쪽: 외부 퀵 링크 & 다크모드 */}
+        <div className="flex gap-2 md:gap-3 items-center w-full md:w-auto justify-center md:justify-end">
+          {/* 학식 링크 수정 완료 */}
+          <a href="https://app.changwon.ac.kr/campus/campus_001.do" target="_blank" rel="noreferrer" className="bg-[#634432] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#4d3527] transition">🍱 학식</a>
+          <a href="https://lib.changwon.ac.kr/" target="_blank" rel="noreferrer" className="bg-[#059669] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#047857] transition">📚 도서관</a>
+          <a href="https://www.instagram.com/cwnu_official/?mi=18361" target="_blank" rel="noreferrer" className="bg-[#d946ef] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#c026d3] transition">📸 인스타</a>
+
+          {/* PC 다크모드 토글 버튼 */}
+          <button 
+            onClick={() => setIsDarkMode(!isDarkMode)} 
+            className="hidden md:block p-2 md:p-2.5 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-sm transition-all duration-300"
+          >
+            {isDarkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/market" element={<MarketPage />} />
+          <Route path="/todo" element={
+            <TodoPage 
+              timerMode={timerMode} setTimerMode={setTimerMode}
+              timerTime={timerTime} setTimerTime={setTimerTime}
+              timerIsRunning={timerIsRunning} setTimerIsRunning={setTimerIsRunning}
+            />
+          } />
+          <Route path="/gpa" element={<GpaPage />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
 

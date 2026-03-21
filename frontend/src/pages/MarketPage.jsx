@@ -269,10 +269,18 @@ function MarketPage() {
         )}
       </div>
 
-      <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-8 relative z-10">
-        <p className="text-gray-500 dark:text-gray-400 font-black text-xs md:text-base uppercase tracking-widest">Software Engineering Project: CWNU Portal System</p>
-        <p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold mt-1 md:mt-2">@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works</p>
-      </footer>
+    
+<footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
+  <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
+    Department of Computer Science
+    <span className="text-gray-400 dark:text-gray-500 font-bold mx-1 md:mx-2 hidden md:inline">|</span> 
+    <br className="md:hidden"/>
+    Software Engineering Project: CWNU Portal System
+  </p>
+  <p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold mt-1 md:mt-2">
+    @ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works
+  </p>
+</footer>
     </div>
   )
 }
