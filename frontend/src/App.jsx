@@ -5,20 +5,24 @@ import MarketPage from './pages/MarketPage';
 import TodoPage from './pages/TodoPage';
 import GpaPage from './pages/GpaPage';
 
-//  2, 3단계: Navbar에서 다크모드 상태와 토글 함수를 props로 받아서 버튼 추가
 function Navbar({ isDarkMode, toggleDarkMode }) {
   const location = useLocation();
   const isMain = location.pathname === '/';
   
   return (
-    <nav className="bg-[#002f6c] dark:bg-gray-900 p-4 text-white shadow-xl sticky top-0 z-[200] transition-colors duration-300">
+    // 📱 모바일: 패딩 축소(p-3) / PC: 기존 유지(p-4)
+    <nav className="bg-[#002f6c] dark:bg-gray-900 p-3 md:p-4 text-white shadow-xl sticky top-0 z-[200] transition-colors duration-300">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="hover:opacity-80 transition-opacity">
-            <h1 className="font-black text-2xl italic tracking-tighter">
-              CWNU PORTAL <span className="text-red-400 px-2">V5_super_4.0</span>
+        
+        {/* 좌측 로고 영역 */}
+        <div className="flex items-center gap-2 md:gap-4 min-w-0">
+          <Link to="/" className="hover:opacity-80 transition-opacity flex-shrink-0">
+            {/* 📱 모바일: 글씨 축소(text-lg), 줄바꿈 방지(whitespace-nowrap) / PC: text-2xl */}
+            <h1 className="font-black text-lg md:text-2xl italic tracking-tighter whitespace-nowrap">
+              CWNU PORTAL <span className="text-red-400 px-1 md:px-2 text-xs md:text-base align-baseline">V5_super_4.0</span>
             </h1>
           </Link>
+          {/* PC 전용 우측 부가 설명 (모바일 자동 숨김 유지 - hidden lg:flex) */}
           <div className="hidden lg:flex items-center gap-4 border-l border-blue-800 ml-4 pl-4">
             <div className="text-[10px] font-bold text-blue-300 uppercase tracking-widest leading-none">
               Software Engineering<br/>Project 2026
@@ -32,18 +36,27 @@ function Navbar({ isDarkMode, toggleDarkMode }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* 우측 메뉴 영역 */}
+        <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
           {!isMain && (
-            <div className="flex gap-6 font-black text-sm items-center mr-2">
-              <Link to="/market" className="hover:text-blue-300 transition-colors flex items-center gap-1">🏪 <span className="hidden sm:inline">창원대 장터 ↗</span></Link>
-              <Link to="/todo" className="hover:text-blue-300 transition-colors flex items-center gap-1">📝 <span className="hidden sm:inline">ToDo 리스트 ↗</span></Link>
-              <Link to="/gpa" className="hover:text-blue-300 transition-colors flex items-center gap-1">🎓 <span className="hidden sm:inline">학점계산기 ↗</span></Link>
+            // 📱 모바일: 메뉴 간격 축소(gap-3) / PC: gap-6
+            <div className="flex gap-3 md:gap-6 font-black text-xs md:text-sm items-center mr-1 md:mr-2">
+              <Link to="/market" className="hover:text-blue-300 transition-colors flex items-center gap-1">
+                {/* 📱 모바일: 터치를 위해 이모지 아이콘 확대(text-xl) */}
+                <span className="text-xl md:text-base">🏪</span> <span className="hidden sm:inline">창원대 장터 ↗</span>
+              </Link>
+              <Link to="/todo" className="hover:text-blue-300 transition-colors flex items-center gap-1">
+                <span className="text-xl md:text-base">📝</span> <span className="hidden sm:inline">ToDo 리스트 ↗</span>
+              </Link>
+              <Link to="/gpa" className="hover:text-blue-300 transition-colors flex items-center gap-1">
+                <span className="text-xl md:text-base">🎓</span> <span className="hidden sm:inline">학점계산기 ↗</span>
+              </Link>
             </div>
           )}
-          {/*  3단계: 다크모드 토글 버튼 (어느 페이지에서든 보이도록 우측 끝에 배치) */}
+          {/* 📱 모바일: 버튼 여백 살짝 조절 */}
           <button
             onClick={toggleDarkMode}
-            className="p-2 rounded-full bg-blue-800/50 hover:bg-blue-700 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-300 border border-blue-700/50 dark:border-gray-600"
+            className="p-1.5 md:p-2 rounded-full bg-blue-800/50 hover:bg-blue-700 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors duration-300 border border-blue-700/50 dark:border-gray-600 text-sm md:text-base flex-shrink-0"
             title="다크모드 토글"
           >
             {isDarkMode ? '🌙' : '☀️'}
@@ -55,7 +68,6 @@ function Navbar({ isDarkMode, toggleDarkMode }) {
 }
 
 function App() {
-  // 🚀 2단계: 다크모드 상태 관리 및 <html> 태그에 'dark' 클래스 탈부착
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -68,7 +80,7 @@ function App() {
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-  // 기존 타이머 로직
+  // 기존 타이머 로직 (원형 그대로 유지)
   const [timerMode, setTimerMode] = useState('timer');
   const [timerTime, setTimerTime] = useState(0);
   const [timerIsRunning, setTimerIsRunning] = useState(false);
@@ -93,10 +105,7 @@ function App() {
 
   return (
     <Router>
-      {/* 
-       4단계: 최상위 div에 다크모드 배경색(dark:bg-gray-900)과 글자색(dark:text-white) 적용 */}
       <div className="min-h-screen bg-slate-50 dark:bg-gray-900 text-black dark:text-white transition-colors duration-300 flex flex-col">
-        {/* Navbar에 상태와 함수 전달 */}
         <Navbar isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         <div className="flex-grow">
           <Routes>

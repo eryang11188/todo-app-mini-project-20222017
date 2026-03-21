@@ -1,4 +1,3 @@
-// src/pages/TodoPage.jsx 전체 복사
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
@@ -117,7 +116,8 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
   const isTimerUrgent = timerMode === 'timer' && timerTime > 0 && timerTime <= 1800000 && isAlertEnabled;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 flex flex-col min-h-screen relative text-gray-900 dark:text-gray-100 transition-colors">
+    // 📱 모바일: p-4 / PC: p-6
+    <div className="max-w-4xl mx-auto p-4 md:p-6 flex flex-col min-h-screen relative text-gray-900 dark:text-gray-100 transition-colors">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nanum+Pen+Script&display=swap');
         .font-cursive-custom { font-family: 'Caveat', 'Nanum Pen Script', cursive; letter-spacing: 0.05em; }
@@ -129,142 +129,153 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
       `}</style>
 
       {tourIndex >= 0 && (
-        <div className="fixed z-[100] bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl border-[3px] border-indigo-400 dark:border-indigo-500 w-[350px] bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
+        <div className="fixed z-[100] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-indigo-400 dark:border-indigo-500 w-[90%] md:w-[350px] bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
           <h3 className="text-indigo-600 dark:text-indigo-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{TOUR_STEPS.length})</h3>
-          <h2 className="text-xl font-black mb-3 dark:text-white">{TOUR_STEPS[tourIndex].title}</h2>
-          <p className="text-gray-600 dark:text-gray-300 text-sm font-bold mb-5">{TOUR_STEPS[tourIndex].desc}</p>
-          <div className="flex justify-between gap-2"><button onClick={() => setTourIndex(-1)} className="px-3 py-1 text-gray-400 dark:text-gray-500 font-bold text-xs hover:text-gray-600 dark:hover:text-gray-300">건너뛰기</button><button onClick={() => setTourIndex(p => p+1 >= TOUR_STEPS.length ? -1 : p+1)} className="bg-indigo-600 dark:bg-indigo-500 text-white px-5 py-2 rounded-xl font-black text-xs shadow-md hover:bg-indigo-700 transition">{tourIndex === TOUR_STEPS.length - 1 ? "투어 종료 🎉" : "다음 보기 ▶"}</button></div>
+          <h2 className="text-lg md:text-xl font-black mb-2 md:mb-3 dark:text-white">{TOUR_STEPS[tourIndex].title}</h2>
+          <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm font-bold mb-4 md:mb-5">{TOUR_STEPS[tourIndex].desc}</p>
+          <div className="flex justify-between gap-2"><button onClick={() => setTourIndex(-1)} className="px-3 py-1 text-gray-400 dark:text-gray-500 font-bold text-xs hover:text-gray-600 dark:hover:text-gray-300">건너뛰기</button><button onClick={() => setTourIndex(p => p+1 >= TOUR_STEPS.length ? -1 : p+1)} className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 md:px-5 py-2 rounded-xl font-black text-xs shadow-md hover:bg-indigo-700 transition">{tourIndex === TOUR_STEPS.length - 1 ? "투어 종료 🎉" : "다음 보기 ▶"}</button></div>
         </div>
       )}
 
       {showVersionInfo && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2rem] max-w-3xl w-full shadow-2xl transform transition-all border-4 border-indigo-50 dark:border-gray-700 max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
+          <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-[2rem] max-w-3xl w-full shadow-2xl transform transition-all border-4 border-indigo-50 dark:border-gray-700 max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
             {showModalConfetti && <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center"><span className="emoji-burst text-6xl">🎉</span></div>}
-            <h3 className="text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 text-center">🚀 Todo V5_super_4.0 ver 업데이트 내역</h3>
-            <p className="text-center text-gray-500 dark:text-gray-400 font-bold mb-8 text-xs">25년 2학기 웹프로그래밍 과목 기말대체 과제 `todos_v4`의 최종 진화형!</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 mt-6">
-              <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-600 text-center text-xs dark:text-gray-300">❌ 이전: 타이머 및 스톱워치 부재</div>
-              <div className="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-3xl border-2 border-indigo-200 dark:border-indigo-800 shadow-inner text-center text-xs font-black dark:text-indigo-300">✅ 현재: 30분 전 알람 및 실시간 카운트다운</div>
+            <h3 className="text-2xl md:text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 text-center">🚀 Todo V5_super_4.0 ver 업데이트 내역</h3>
+            <p className="text-center text-gray-500 dark:text-gray-400 font-bold mb-6 md:mb-8 text-[10px] md:text-xs">25년 2학기 웹프로그래밍 과목 기말대체 과제 `todos_v4`의 최종 진화형!</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 md:mb-8 mt-4 md:mt-6">
+              <div className="bg-gray-50 dark:bg-gray-700 p-5 md:p-6 rounded-2xl md:rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-600 text-center text-xs dark:text-gray-300">❌ 이전: 타이머 및 스톱워치 부재</div>
+              <div className="bg-indigo-50 dark:bg-indigo-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border-2 border-indigo-200 dark:border-indigo-800 shadow-inner text-center text-xs font-black dark:text-indigo-300">✅ 현재: 30분 전 알람 및 실시간 카운트다운</div>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-3xl border border-gray-100 dark:border-gray-600 mb-8"><h4 className="text-xl font-black text-gray-800 dark:text-white mb-4 text-center flex items-center justify-center gap-3">🛠️ CWNU PORTAL V5 발전 과정</h4>
-            <div className="space-y-4 text-sm font-medium text-gray-600 dark:text-gray-300">
-              <p>• <span className="text-indigo-600 dark:text-indigo-400 font-black">V1.0:</span> 투두 CRUD 및 서버 연동</p>
-              <p>• <span className="text-indigo-600 dark:text-indigo-400 font-black">V2.0:</span> 중고마켓 서비스 추가</p>
-            <p>• <span className="text-indigo-600 dark:text-indigo-400 font-black">V3.0:</span> 학점계산기 통합 및 데이터 시각화</p>
-            <p>• <span className="text-indigo-600 dark:text-indigo-400 font-black">V4.0:</span> [공통] 다크모드 기능 추가!</p>
-            </div></div>
-            <button onClick={() => setShowVersionInfo(false)} className="w-full bg-gray-900 dark:bg-gray-700 text-white py-4 rounded-xl font-black text-lg hover:bg-black dark:hover:bg-gray-600 transition">확인 완료!</button>
+            <button onClick={() => setShowVersionInfo(false)} className="w-full bg-gray-900 dark:bg-gray-700 text-white py-3 md:py-4 rounded-xl font-black text-base md:text-lg hover:bg-black dark:hover:bg-gray-600 transition">확인 완료!</button>
           </div>
         </div>
       )}
 
       <div className="flex-grow">
-        <div id="tour-header" className="text-center mb-6 relative">
-          <button onClick={() => setTourIndex(0)} className="absolute top-0 right-0 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400 px-4 py-2 rounded-full font-black text-xs animate-pulse">💡 가이드 시작</button>
-          <h2 className="text-5xl font-black text-[#002f6c] dark:text-blue-300 mb-3 tracking-tighter flex justify-center items-center cursor-pointer">
-            CWNU TODO <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 dark:from-red-400 dark:to-red-500 animate-[pulse_1.5s_ease-in-out_infinite] hover:-skew-x-12 transition-transform duration-300 italic drop-shadow-lg text-4xl">V5_super_4.0</span>
+        <div id="tour-header" className="text-center mb-6 relative mt-4 md:mt-0">
+          <button onClick={() => setTourIndex(0)} className="absolute -top-4 md:top-0 right-0 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-black text-[10px] md:text-xs animate-pulse">💡 가이드 시작</button>
+          {/* 📱 모바일: text-4xl / PC: text-5xl */}
+          <h2 className="text-4xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 mb-2 md:mb-3 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
+            CWNU TODO <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 dark:from-red-400 dark:to-red-500 animate-[pulse_1.5s_ease-in-out_infinite] hover:-skew-x-12 transition-transform duration-300 italic drop-shadow-lg text-2xl md:text-4xl">V5_super_4.0</span>
           </h2>
-          <p className="text-gray-400 dark:text-gray-500 font-bold text-xs mb-3 cursor-pointer hover:text-indigo-400 transition" onClick={() => setShowVersionInfo(true)}>(업데이트 내역을 보려면 V5를 클릭하세요!)</p>
+          <p className="text-gray-400 dark:text-gray-500 font-bold text-[10px] md:text-xs mb-3 cursor-pointer hover:text-indigo-400 transition" onClick={() => setShowVersionInfo(true)}>(업데이트 내역을 보려면 V5를 클릭하세요!)</p>
         </div>
 
-        <div id="tour-timer" className="bg-[#111] dark:bg-gray-950 text-white p-10 rounded-[4rem] mb-12 shadow-2xl border-b-[12px] border-indigo-900 dark:border-indigo-800 text-center relative mt-8">
+        {/* 📱 타이머 영역 패딩 축소: p-6 */}
+        <div id="tour-timer" className="bg-[#111] dark:bg-gray-950 text-white p-6 md:p-10 rounded-3xl md:rounded-[4rem] mb-8 md:mb-12 shadow-2xl border-b-[8px] md:border-b-[12px] border-indigo-900 dark:border-indigo-800 text-center relative mt-6 md:mt-8">
           {timerMode === 'timer' && (
-            <div id="tour-timer-alert" className="absolute top-8 right-10 flex items-center gap-2 bg-gray-900 p-2 rounded-xl border border-gray-700 z-10">
-              <span className={`text-[10px] font-black uppercase tracking-wider ${isAlertEnabled ? 'text-red-400' : 'text-gray-500'}`}>30분 전 알람</span>
-              <label className="relative inline-flex items-center cursor-pointer"><input type="checkbox" className="sr-only peer" checked={isAlertEnabled} onChange={()=>setIsAlertEnabled(!isAlertEnabled)} /><div className="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-red-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+            <div id="tour-timer-alert" className="absolute top-4 right-4 md:top-8 md:right-10 flex items-center gap-1 md:gap-2 bg-gray-900 p-1.5 md:p-2 rounded-lg md:rounded-xl border border-gray-700 z-10">
+              <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-wider hidden sm:inline ${isAlertEnabled ? 'text-red-400' : 'text-gray-500'}`}>30분 전 알람</span>
+              <label className="relative inline-flex items-center cursor-pointer"><input type="checkbox" className="sr-only peer" checked={isAlertEnabled} onChange={()=>setIsAlertEnabled(!isAlertEnabled)} /><div className="w-7 md:w-9 h-4 md:h-5 bg-gray-700 rounded-full peer peer-checked:bg-red-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 md:after:h-4 after:w-3 md:after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
             </div>
           )}
-          <div className="flex justify-center gap-4 mb-6">
-            <button onClick={()=>{setTimerMode('timer'); setTimerTime(0); setTimerIsRunning(false)}} className={`px-5 py-1.5 rounded-full text-[10px] font-black transition-all ${timerMode==='timer'?'bg-blue-600 shadow-lg shadow-blue-500/50':'bg-gray-800 text-gray-500'}`}>집중 타이머</button>
-            <button onClick={()=>{setTimerMode('stopwatch'); setTimerTime(0); setTimerIsRunning(false)}} className={`px-5 py-1.5 rounded-full text-[10px] font-black transition-all ${timerMode==='stopwatch'?'bg-indigo-600 shadow-lg shadow-indigo-500/50':'bg-gray-800 text-gray-500'}`}>스톱워치</button>
+          <div className="flex justify-center gap-3 md:gap-4 mb-4 md:mb-6 mt-4 sm:mt-0">
+            <button onClick={()=>{setTimerMode('timer'); setTimerTime(0); setTimerIsRunning(false)}} className={`px-4 py-1.5 md:px-5 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black transition-all ${timerMode==='timer'?'bg-blue-600 shadow-lg shadow-blue-500/50':'bg-gray-800 text-gray-500'}`}>집중 타이머</button>
+            <button onClick={()=>{setTimerMode('stopwatch'); setTimerTime(0); setTimerIsRunning(false)}} className={`px-4 py-1.5 md:px-5 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black transition-all ${timerMode==='stopwatch'?'bg-indigo-600 shadow-lg shadow-indigo-500/50':'bg-gray-800 text-gray-500'}`}>스톱워치</button>
           </div>
-          <div className={`text-7xl font-black mb-10 font-mono tracking-tighter ${isTimerUrgent ? 'animate-[pulse_1s_ease-in-out_infinite] text-red-500' : ''}`}>{formatTime(timerTime)}</div>
+          {/* 📱 타이머 텍스트 축소: text-5xl */}
+          <div className={`text-5xl md:text-7xl font-black mb-6 md:mb-10 font-mono tracking-tighter ${isTimerUrgent ? 'animate-[pulse_1s_ease-in-out_infinite] text-red-500' : ''}`}>{formatTime(timerTime)}</div>
           {timerMode === 'timer' && !timerIsRunning && (
-            <div className="flex justify-center gap-3 mb-8">
-              <input type="number" placeholder="H" value={inputs.h} onChange={e=>setInputs({...inputs, h: e.target.value})} className="w-16 p-3 rounded-2xl bg-gray-900 text-white font-bold text-center outline-none focus:ring-2 ring-blue-500"/><input type="number" placeholder="M" value={inputs.m} onChange={e=>setInputs({...inputs, m: e.target.value})} className="w-16 p-3 rounded-2xl bg-gray-900 text-white font-bold text-center outline-none focus:ring-2 ring-blue-500"/><input type="number" placeholder="S" value={inputs.s} onChange={e=>setInputs({...inputs, s: e.target.value})} className="w-16 p-3 rounded-2xl bg-gray-900 text-white font-bold text-center outline-none focus:ring-2 ring-blue-500"/><button onClick={()=>{ const hour = parseInt(inputs.h || 0); const min = parseInt(inputs.m || 0); const sec = parseInt(inputs.s || 0); setTimerTime((hour*3600 + min*60 + sec)*1000); setTimerIsRunning(false); }} className="bg-blue-600 px-5 rounded-2xl font-black text-xs hover:bg-blue-500 transition shadow-xl">SET</button>
+            <div className="flex justify-center gap-2 md:gap-3 mb-6 md:mb-8">
+              <input type="number" placeholder="H" value={inputs.h} onChange={e=>setInputs({...inputs, h: e.target.value})} className="w-12 md:w-16 p-2 md:p-3 rounded-xl md:rounded-2xl bg-gray-900 text-white font-bold text-center text-sm md:text-base outline-none focus:ring-2 ring-blue-500"/>
+              <input type="number" placeholder="M" value={inputs.m} onChange={e=>setInputs({...inputs, m: e.target.value})} className="w-12 md:w-16 p-2 md:p-3 rounded-xl md:rounded-2xl bg-gray-900 text-white font-bold text-center text-sm md:text-base outline-none focus:ring-2 ring-blue-500"/>
+              <input type="number" placeholder="S" value={inputs.s} onChange={e=>setInputs({...inputs, s: e.target.value})} className="w-12 md:w-16 p-2 md:p-3 rounded-xl md:rounded-2xl bg-gray-900 text-white font-bold text-center text-sm md:text-base outline-none focus:ring-2 ring-blue-500"/>
+              <button onClick={()=>{ const hour = parseInt(inputs.h || 0); const min = parseInt(inputs.m || 0); const sec = parseInt(inputs.s || 0); setTimerTime((hour*3600 + min*60 + sec)*1000); setTimerIsRunning(false); }} className="bg-blue-600 px-3 md:px-5 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs hover:bg-blue-500 transition shadow-xl">SET</button>
             </div>
           )}
-          <div className="flex justify-center gap-4">
-            <button onClick={()=>setTimerIsRunning(!timerIsRunning)} className={`px-12 py-4 rounded-full font-black text-lg transition-all ${timerIsRunning?'bg-gray-800 text-gray-400':'bg-white text-black hover:scale-105 active:scale-95'}`}>{timerIsRunning?'PAUSE':'START'}</button>
-            <button onClick={()=>{setTimerIsRunning(false); setTimerTime(0); setInputs({h:'',m:'',s:''})}} className="border-2 border-gray-800 px-12 py-4 rounded-full font-black text-lg text-gray-600 hover:border-gray-600 transition-colors">RESET</button>
+          <div className="flex justify-center gap-3 md:gap-4">
+            <button onClick={()=>setTimerIsRunning(!timerIsRunning)} className={`px-8 py-3 md:px-12 md:py-4 rounded-full font-black text-sm md:text-lg transition-all ${timerIsRunning?'bg-gray-800 text-gray-400':'bg-white text-black hover:scale-105 active:scale-95'}`}>{timerIsRunning?'PAUSE':'START'}</button>
+            <button onClick={()=>{setTimerIsRunning(false); setTimerTime(0); setInputs({h:'',m:'',s:''})}} className="border-2 border-gray-800 px-8 py-3 md:px-12 md:py-4 rounded-full font-black text-sm md:text-lg text-gray-600 hover:border-gray-600 transition-colors">RESET</button>
           </div>
         </div>
 
-        <div className="text-center mb-10">
-          <h2 className="text-[2.5rem] py-2 font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-indigo-800 to-black dark:from-white dark:via-indigo-300 dark:to-gray-300 mb-8 tracking-tighter drop-shadow-sm flex justify-center items-center relative">
+        {/* 📱 명언 영역 글씨 축소 */}
+        <div className="text-center mb-8 md:mb-10">
+          <h2 className="text-xl md:text-[2.5rem] py-2 font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-indigo-800 to-black dark:from-white dark:via-indigo-300 dark:to-gray-300 mb-6 md:mb-8 tracking-tighter drop-shadow-sm flex justify-center items-center relative">
              <span key={TITLE_MENTIONS[titleMentionIndex]} className="inline-block animate-submit-text-fade">{TITLE_MENTIONS[titleMentionIndex]}</span>
           </h2>
-          <div className="flex flex-col items-center p-10 rounded-[3rem] border-2 border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800 dark:to-gray-900 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-none relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100/50 dark:bg-indigo-900/30 rounded-bl-full opacity-50"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-100/50 dark:bg-purple-900/30 rounded-tr-full opacity-50"></div>
-            <p className="text-[2.5rem] py-2 font-cursive-custom font-black mb-5 drop-shadow-md text-center px-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 dark:from-pink-400 dark:via-purple-400 dark:to-indigo-400">"{quote.en}"</p>
-            <p className="text-3xl font-korean-cursive text-gray-700 dark:text-gray-200 font-bold bg-white/80 dark:bg-gray-800/80 px-8 py-3 rounded-full shadow-sm border border-gray-100 dark:border-gray-700">{quote.ko}</p>
-            <button onClick={handleRandomize} className="mt-8 text-[11px] bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-300 px-6 py-2.5 rounded-full font-black hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-sm transition-all hover:scale-105 z-10 uppercase tracking-widest">🔄 New Quote</button>
+          <div className="flex flex-col items-center p-6 md:p-10 rounded-3xl md:rounded-[3rem] border-2 border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800 dark:to-gray-900 shadow-[0_10px_30px_rgba(0,0,0,0.03)] dark:shadow-none relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-indigo-100/50 dark:bg-indigo-900/30 rounded-bl-full opacity-50"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 md:w-24 md:h-24 bg-purple-100/50 dark:bg-purple-900/30 rounded-tr-full opacity-50"></div>
+            <p className="text-2xl md:text-[2.5rem] py-2 font-cursive-custom font-black mb-4 md:mb-5 drop-shadow-md text-center px-2 md:px-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 dark:from-pink-400 dark:via-purple-400 dark:to-indigo-400">"{quote.en}"</p>
+            <p className="text-xl md:text-3xl font-korean-cursive text-gray-700 dark:text-gray-200 font-bold bg-white/80 dark:bg-gray-800/80 px-6 py-2 md:px-8 md:py-3 rounded-full shadow-sm border border-gray-100 dark:border-gray-700">{quote.ko}</p>
+            <button onClick={handleRandomize} className="mt-6 md:mt-8 text-[10px] md:text-[11px] bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-300 px-5 py-2 md:px-6 md:py-2.5 rounded-full font-black hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-sm transition-all hover:scale-105 z-10 uppercase tracking-widest">🔄 New Quote</button>
           </div>
         </div>
 
-        <form id="tour-add" onSubmit={addTodo} className="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 flex flex-wrap gap-3 mb-6 relative overflow-hidden">
-          <select value={importance} onChange={e=>setImportance(e.target.value)} className="bg-gray-50 dark:bg-gray-700 dark:text-white px-5 rounded-2xl font-black text-sm outline-none border border-gray-100 dark:border-gray-600 z-10"><option>긴급</option><option>보통</option><option>낮음</option></select>
-          <input placeholder={PLACEHOLDERS[placeholderIndex]} value={title} onChange={e=>setTitle(e.target.value)} className="flex-grow p-3 outline-none bg-transparent font-bold text-gray-800 dark:text-white dark:placeholder-gray-400 text-lg z-10"/>
-          <input type="datetime-local" value={todoDeadline} onChange={e=>setTodoDeadline(e.target.value)} className="w-56 p-3 bg-gray-50 dark:bg-gray-700 rounded-2xl text-xs font-black cursor-pointer text-gray-600 dark:text-gray-300 dark:[color-scheme:dark] z-10"/>
-          <button className="bg-indigo-900 dark:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition shadow-lg z-10">추가하기</button>
+        {/* 📱 입력 폼: 모바일에서는 요소들을 w-full로 꽉 차게 세로로 나열 */}
+        <form id="tour-add" onSubmit={addTodo} className="bg-white dark:bg-gray-800 p-4 md:p-4 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row flex-wrap gap-3 mb-6 relative overflow-hidden">
+          <select value={importance} onChange={e=>setImportance(e.target.value)} className="w-full md:w-auto bg-gray-50 dark:bg-gray-700 dark:text-white p-3 md:px-5 rounded-2xl font-black text-sm outline-none border border-gray-100 dark:border-gray-600 z-10"><option>긴급</option><option>보통</option><option>낮음</option></select>
+          <input placeholder={PLACEHOLDERS[placeholderIndex]} value={title} onChange={e=>setTitle(e.target.value)} className="w-full md:w-auto flex-grow p-3 outline-none bg-transparent font-bold text-gray-800 dark:text-white dark:placeholder-gray-400 text-base md:text-lg z-10 border border-gray-100 dark:border-gray-600 md:border-none rounded-2xl md:rounded-none"/>
+          <input type="datetime-local" value={todoDeadline} onChange={e=>setTodoDeadline(e.target.value)} className="w-full md:w-56 p-3 bg-gray-50 dark:bg-gray-700 rounded-2xl text-xs font-black cursor-pointer text-gray-600 dark:text-gray-300 dark:[color-scheme:dark] z-10 border border-gray-100 dark:border-gray-600 md:border-none"/>
+          <button className="w-full md:w-auto bg-indigo-900 dark:bg-indigo-700 text-white px-6 py-3 md:px-10 md:py-4 rounded-2xl font-black text-base md:text-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition shadow-lg z-10">추가하기</button>
         </form>
 
         <div className="flex justify-end mb-6">
           <div id="tour-list-buttons" className="flex gap-2 bg-white/50 dark:bg-gray-800/50 p-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
-            <button onClick={() => setViewType('list')} className={`px-5 py-2 rounded-full text-xs font-black transition-all shadow-sm ${viewType==='list'?'bg-indigo-900 dark:bg-indigo-600 text-white':'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400'}`}>LIST</button>
-            <button onClick={() => setViewType('grid')} className={`px-5 py-2 rounded-full text-xs font-black transition-all shadow-sm ${viewType==='grid'?'bg-indigo-900 dark:bg-indigo-600 text-white':'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400'}`}>GRID</button>
-            <button onClick={() => setViewType('table')} className={`px-5 py-2 rounded-full text-xs font-black transition-all shadow-sm ${viewType==='table'?'bg-indigo-900 dark:bg-indigo-600 text-white':'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400'}`}>TABLE</button>
+            <button onClick={() => setViewType('list')} className={`px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black transition-all shadow-sm ${viewType==='list'?'bg-indigo-900 dark:bg-indigo-600 text-white':'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400'}`}>LIST</button>
+            <button onClick={() => setViewType('grid')} className={`px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black transition-all shadow-sm ${viewType==='grid'?'bg-indigo-900 dark:bg-indigo-600 text-white':'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400'}`}>GRID</button>
+            <button onClick={() => setViewType('table')} className={`px-4 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-black transition-all shadow-sm ${viewType==='table'?'bg-indigo-900 dark:bg-indigo-600 text-white':'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400'}`}>TABLE</button>
           </div>
         </div>
 
         <div className="transition-all">
           {viewType === 'table' ? (
-            <div className="bg-white dark:bg-gray-800 rounded-[2rem] shadow-xl overflow-hidden border-2 border-gray-100 dark:border-gray-700 mb-8 w-full"><table className="w-full text-center"><thead className="bg-[#111] dark:bg-gray-950 text-white text-sm font-bold uppercase tracking-widest"><tr><th className="p-5">우선순위</th><th className="p-5 text-left">미션명</th><th className="p-5">남은 시간</th><th className="p-5">관리</th></tr></thead><tbody>
-              {currentTodos.map(todo => { 
-                const remain = getRemainingTime(todo.todoDeadline); 
-                return ( 
-                <tr key={todo._id} className="border-b dark:border-gray-700 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/30 transition-colors"> 
-                  {editingId === todo._id ? (
-                    <td colSpan="4" className="p-4 bg-indigo-50/50 dark:bg-indigo-900/30">
-                      <div className="flex gap-2 items-center">
-                        <select value={editForm.importance} onChange={e=>setEditForm({...editForm, importance: e.target.value})} className="p-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-bold text-xs"><option>긴급</option><option>보통</option><option>낮음</option></select>
-                        <input value={editForm.title} onChange={e=>setEditForm({...editForm, title: e.target.value})} className="flex-grow p-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-bold text-sm outline-none"/>
-                        <input type="datetime-local" value={editForm.todoDeadline} onChange={e=>setEditForm({...editForm, todoDeadline: e.target.value})} className="p-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl text-xs font-bold outline-none dark:[color-scheme:dark]"/>
-                        <button onClick={() => saveEditTodo(todo._id)} className="bg-green-500 text-white px-4 py-2 rounded-xl font-black text-xs hover:bg-green-600 transition">저장</button>
-                        <button onClick={() => setEditingId(null)} className="bg-gray-400 text-white px-4 py-2 rounded-xl font-black text-xs hover:bg-gray-500 transition">취소</button>
-                      </div>
-                    </td>
-                  ) : (
-                    <>
-                      <td className="p-5"><span className={`px-3 py-1.5 rounded-full text-[10px] font-black text-white shadow-sm ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400 text-gray-900':'bg-green-500'}`}>{todo.importance}</span></td> 
-                      <td className="p-5 text-left font-black text-gray-800 dark:text-gray-100 text-lg">{todo.title}</td> 
-                      <td className="p-5 text-xs font-black text-indigo-600 dark:text-indigo-400">{remain === "EXPIRED" ? "💀 기한만료" : remain ? `${remain.days}일 ${String(remain.hours).padStart(2,'0')}:${String(remain.mins).padStart(2,'0')}:${String(remain.secs).padStart(2,'0')}.${String(remain.ms).padStart(2,'0')}` : "-"}</td> 
-                      <td className="p-5 flex justify-center gap-2"><button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="text-[10px] font-black uppercase text-indigo-400 hover:text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 rounded-full transition">Edit</button><button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="text-[10px] font-black uppercase text-red-400 hover:text-white hover:bg-red-500 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 rounded-full transition">Del</button></td> 
-                    </>
-                  )}
-                </tr> 
-              )})}
-            </tbody></table></div>
+            // 📱 테이블 모바일 스와이프: overflow-x-auto
+            <div className="bg-white dark:bg-gray-800 rounded-3xl md:rounded-[2rem] shadow-xl overflow-x-auto border-2 border-gray-100 dark:border-gray-700 mb-8 w-full">
+              <table className="w-full text-center min-w-[500px] md:min-w-full">
+                <thead className="bg-[#111] dark:bg-gray-950 text-white text-xs md:text-sm font-bold uppercase tracking-widest"><tr><th className="p-3 md:p-5">우선순위</th><th className="p-3 md:p-5 text-left">미션명</th><th className="p-3 md:p-5">남은 시간</th><th className="p-3 md:p-5">관리</th></tr></thead>
+                <tbody>
+                {currentTodos.map(todo => { 
+                  const remain = getRemainingTime(todo.todoDeadline); 
+                  return ( 
+                  <tr key={todo._id} className="border-b dark:border-gray-700 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/30 transition-colors"> 
+                    {editingId === todo._id ? (
+                      <td colSpan="4" className="p-3 md:p-4 bg-indigo-50/50 dark:bg-indigo-900/30">
+                        <div className="flex flex-col sm:flex-row gap-2 items-center">
+                          <select value={editForm.importance} onChange={e=>setEditForm({...editForm, importance: e.target.value})} className="w-full sm:w-auto p-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-bold text-xs"><option>긴급</option><option>보통</option><option>낮음</option></select>
+                          <input value={editForm.title} onChange={e=>setEditForm({...editForm, title: e.target.value})} className="w-full sm:flex-grow p-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-bold text-sm outline-none"/>
+                          <input type="datetime-local" value={editForm.todoDeadline} onChange={e=>setEditForm({...editForm, todoDeadline: e.target.value})} className="w-full sm:w-auto p-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl text-xs font-bold outline-none dark:[color-scheme:dark]"/>
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <button onClick={() => saveEditTodo(todo._id)} className="flex-1 sm:flex-none bg-green-500 text-white px-4 py-2 rounded-xl font-black text-xs hover:bg-green-600 transition">저장</button>
+                            <button onClick={() => setEditingId(null)} className="flex-1 sm:flex-none bg-gray-400 text-white px-4 py-2 rounded-xl font-black text-xs hover:bg-gray-500 transition">취소</button>
+                          </div>
+                        </div>
+                      </td>
+                    ) : (
+                      <>
+                        <td className="p-3 md:p-5"><span className={`px-2 py-1 md:px-3 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black text-white shadow-sm ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400 text-gray-900':'bg-green-500'}`}>{todo.importance}</span></td> 
+                        <td className="p-3 md:p-5 text-left font-black text-gray-800 dark:text-gray-100 text-sm md:text-lg">{todo.title}</td> 
+                        <td className="p-3 md:p-5 text-[10px] md:text-xs font-black text-indigo-600 dark:text-indigo-400 whitespace-nowrap">{remain === "EXPIRED" ? "💀 기한만료" : remain ? `${remain.days}일 ${String(remain.hours).padStart(2,'0')}:${String(remain.mins).padStart(2,'0')}:${String(remain.secs).padStart(2,'0')}.${String(remain.ms).padStart(2,'0')}` : "-"}</td> 
+                        <td className="p-3 md:p-5 flex justify-center gap-1.5 md:gap-2">
+                          <button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="text-[9px] md:text-[10px] font-black uppercase text-indigo-400 hover:text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full transition">Edit</button>
+                          <button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="text-[9px] md:text-[10px] font-black uppercase text-red-400 hover:text-white hover:bg-red-500 bg-red-50 dark:bg-red-900/30 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full transition">Del</button>
+                        </td> 
+                      </>
+                    )}
+                  </tr> 
+                )})}
+              </tbody></table></div>
           ) : (
-            <div className={viewType === 'list' ? "space-y-4 mb-8" : "grid grid-cols-2 gap-5 mb-8"}>
+            // 📱 그리드 뷰 모바일 1줄 세우기: grid-cols-1 md:grid-cols-2
+            <div className={viewType === 'list' ? "space-y-3 md:space-y-4 mb-8" : "grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-8"}>
               {currentTodos.map(todo => { 
                 const remain = getRemainingTime(todo.todoDeadline); 
                 return ( 
-                <div key={todo._id} className="bg-white dark:bg-gray-800 p-7 rounded-[2.5rem] shadow-md border border-gray-100 dark:border-gray-700 flex flex-col group transition-all hover:-translate-y-1 hover:shadow-xl"> 
+                <div key={todo._id} className="bg-white dark:bg-gray-800 p-5 md:p-7 rounded-3xl md:rounded-[2.5rem] shadow-md border border-gray-100 dark:border-gray-700 flex flex-col group transition-all hover:-translate-y-1 hover:shadow-xl"> 
                   {editingId === todo._id ? (
-                    <div className="flex flex-col gap-3">
-                      <select value={editForm.importance} onChange={e=>setEditForm({...editForm, importance: e.target.value})} className="p-3 border-2 border-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-bold text-sm outline-none"><option>긴급</option><option>보통</option><option>낮음</option></select>
-                      <input value={editForm.title} onChange={e=>setEditForm({...editForm, title: e.target.value})} className="p-3 border-2 border-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-black text-gray-800 outline-none"/>
-                      <input type="datetime-local" value={editForm.todoDeadline} onChange={e=>setEditForm({...editForm, todoDeadline: e.target.value})} className="p-3 border-2 border-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl text-xs font-bold text-gray-600 outline-none dark:[color-scheme:dark]"/>
-                      <div className="flex gap-2"><button onClick={() => saveEditTodo(todo._id)} className="bg-green-500 text-white flex-grow py-2.5 rounded-xl font-black text-xs shadow-md hover:bg-green-600 transition">저장</button><button onClick={() => setEditingId(null)} className="bg-gray-400 text-white flex-grow py-2.5 rounded-xl font-black text-xs shadow-md hover:bg-gray-500 transition">취소</button></div>
+                    <div className="flex flex-col gap-2 md:gap-3">
+                      <select value={editForm.importance} onChange={e=>setEditForm({...editForm, importance: e.target.value})} className="p-2 md:p-3 border-2 border-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-bold text-xs md:text-sm outline-none"><option>긴급</option><option>보통</option><option>낮음</option></select>
+                      <input value={editForm.title} onChange={e=>setEditForm({...editForm, title: e.target.value})} className="p-2 md:p-3 border-2 border-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl font-black text-gray-800 outline-none text-sm md:text-base"/>
+                      <input type="datetime-local" value={editForm.todoDeadline} onChange={e=>setEditForm({...editForm, todoDeadline: e.target.value})} className="p-2 md:p-3 border-2 border-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl text-[10px] md:text-xs font-bold text-gray-600 outline-none dark:[color-scheme:dark]"/>
+                      <div className="flex gap-2"><button onClick={() => saveEditTodo(todo._id)} className="bg-green-500 text-white flex-grow py-2 md:py-2.5 rounded-xl font-black text-[10px] md:text-xs shadow-md hover:bg-green-600 transition">저장</button><button onClick={() => setEditingId(null)} className="bg-gray-400 text-white flex-grow py-2 md:py-2.5 rounded-xl font-black text-[10px] md:text-xs shadow-md hover:bg-gray-500 transition">취소</button></div>
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center gap-3 w-full"><span className={`min-w-[12px] h-3 rounded-full shadow-inner ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400':'bg-green-500'}`}></span><span className="font-black text-gray-800 dark:text-gray-100 text-xl truncate">{todo.title}</span></div> 
-                      {remain && <div className={`text-[10px] font-black ml-6 mt-1 bg-gray-50 dark:bg-gray-700 inline-block px-3 py-1 rounded-lg border ${remain === "EXPIRED" ? "text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600" : "text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/30"}`}>⏱️ {remain === "EXPIRED" ? "만료됨" : `${remain.days}일 ${String(remain.hours).padStart(2,'0')}:${String(remain.mins).padStart(2,'0')}:${String(remain.secs).padStart(2,'0')}.${String(remain.ms).padStart(2,'0')} 남음`}</div>} 
-                      <div className="flex gap-2 mt-4 ml-6"><button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 rounded-xl font-black text-[10px] uppercase hover:bg-indigo-600 hover:text-white transition">Edit</button><button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-400 rounded-xl font-black text-[10px] uppercase hover:bg-red-500 hover:text-white transition">Delete</button></div> 
+                      <div className="flex items-center gap-2 md:gap-3 w-full"><span className={`min-w-[10px] h-2.5 md:min-w-[12px] md:h-3 rounded-full shadow-inner ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400':'bg-green-500'}`}></span><span className="font-black text-gray-800 dark:text-gray-100 text-lg md:text-xl truncate">{todo.title}</span></div> 
+                      {remain && <div className={`text-[9px] md:text-[10px] font-black ml-5 md:ml-6 mt-1 md:mt-2 bg-gray-50 dark:bg-gray-700 inline-block px-2 py-1 md:px-3 md:py-1 rounded-md md:rounded-lg border ${remain === "EXPIRED" ? "text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600" : "text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/30"}`}>⏱️ {remain === "EXPIRED" ? "만료됨" : `${remain.days}일 ${String(remain.hours).padStart(2,'0')}:${String(remain.mins).padStart(2,'0')}:${String(remain.secs).padStart(2,'0')}.${String(remain.ms).padStart(2,'0')} 남음`}</div>} 
+                      <div className="flex gap-2 mt-3 md:mt-4 ml-5 md:ml-6"><button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="px-3 py-1.5 md:px-4 md:py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400 rounded-lg md:rounded-xl font-black text-[9px] md:text-[10px] uppercase hover:bg-indigo-600 hover:text-white transition">Edit</button><button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="px-3 py-1.5 md:px-4 md:py-2 bg-red-50 dark:bg-red-900/30 text-red-400 rounded-lg md:rounded-xl font-black text-[9px] md:text-[10px] uppercase hover:bg-red-500 hover:text-white transition">Delete</button></div> 
                     </>
                   )}
                 </div> 
@@ -274,14 +285,14 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
         </div>
         
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4 mb-10">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-5 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl font-black text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 disabled:opacity-30 transition">PREV</button>
-            <span className="font-black text-[#111] dark:text-white text-xl bg-gray-100 dark:bg-gray-700 px-6 py-2 rounded-2xl">{currentPage} <span className="text-gray-400 dark:text-gray-400 mx-1">/</span> {totalPages}</span>
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-5 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl font-black text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 disabled:opacity-30 transition">NEXT</button>
+          <div className="flex justify-center items-center gap-2 md:gap-4 mb-8 md:mb-10">
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 md:px-5 py-2 md:py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-lg md:rounded-xl font-black text-xs md:text-sm text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 disabled:opacity-30 transition">PREV</button>
+            <span className="font-black text-[#111] dark:text-white text-base md:text-xl bg-gray-100 dark:bg-gray-700 px-4 py-1.5 md:px-6 md:py-2 rounded-xl md:rounded-2xl">{currentPage} <span className="text-gray-400 dark:text-gray-400 mx-1">/</span> {totalPages}</span>
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 md:px-5 py-2 md:py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-lg md:rounded-xl font-black text-xs md:text-sm text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 disabled:opacity-30 transition">NEXT</button>
           </div>
         )}
       </div>
-      <footer className="py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-10 z-10"><p className="text-gray-500 dark:text-gray-400 font-black text-base uppercase tracking-widest">Software Engineering Project: CWNU Portal System</p><p className="text-gray-400 dark:text-gray-500 text-sm font-bold">@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works</p></footer>
+      <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-8 md:mt-10 z-10"><p className="text-gray-500 dark:text-gray-400 font-black text-xs md:text-base uppercase tracking-widest">Software Engineering Project: CWNU Portal System</p><p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold mt-1 md:mt-2">@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works</p></footer>
     </div>
   )
 }
