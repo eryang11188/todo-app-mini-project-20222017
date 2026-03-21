@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 
 function MainPage() {
   const services = [
-    { title: "중고 마켓", desc: "학우들과 안전하게 물건을 나누세요.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
-    { title: "투두 리스트", desc: "집중 타이머와 함께 일정을 관리하세요.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
+    { title: "중고 마켓", desc: "학우들과 즐겁게 물건을 나누세요.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
+    { title: "ToDo List", desc: "집중 타이머와 함께 일정을 관리하세요.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
     { title: "학점 계산기", desc: "실시간 그래프로 성적을 분석하세요.", icon: "🎓", path: "/gpa", color: "from-emerald-600 to-teal-700" },
   ];
 
@@ -30,9 +30,17 @@ function MainPage() {
         ))}
       </div>
 
-      <div className="mt-20 bg-blue-50/50 p-10 rounded-[3rem] border-2 border-blue-100/50 text-center">
-        <h4 className="text-xl font-black text-blue-800 mb-2">📢 오늘 공지사항</h4>
-        <p className="text-blue-600 font-bold italic">"V5_super_3.0 정식 업데이트가 완료되었습니다. 새로운 학점 계산기를 만나보세요!"</p>
+      {/* 🚀 공지사항 링크 반영 */}
+      <div className="mt-20 bg-blue-50/50 p-10 rounded-[3rem] border-2 border-blue-100/50 text-center flex flex-col items-center">
+        <h4 className="text-xl font-black text-blue-800 mb-4">📢 공지사항</h4>
+        <a 
+          href="https://www.changwon.ac.kr/portal/na/ntt/selectNttList.do?mi=13532&bbsId=2932" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="text-blue-600 font-bold text-lg hover:text-blue-800 hover:underline transition-colors flex items-center gap-2"
+        >
+          "V5_super_3.5 정식 업데이트 완료! 창원대학교 공식 공지사항 확인하기" <span className="text-sm">↗</span>
+        </a>
       </div>
     </div>
   );
