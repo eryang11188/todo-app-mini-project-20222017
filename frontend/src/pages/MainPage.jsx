@@ -1,41 +1,91 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const TOUR_STEPS = [
-  { title: "👋 환영합니다!", desc: "창원대 학우들을 위한 스마트 포털입니다.", targetId: "tour-main-header" },
-  { title: "🚀 핵심 서비스", desc: "중고 마켓, ToDo, 학점 계산기를 바로 이용해보세요.", targetId: "tour-main-services" },
-  { title: "📢 공식 소식 & 와글", desc: "학교 공지사항과 와글 포털로 바로 이동할 수 있습니다.", targetId: "tour-main-notices" },
-  { title: "🏫 캠퍼스 퀵 링크", desc: "e캠퍼스, 수강신청 등 자주 찾는 메뉴를 모아두었습니다.", targetId: "tour-main-shortcuts" }
-];
-
-function MainPage() {
+function MainPage({ lang }) {
   const [tourIndex, setTourIndex] = useState(-1);
 
-  const services = [
-    { title: "중고 마켓", desc: "학우들과 즐겁게 물건을 나누세요.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
-    { title: "ToDo List", desc: "집중 타이머와 함께 일정을 관리하세요.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
-    { title: "학점 계산기", desc: "실시간 그래프로 성적을 분석하세요.", icon: "🎓", path: "/gpa", color: "from-emerald-600 to-teal-700" },
-  ];
+  // ✅ 신규: 메인 페이지 다국어 사전
+  const t = {
+    ko: {
+      subtitle: "창원대학교 학우들을 위한 올인원 캠퍼스 솔루션",
+      help: "💡 도움말",
+      tourEnd: "투어 종료 🎉",
+      tourSkip: "건너뛰기",
+      tourNext: "다음 보기 ▶",
+      serviceGo: "서비스 바로가기 →",
+      noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE",
+      noticeBtn1: "창원대학교 공지사항",
+      noticeBtn2: "와글 (포털)",
+      shortcutTitle: "CAMPUS SHORTCUTS",
+      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System",
+      footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
+      tourSteps: [
+        { title: "👋 환영합니다!", desc: "창원대 학우들을 위한 스마트 포털입니다.", targetId: "tour-main-header" },
+        { title: "🚀 핵심 서비스", desc: "중고 마켓, ToDo, 학점 계산기를 바로 이용해보세요.", targetId: "tour-main-services" },
+        { title: "📢 공식 소식 & 와글", desc: "학교 공지사항과 와글 포털로 바로 이동할 수 있습니다.", targetId: "tour-main-notices" },
+        { title: "🏫 캠퍼스 퀵 링크", desc: "e캠퍼스, 수강신청 등 자주 찾는 메뉴를 모아두었습니다.", targetId: "tour-main-shortcuts" }
+      ],
+      services: [
+        { title: "중고 마켓", desc: "학우들과 즐겁게 물건을 나누세요.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
+        { title: "ToDo List", desc: "집중 타이머와 함께 일정을 관리하세요.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
+        { title: "학점 계산기", desc: "실시간 그래프로 성적을 분석하세요.", icon: "🎓", path: "/gpa", color: "from-emerald-600 to-teal-700" }
+      ],
+      quickLinks: [
+        { name: "e캠퍼스", url: "https://ecampus.changwon.ac.kr/login.php?mi=18314", icon: "💻" },
+        { name: "학사일정", url: "https://www.changwon.ac.kr/haksa/sv/schdulView/schdulCalendarView.do?mi=10980", icon: "📅" },
+        { name: "학사안내", url: "https://www.changwon.ac.kr/haksa/main.do", icon: "📜" }, 
+        { name: "수강신청", url: "https://chains.changwon.ac.kr/nonstop/suup/sugang/hakbu/index.php?mi=18302", icon: "📚" },
+        { name: "드림캐치", url: "https://dreamcatch.changwon.ac.kr/main.do?mi=18316", icon: "🧭" },
+        { name: "이뤄드림", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" }
+      ]
+    },
+    en: {
+      subtitle: "All-in-one Campus Solution for CWNU Students",
+      help: "💡 Guide",
+      tourEnd: "End Tour 🎉",
+      tourSkip: "Skip",
+      tourNext: "Next ▶",
+      serviceGo: "Go to Service →",
+      noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE",
+      noticeBtn1: "CWNU Notice Board",
+      noticeBtn2: "Wagle (Portal)",
+      shortcutTitle: "CAMPUS SHORTCUTS",
+      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System",
+      footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
+      tourSteps: [
+        { title: "👋 Welcome!", desc: "Smart portal for CWNU students.", targetId: "tour-main-header" },
+        { title: "🚀 Core Services", desc: "Try Flea Market, ToDo, and GPA Calculator.", targetId: "tour-main-services" },
+        { title: "📢 Official News", desc: "Quick access to university notices and Wagle.", targetId: "tour-main-notices" },
+        { title: "🏫 Quick Links", desc: "Shortcuts to e-Campus, course registration, etc.", targetId: "tour-main-shortcuts" }
+      ],
+      services: [
+        { title: "Flea Market", desc: "Share items happily with peers.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
+        { title: "ToDo List", desc: "Manage tasks with a focus timer.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
+        { title: "GPA Calculator", desc: "Analyze grades with real-time graphs.", icon: "🎓", path: "/gpa", color: "from-emerald-600 to-teal-700" }
+      ],
+      quickLinks: [
+        { name: "e-Campus", url: "https://ecampus.changwon.ac.kr/login.php?mi=18314", icon: "💻" },
+        { name: "Schedule", url: "https://www.changwon.ac.kr/haksa/sv/schdulView/schdulCalendarView.do?mi=10980", icon: "📅" },
+        { name: "Academic Info", url: "https://www.changwon.ac.kr/haksa/main.do", icon: "📜" }, 
+        { name: "Course Reg.", url: "https://chains.changwon.ac.kr/nonstop/suup/sugang/hakbu/index.php?mi=18302", icon: "📚" },
+        { name: "Dream Catch", url: "https://dreamcatch.changwon.ac.kr/main.do?mi=18316", icon: "🧭" },
+        { name: "E-Dream", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" }
+      ]
+    }
+  };
 
-  const quickLinks = [
-    { name: "e캠퍼스", url: "https://ecampus.changwon.ac.kr/login.php?mi=18314", icon: "💻" },
-    { name: "학사일정", url: "https://www.changwon.ac.kr/haksa/sv/schdulView/schdulCalendarView.do?mi=10980", icon: "📅" },
-    { name: "학사안내", url: "https://www.changwon.ac.kr/haksa/main.do", icon: "📜" }, 
-    { name: "수강신청", url: "https://chains.changwon.ac.kr/nonstop/suup/sugang/hakbu/index.php?mi=18302", icon: "📚" },
-    { name: "드림캐치", url: "https://dreamcatch.changwon.ac.kr/main.do?mi=18316", icon: "🧭" },
-    { name: "이뤄드림", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" },
-  ];
+  const current = t[lang];
 
   useEffect(() => {
-    if (tourIndex >= 0 && tourIndex < TOUR_STEPS.length) {
-      const el = document.getElementById(TOUR_STEPS[tourIndex].targetId);
+    if (tourIndex >= 0 && tourIndex < current.tourSteps.length) {
+      const el = document.getElementById(current.tourSteps[tourIndex].targetId);
       if (el) { 
         el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
         el.classList.add('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
         return () => { el.classList.remove('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); }; 
       }
     }
-  }, [tourIndex]);
+  }, [tourIndex, current.tourSteps]);
 
   return (
     <div className="max-w-7xl mx-auto p-5 md:p-10 min-h-screen flex flex-col transition-colors relative">
@@ -44,39 +94,35 @@ function MainPage() {
         @keyframes slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
       `}</style>
 
-      {/* 도움말 투어 모달 */}
       {tourIndex >= 0 && (
         <div className="fixed z-[150] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-blue-400 dark:border-blue-500 w-[92%] max-w-[350px] bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
-          <h3 className="text-blue-600 dark:text-blue-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{TOUR_STEPS.length})</h3>
-          <h2 className="text-lg md:text-xl font-black mb-2 md:mb-3 dark:text-white">{TOUR_STEPS[tourIndex].title}</h2>
-          <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm font-bold mb-4 md:mb-5">{TOUR_STEPS[tourIndex].desc}</p>
+          <h3 className="text-blue-600 dark:text-blue-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{current.tourSteps.length})</h3>
+          <h2 className="text-lg md:text-xl font-black mb-2 md:mb-3 dark:text-white">{current.tourSteps[tourIndex].title}</h2>
+          <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm font-bold mb-4 md:mb-5">{current.tourSteps[tourIndex].desc}</p>
           <div className="flex justify-between gap-2">
-            <button onClick={() => setTourIndex(-1)} className="px-3 py-1 text-gray-400 dark:text-gray-500 font-bold text-xs hover:text-gray-600 dark:hover:text-gray-300">건너뛰기</button>
-            <button onClick={() => setTourIndex(p => p+1 >= TOUR_STEPS.length ? -1 : p+1)} className="bg-blue-600 dark:bg-blue-500 text-white px-4 md:px-5 py-2 rounded-xl font-black text-xs shadow-md hover:bg-blue-700 transition">{tourIndex === TOUR_STEPS.length - 1 ? "투어 종료 🎉" : "다음 보기 ▶"}</button>
+            <button onClick={() => setTourIndex(-1)} className="px-3 py-1 text-gray-400 dark:text-gray-500 font-bold text-xs hover:text-gray-600 dark:hover:text-gray-300">{current.tourSkip}</button>
+            <button onClick={() => setTourIndex(p => p+1 >= current.tourSteps.length ? -1 : p+1)} className="bg-blue-600 dark:bg-blue-500 text-white px-4 md:px-5 py-2 rounded-xl font-black text-xs shadow-md hover:bg-blue-700 transition">{tourIndex === current.tourSteps.length - 1 ? current.tourEnd : current.tourNext}</button>
           </div>
         </div>
       )}
 
       <div className="flex-grow flex flex-col justify-center">
-        {/* 헤더 섹션 (도움말 버튼 타이틀 우측에 배치) */}
         <div id="tour-main-header" className="text-center mb-10 md:mb-16 relative">
           <div className="flex items-center justify-center gap-4 mb-4">
             <h2 className="text-4xl md:text-6xl font-black text-[#002f6c] dark:text-blue-400 tracking-tighter transition-colors">
               CWNU <span className="text-blue-600 dark:text-blue-500">SMART</span> PORTAL
             </h2>
-            {/* PC에서만 보이는 도움말 버튼 */}
             <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all">
-              💡 도움말
+              {current.help}
             </button>
           </div>
           <p className="text-gray-500 dark:text-gray-400 font-bold text-base md:text-lg transition-colors">
-            창원대학교 학우들을 위한 올인원 캠퍼스 솔루션
+            {current.subtitle}
           </p>
         </div>
 
-        {/* 메인 서비스 카드 그리드 */}
         <div id="tour-main-services" className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mb-12 md:mb-20">
-          {services.map((s, idx) => (
+          {current.services.map((s, idx) => (
             <Link 
               key={idx} 
               to={s.path} 
@@ -87,18 +133,16 @@ function MainPage() {
               <h3 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-3">{s.title}</h3>
               <p className="text-gray-500 dark:text-gray-400 font-medium text-sm md:text-base mb-6 md:mb-8 leading-relaxed">{s.desc}</p>
               <div className={`inline-block px-5 md:px-6 py-2 rounded-full bg-gradient-to-r ${s.color} text-white font-black text-xs md:text-sm shadow-md`}>
-                서비스 바로가기 →
+                {current.serviceGo}
               </div>
             </Link>
           ))}
         </div>
 
-        {/* 통합 안내 및 퀵 링크 섹션 */}
         <div className="bg-blue-50/50 dark:bg-blue-900/20 p-6 md:p-12 rounded-3xl md:rounded-[3.5rem] border-2 border-blue-100/50 dark:border-blue-800/50 transition-colors relative overflow-hidden">
-          
           <div id="tour-main-notices" className="text-center mb-12 md:mb-16 relative z-10 p-4">
             <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-6 md:mb-8 transition-colors">
-              OFFICIAL ANNOUNCEMENTS & WAGLE
+              {current.noticeTitle}
             </h4>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6">
               <a 
@@ -107,7 +151,7 @@ function MainPage() {
                 rel="noreferrer" 
                 className="inline-block bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 font-black text-base md:text-xl px-6 md:px-10 py-3.5 md:py-5 rounded-2xl md:rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:text-blue-800 dark:hover:text-blue-200 transition-all border border-blue-100 dark:border-gray-700 break-keep w-full sm:w-auto"
               >
-                창원대학교 공지사항 <span className="text-sm ml-1 transition-transform group-hover:translate-x-1">↗</span>
+                {current.noticeBtn1} <span className="text-sm ml-1 transition-transform group-hover:translate-x-1">↗</span>
               </a>
               <a 
                 href="https://www.changwon.ac.kr/portal/main.do#" 
@@ -115,17 +159,17 @@ function MainPage() {
                 rel="noreferrer" 
                 className="inline-block bg-[#002f6c] dark:bg-blue-800 text-white font-black text-base md:text-xl px-6 md:px-10 py-3.5 md:py-5 rounded-2xl md:rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:bg-blue-700 dark:hover:bg-blue-700 transition-all border border-blue-900 dark:border-blue-700 break-keep w-full sm:w-auto"
               >
-                와글 (포털) <span className="text-sm ml-1">↗</span>
+                {current.noticeBtn2} <span className="text-sm ml-1">↗</span>
               </a>
             </div>
           </div>
 
           <div id="tour-main-shortcuts" className="relative z-10 p-4">
             <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-6 transition-colors">
-              CAMPUS SHORTCUTS
+              {current.shortcutTitle}
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
-              {quickLinks.map((link, idx) => (
+              {current.quickLinks.map((link, idx) => (
                 <a 
                   key={idx}
                   href={link.url}
@@ -144,17 +188,14 @@ function MainPage() {
         </div>
       </div>
 
-<footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
-  <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
-    Department of Computer Science
-    <span className="text-gray-400 dark:text-gray-500 font-bold mx-1 md:mx-2 hidden md:inline">|</span> 
-    <br className="md:hidden"/>
-    Software Engineering Project: CWNU Portal System
-  </p>
-  <p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold mt-1 md:mt-2">
-    @ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works
-  </p>
-</footer>
+      <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
+        <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
+          {current.footerDept}
+        </p>
+        <p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold mt-1 md:mt-2">
+          {current.footerCopy}
+        </p>
+      </footer>
     </div>
   );
 }
