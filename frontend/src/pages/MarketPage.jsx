@@ -1,10 +1,26 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-// ✅ 다국어 배열 분리
+// ✅ 다국어 배열 분리 (+ 사진에 있던 명언 추가!)
 const MARKET_QUOTES = {
-  ko: ["안 쓰는 물건, 누군가에겐 보물입니다.", "빠른 쿨거래가 창대인의 매너를 만듭니다.", "네고는 둥글게, 거래는 확실하게!", "오늘 비운 공간, 내일의 여유가 됩니다.", "신뢰는 최고의 거래 조건입니다."],
-  en: ["An unused item is someone else's treasure.", "Quick and cool deals make CWNU manners.", "Negotiate smoothly, deal surely!", "Space emptied today becomes tomorrow's leisure.", "Trust is the best deal condition."]
+  ko: [
+    "안 쓰는 물건, 누군가에겐 보물입니다.", 
+    "빠른 쿨거래가 창대인의 매너를 만듭니다.", 
+    "네고는 둥글게, 거래는 확실하게!", 
+    "오늘 비운 공간, 내일의 여유가 됩니다.", 
+    "신뢰는 최고의 거래 조건입니다.",
+    "자취방 이사 전 필수 코스! 물건 비우기 대작전",
+    "안전한 캠퍼스 직거래, 지금 바로 시작하세요."
+  ],
+  en: [
+    "An unused item is someone else's treasure.", 
+    "Quick and cool deals make CWNU manners.", 
+    "Negotiate smoothly, deal surely!", 
+    "Space emptied today becomes tomorrow's leisure.", 
+    "Trust is the best deal condition.",
+    "A must before moving out! Operation: Empty the room.",
+    "Safe campus direct trading, start right now."
+  ]
 };
 const SUBMIT_MENTIONS = {
   ko: ["내 물건 마켓에 올리기", "신상 등록하고 용돈 벌기", "박스 속 물건 새 주인 찾기", "치킨값 벌러 물건 올리기"],
@@ -21,7 +37,10 @@ function MarketPage({ lang }) {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 6;
   const [likedItems, setLikedItems] = useState(() => new Set(JSON.parse(localStorage.getItem('likedItems') || '[]')))
+  
+  // ✅ 명언 인덱스 상태
   const [quoteIndex, setQuoteIndex] = useState(0)
+  
   const [showVersionInfo, setShowVersionInfo] = useState(false)
   const [submitMentionIndex, setSubmitMentionIndex] = useState(0);
   const [tourIndex, setTourIndex] = useState(-1) 
@@ -48,7 +67,6 @@ function MarketPage({ lang }) {
       currency: "원", freeBadge: "🎁 무료 나눔!", soldOut: "SOLD OUT", sellerPrefix: "👤", locPrefix: "📍 희망처:", deadlinePrefix: "📅 마감:", deadlineNone: "없음",
       btnEdit: "Edit", btnDel: "Del", btnDone: "Complete", btnUndo: "Cancel", btnSave: "수정 저장", btnEditCancel: "취소",
       thItem: "Item", thPrice: "Price", thSeller: "Seller", thStatus: "Status", thAction: "Action", stDone: "거래완료", stSale: "판매중",
-      // ✅ 워터마크 한국어 번역 적용
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", 
       footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
       modalTitle: "Market V5 5.0 ver 업데이트 내역", modalSub: "25년 2학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
@@ -100,6 +118,11 @@ function MarketPage({ lang }) {
       }
     }
   }, [tourIndex, current.tourSteps]);
+
+  // ✅ 명언 새로고침 핸들러
+  const handleQuoteRefresh = () => {
+    setQuoteIndex(Math.floor(Math.random() * MARKET_QUOTES[lang].length));
+  };
 
   const handlePhoneChange = (value) => {
     const numeric = value.replace(/[^0-9]/g, '');
@@ -217,13 +240,13 @@ function MarketPage({ lang }) {
                 <h4 className="text-xl font-black text-blue-800 dark:text-blue-400 mb-1">{current.modalFreeTitle}</h4>
                 <p className="text-blue-700 dark:text-blue-300 font-bold text-xs"><span className="font-black text-sm">{current.modalFreeDesc1}</span><br/>{current.modalFreeDesc2}</p>
             </div>
-            <button onClick={() => setShowVersionInfo(false)} className="w-full bg-gray-900 dark:bg-gray-700 text-white py-3 md:py-4 rounded-xl font-black text-base md:text-lg hover:bg-black transition">{current.modalBtn}</button>
+            <button onClick={() => setShowVersionInfo(false)} className="w-full bg-gray-900 dark:bg-gray-700 text-white py-3 md:py-4 rounded-xl font-black text-base md:text-lg hover:bg-black transition shadow-lg">{current.modalBtn}</button>
           </div>
         </div>
       )}
 
       <div className="flex-grow">
-        <div id="tour-header" className="text-center mb-8 md:mb-10 relative mt-4 md:mt-0">
+        <div id="tour-header" className="text-center mb-6 md:mb-8 relative mt-4 md:mt-0">
           <div className="flex items-center justify-center gap-4 mb-2">
             <h2 className="text-3xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
               MARKET <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-4 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5 5.0</span>
@@ -233,9 +256,23 @@ function MarketPage({ lang }) {
             </button>
           </div>
           <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-blue-400 dark:text-blue-500 font-black cursor-pointer hover:text-blue-600 transition tracking-widest">{current.verCheck}</p>
+          
+          {/* ✅ 명언 말풍선 배너 UI 복구 & 다국어 지원 */}
+          <div className="flex justify-center items-center gap-3 mt-5 md:mt-7 mb-2 px-2">
+            <div className="px-5 md:px-8 py-2 md:py-3 border border-blue-400 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 font-bold text-xs md:text-sm shadow-sm transition-colors text-center break-keep">
+              "{MARKET_QUOTES[lang][quoteIndex]}"
+            </div>
+            <button 
+              onClick={handleQuoteRefresh}
+              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition-all flex-shrink-0"
+              title="새로운 문구 보기"
+            >
+              <span className="text-blue-500 dark:text-blue-400 font-black text-sm md:text-base">🔄</span>
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={addItem} className="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl mb-6 md:mb-10 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 border border-blue-50 dark:border-gray-700 relative z-10">
+        <form onSubmit={addItem} className="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl mb-6 md:mb-10 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 border border-blue-50 dark:border-gray-700 relative z-10 mt-4">
           <input placeholder={current.phTitle} value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="border-2 border-gray-100 dark:border-gray-600 dark:bg-gray-700 p-3 md:p-4 text-sm md:text-base rounded-2xl outline-none focus:border-blue-400 transition"/>
           <div id="tour-freebie" className="flex gap-2">
             <input 
