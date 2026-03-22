@@ -25,17 +25,13 @@ function GpaPage() {
   const [editingId, setEditingId] = useState(null); 
   const [editForm, setEditForm] = useState({});
   const [showVersionInfo, setShowVersionInfo] = useState(false); 
+  const [showSecurityInfo, setShowSecurityInfo] = useState(false); // ✅ 보안 안내 팝업 상태
   const [showModalConfetti, setShowModalConfetti] = useState(false);
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(courses)); }, [courses]);
   useEffect(() => { if (showVersionInfo) { setShowModalConfetti(true); setTimeout(() => setShowModalConfetti(false), 2500); } }, [showVersionInfo]);
   
-  // App.jsx 도움말 버튼 연동
-  useEffect(() => {
-    const handleTourStart = () => setTourIndex(0);
-    window.addEventListener('start-tour', handleTourStart);
-    return () => window.removeEventListener('start-tour', handleTourStart);
-  }, []);
+  // 글로벌 이벤트 리스너 제거 (각 페이지 타이틀 옆 버튼으로 직접 제어)
 
   useEffect(() => {
     if (tourIndex >= 0 && tourIndex < TOUR_STEPS.length) {
@@ -131,6 +127,23 @@ function GpaPage() {
         </div>
       )}
 
+      {/* ✅ 3번 문제 해결: 보안 데이터 안내 상세 팝업창 */}
+      {showSecurityInfo && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowSecurityInfo(false)}>
+          <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl md:rounded-[2rem] max-w-md w-full shadow-2xl transform transition-all border-4 border-emerald-50 dark:border-gray-700" onClick={e=>e.stopPropagation()}>
+            <div className="text-center mb-4"><span className="text-4xl md:text-5xl">🛡️</span></div>
+            <h3 className="text-xl md:text-2xl font-black mb-4 text-emerald-700 dark:text-emerald-400 text-center tracking-tight">데이터 보안 안내</h3>
+            <div className="bg-emerald-50 dark:bg-gray-700/50 p-4 md:p-5 rounded-2xl mb-6 text-xs md:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+              <p className="mb-3 font-bold"><strong>"정말 저한테만 보이나요?"</strong></p>
+              <p className="mb-3">네, 100% 안전합니다! 🙆‍♂️</p>
+              <p className="mb-2">이 학점 계산기는 외부 서버나 데이터베이스를 전혀 사용하지 않고, 오직 학우님이 접속하신 <strong>브라우저의 '로컬 스토리지(Local Storage)'</strong>라는 개인 기기 내장 공간에만 데이터를 보관합니다.</p>
+              <p className="mt-3 text-emerald-600 dark:text-emerald-400 font-black">심지어 개발자조차 학우님의 성적을 절대 볼 수 없으니 안심하고 사용하세요!</p>
+            </div>
+            <button onClick={() => setShowSecurityInfo(false)} className="w-full bg-emerald-600 dark:bg-emerald-500 text-white py-3 md:py-4 rounded-xl font-black text-sm md:text-base hover:bg-emerald-700 transition shadow-lg">안심하고 확인 완료!</button>
+          </div>
+        </div>
+      )}
+
       {/* 업데이트 내역 모달 */}
       {showVersionInfo && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
@@ -178,17 +191,22 @@ function GpaPage() {
       )}
 
       <div className="flex-grow">
-        {/* 헤더: CWNU 텍스트 제거, 은은한 깜빡임 적용, 업데이트 안내 추가 */}
+        {/* 타이틀과 도움말 버튼 나란히 배치 */}
         <div id="tour-header" className="text-center mb-4 md:mb-6 relative mt-4 md:mt-0">
-          <h2 className="text-4xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
-            GPA <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5_super_4.0</span>
-          </h2>
-          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-emerald-400 dark:text-emerald-500 font-black mt-2 cursor-pointer hover:text-emerald-600 transition tracking-widest">(버전 클릭 시 업데이트 내역 확인)</p>
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <h2 className="text-4xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
+              GPA <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5_super_4.0</span>
+            </h2>
+            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
+              💡 도움말
+            </button>
+          </div>
+          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-emerald-400 dark:text-emerald-500 font-black cursor-pointer hover:text-emerald-600 transition tracking-widest">(버전 클릭 시 업데이트 내역 확인)</p>
         </div>
 
-        {/* 6. 데이터 보안 신뢰성 안내 텍스트 추가 */}
+        {/* 6번 데이터 보안 신뢰성 안내 (클릭 시 팝업창 오픈) */}
         <div className="flex justify-center mb-6 md:mb-8 px-2">
-           <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-4 md:px-6 py-2 md:py-3 rounded-2xl text-[10px] md:text-xs font-bold flex items-center gap-2 shadow-sm break-keep text-center">
+           <div onClick={() => setShowSecurityInfo(true)} className="cursor-pointer bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-4 md:px-6 py-2 md:py-3 rounded-2xl text-[10px] md:text-xs font-bold flex items-center gap-2 shadow-sm break-keep text-center hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors">
              <span className="text-sm md:text-base">🔒</span> 입력하신 성적 데이터는 본인의 기기에만 안전하게 저장되며, 외부로 공유되지 않습니다.
            </div>
         </div>
@@ -294,7 +312,6 @@ function GpaPage() {
         </div>
       </div>
       
-
 <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
   <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
     Department of Computer Science

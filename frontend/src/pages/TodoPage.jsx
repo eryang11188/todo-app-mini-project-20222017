@@ -49,11 +49,7 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
   useEffect(() => { const intervalId = setInterval(() => { setTitleMentionIndex(p => (p + 1) % TITLE_MENTIONS.length); setPlaceholderIndex(p => (p + 1) % PLACEHOLDERS.length); }, 6000); return () => clearInterval(intervalId); }, []);
   useEffect(() => { if (showVersionInfo) { setShowModalConfetti(true); setTimeout(() => setShowModalConfetti(false), 2500); } }, [showVersionInfo]);
   
-  useEffect(() => {
-    const handleTourStart = () => setTourIndex(0);
-    window.addEventListener('start-tour', handleTourStart);
-    return () => window.removeEventListener('start-tour', handleTourStart);
-  }, []);
+  // 글로벌 이벤트 수신 코드는 삭제되었습니다. (직접 버튼으로 제어)
 
   useEffect(() => {
     if (tourIndex >= 0 && tourIndex < TOUR_STEPS.length) {
@@ -89,22 +85,20 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
   const addTodo = async (e) => { e.preventDefault(); if(!title) return; await axios.post(API_URL, { title, importance, todoDeadline }); fetchTodos(); setTitle(''); setTodoDeadline(''); setCurrentPage(1); handleRandomize(); }
   const saveEditTodo = async (id) => { await axios.put(`${COMMON_URL}/${id}`, editForm); fetchTodos(); setEditingId(null); }
 
-  // ✅ 2번 문제 해결: 백스페이스 자유롭게 허용 및 제한 로직 개선
   const handleTimeInput = (field, value) => {
-    const rawValue = value.replace(/[^0-9]/g, ''); // 숫자만 허용
-    if (rawValue.length > 2) return; // 최대 2자리까지만 입력 가능
+    const rawValue = value.replace(/[^0-9]/g, ''); 
+    if (rawValue.length > 2) return; 
 
     let num = parseInt(rawValue, 10);
     if (!isNaN(num)) {
       if (field === 'h' && num > 23) num = 23;
       if ((field === 'm' || field === 's') && num > 59) num = 59;
-      setInputs(prev => ({ ...prev, [field]: num.toString() })); // 문자열 그대로 저장 (00 패딩 안 함)
+      setInputs(prev => ({ ...prev, [field]: num.toString() })); 
     } else {
-      setInputs(prev => ({ ...prev, [field]: '' })); // 다 지우면 빈칸 유지
+      setInputs(prev => ({ ...prev, [field]: '' })); 
     }
   };
 
-  // ✅ 커서가 벗어날 때(onBlur) 예쁘게 두 자리로 맞춰줌
   const handleTimeBlur = (field) => {
     setInputs(prev => {
       if (prev[field] === '') return { ...prev, [field]: '00' };
@@ -129,7 +123,6 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
   const currentTodos = filteredTodos.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const isTimerUrgent = timerMode === 'timer' && timerTime > 0 && timerTime <= 1800000 && isAlertEnabled;
   
-  // ✅ 4번 문제 해결: 페이지네이션 숫자 배열 생성
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
@@ -201,11 +194,17 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
       )}
 
       <div className="flex-grow">
+        {/* 타이틀과 도움말 버튼 나란히 배치 */}
         <div id="tour-header" className="text-center mb-6 relative mt-4 md:mt-0">
-          <h2 className="text-4xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
-            TODO <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5_super_4.0</span>
-          </h2>
-          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-indigo-400 dark:text-indigo-500 font-black mt-2 cursor-pointer hover:text-indigo-600 transition tracking-widest">(버전 클릭 시 업데이트 내역 확인)</p>
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <h2 className="text-4xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
+              TODO <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5_super_4.0</span>
+            </h2>
+            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
+              💡 도움말
+            </button>
+          </div>
+          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-indigo-400 dark:text-indigo-500 font-black cursor-pointer hover:text-indigo-600 transition tracking-widest">(버전 클릭 시 업데이트 내역 확인)</p>
         </div>
 
         {/* 타이머 영역 */}
@@ -338,7 +337,6 @@ function TodoPage({ timerMode, setTimerMode, timerTime, setTimerTime, timerIsRun
           )}
         </div>
         
-        {/* ✅ 4번 문제 해결: 페이지네이션 마켓과 통일 */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mb-10">
             <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-2 bg-white dark:bg-gray-800 border-2 border-indigo-100 dark:border-gray-700 rounded-lg font-black text-xs text-gray-400 hover:text-indigo-600 disabled:opacity-30 transition">PREV</button>

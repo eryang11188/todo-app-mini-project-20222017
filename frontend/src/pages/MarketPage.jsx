@@ -30,11 +30,7 @@ function MarketPage() {
   useEffect(() => { const intervalId = setInterval(() => setSubmitMentionIndex(prev => (prev + 1) % SUBMIT_MENTIONS.length), 6000); return () => clearInterval(intervalId); }, []);
   useEffect(() => { if (showVersionInfo) { setShowModalConfetti(true); setTimeout(() => setShowModalConfetti(false), 2500); } }, [showVersionInfo]);
   
-  useEffect(() => {
-    const handleTourStart = () => setTourIndex(0);
-    window.addEventListener('start-tour', handleTourStart);
-    return () => window.removeEventListener('start-tour', handleTourStart);
-  }, []);
+  // 글로벌 이벤트 리스너 제거 (각 페이지 타이틀 옆 버튼으로 직접 제어)
 
   useEffect(() => {
     if (tourIndex >= 0 && tourIndex < TOUR_STEPS.length) {
@@ -170,17 +166,22 @@ function MarketPage() {
       )}
 
       <div className="flex-grow">
-        <div id="tour-header" className="text-center mb-8 md:mb-10 relative">
-          <h2 className="text-3xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer">
-            MARKET <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-4 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5_super_4.0</span>
-          </h2>
-          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-blue-400 dark:text-blue-500 font-black mt-2 cursor-pointer hover:text-blue-600 transition tracking-widest">(버전 클릭 시 업데이트 내역 확인)</p>
+        {/* 타이틀과 도움말 버튼 나란히 배치 */}
+        <div id="tour-header" className="text-center mb-8 md:mb-10 relative mt-4 md:mt-0">
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <h2 className="text-3xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
+              MARKET <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-4 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5_super_4.0</span>
+            </h2>
+            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
+              💡 도움말
+            </button>
+          </div>
+          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-blue-400 dark:text-blue-500 font-black cursor-pointer hover:text-blue-600 transition tracking-widest">(버전 클릭 시 업데이트 내역 확인)</p>
         </div>
 
         <form onSubmit={addItem} className="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl mb-6 md:mb-10 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 border border-blue-50 dark:border-gray-700 relative z-10">
           <input placeholder="물품명" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="border-2 border-gray-100 dark:border-gray-600 dark:bg-gray-700 p-3 md:p-4 text-sm md:text-base rounded-2xl outline-none focus:border-blue-400 transition"/>
           <div id="tour-freebie" className="flex gap-2">
-            {/* ✅ 1번 문제 해결: 무료 나눔 시 입력창 스타일 및 placeholder 변경으로 이펙트 시각화 */}
             <input 
               placeholder={form.price === 'free' ? "🎁 무료 나눔 설정됨" : "가격(원)"} 
               type={form.price === 'free' ? "text" : "number"} 

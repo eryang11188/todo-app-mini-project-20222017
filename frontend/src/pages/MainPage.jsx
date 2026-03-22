@@ -1,6 +1,16 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+const TOUR_STEPS = [
+  { title: "👋 환영합니다!", desc: "창원대 학우들을 위한 스마트 포털입니다.", targetId: "tour-main-header" },
+  { title: "🚀 핵심 서비스", desc: "중고 마켓, ToDo, 학점 계산기를 바로 이용해보세요.", targetId: "tour-main-services" },
+  { title: "📢 공식 소식 & 와글", desc: "학교 공지사항과 와글 포털로 바로 이동할 수 있습니다.", targetId: "tour-main-notices" },
+  { title: "🏫 캠퍼스 퀵 링크", desc: "e캠퍼스, 수강신청 등 자주 찾는 메뉴를 모아두었습니다.", targetId: "tour-main-shortcuts" }
+];
+
 function MainPage() {
+  const [tourIndex, setTourIndex] = useState(-1);
+
   const services = [
     { title: "중고 마켓", desc: "학우들과 즐겁게 물건을 나누세요.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
     { title: "ToDo List", desc: "집중 타이머와 함께 일정을 관리하세요.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
@@ -16,22 +26,56 @@ function MainPage() {
     { name: "이뤄드림", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" },
   ];
 
+  useEffect(() => {
+    if (tourIndex >= 0 && tourIndex < TOUR_STEPS.length) {
+      const el = document.getElementById(TOUR_STEPS[tourIndex].targetId);
+      if (el) { 
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+        el.classList.add('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
+        return () => { el.classList.remove('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); }; 
+      }
+    }
+  }, [tourIndex]);
+
   return (
-    <div className="max-w-7xl mx-auto p-5 md:p-10 min-h-screen flex flex-col transition-colors">
-      
+    <div className="max-w-7xl mx-auto p-5 md:p-10 min-h-screen flex flex-col transition-colors relative">
+      <style>{`
+        .tour-popup { animation: slide-up 0.4s forwards; }
+        @keyframes slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
+      `}</style>
+
+      {/* 도움말 투어 모달 */}
+      {tourIndex >= 0 && (
+        <div className="fixed z-[150] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-blue-400 dark:border-blue-500 w-[92%] max-w-[350px] bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
+          <h3 className="text-blue-600 dark:text-blue-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{TOUR_STEPS.length})</h3>
+          <h2 className="text-lg md:text-xl font-black mb-2 md:mb-3 dark:text-white">{TOUR_STEPS[tourIndex].title}</h2>
+          <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm font-bold mb-4 md:mb-5">{TOUR_STEPS[tourIndex].desc}</p>
+          <div className="flex justify-between gap-2">
+            <button onClick={() => setTourIndex(-1)} className="px-3 py-1 text-gray-400 dark:text-gray-500 font-bold text-xs hover:text-gray-600 dark:hover:text-gray-300">건너뛰기</button>
+            <button onClick={() => setTourIndex(p => p+1 >= TOUR_STEPS.length ? -1 : p+1)} className="bg-blue-600 dark:bg-blue-500 text-white px-4 md:px-5 py-2 rounded-xl font-black text-xs shadow-md hover:bg-blue-700 transition">{tourIndex === TOUR_STEPS.length - 1 ? "투어 종료 🎉" : "다음 보기 ▶"}</button>
+          </div>
+        </div>
+      )}
+
       <div className="flex-grow flex flex-col justify-center">
-        {/* 헤더 섹션 */}
-        <div className="text-center mb-10 md:mb-16">
-          <h2 className="text-4xl md:text-6xl font-black text-[#002f6c] dark:text-blue-400 mb-4 tracking-tighter transition-colors">
-            CWNU <span className="text-blue-600 dark:text-blue-500">SMART</span> PORTAL
-          </h2>
+        {/* 헤더 섹션 (도움말 버튼 타이틀 우측에 배치) */}
+        <div id="tour-main-header" className="text-center mb-10 md:mb-16 relative">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h2 className="text-4xl md:text-6xl font-black text-[#002f6c] dark:text-blue-400 tracking-tighter transition-colors">
+              CWNU <span className="text-blue-600 dark:text-blue-500">SMART</span> PORTAL
+            </h2>
+            {/* PC에서만 보이는 도움말 버튼 */}
+            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all">
+              💡 도움말
+            </button>
+          </div>
           <p className="text-gray-500 dark:text-gray-400 font-bold text-base md:text-lg transition-colors">
             창원대학교 학우들을 위한 올인원 캠퍼스 솔루션
           </p>
         </div>
 
         {/* 메인 서비스 카드 그리드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mb-12 md:mb-20">
+        <div id="tour-main-services" className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mb-12 md:mb-20">
           {services.map((s, idx) => (
             <Link 
               key={idx} 
@@ -52,8 +96,7 @@ function MainPage() {
         {/* 통합 안내 및 퀵 링크 섹션 */}
         <div className="bg-blue-50/50 dark:bg-blue-900/20 p-6 md:p-12 rounded-3xl md:rounded-[3.5rem] border-2 border-blue-100/50 dark:border-blue-800/50 transition-colors relative overflow-hidden">
           
-          {/* 공지사항 및 와글 배치 */}
-          <div className="text-center mb-12 md:mb-16 relative z-10">
+          <div id="tour-main-notices" className="text-center mb-12 md:mb-16 relative z-10 p-4">
             <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-6 md:mb-8 transition-colors">
               OFFICIAL ANNOUNCEMENTS & WA-GLE
             </h4>
@@ -77,8 +120,7 @@ function MainPage() {
             </div>
           </div>
 
-          {/* 캠퍼스 바로가기 그리드 */}
-          <div className="relative z-10">
+          <div id="tour-main-shortcuts" className="relative z-10 p-4">
             <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-6 transition-colors">
               CAMPUS SHORTCUTS
             </h4>
