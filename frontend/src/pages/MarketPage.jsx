@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-// ✅ 다국어 배열 분리 (+ 사진에 있던 명언 추가!)
+// ✅ 다국어 배열 분리 (명언 유지)
 const MARKET_QUOTES = {
   ko: [
     "안 쓰는 물건, 누군가에겐 보물입니다.", 
@@ -38,8 +38,6 @@ const MARKET_QUOTES = {
     "Sweet pocket money for the seller, thrilling finds for the buyer!"
   ]
 };
-
-
 const SUBMIT_MENTIONS = {
   ko: ["내 물건 마켓에 올리기", "신상 등록하고 용돈 벌기", "박스 속 물건 새 주인 찾기", "치킨값 벌러 물건 올리기"],
   en: ["Upload my item to Market", "Register new item & earn money", "Find a new owner for boxed items", "Upload item to earn chicken money"]
@@ -56,15 +54,16 @@ function MarketPage({ lang }) {
   const itemsPerPage = 6;
   const [likedItems, setLikedItems] = useState(() => new Set(JSON.parse(localStorage.getItem('likedItems') || '[]')))
   
-  // ✅ 명언 인덱스 상태
   const [quoteIndex, setQuoteIndex] = useState(0)
-  
   const [showVersionInfo, setShowVersionInfo] = useState(false)
   const [submitMentionIndex, setSubmitMentionIndex] = useState(0);
   const [tourIndex, setTourIndex] = useState(-1) 
   const [showConfetti, setShowConfetti] = useState(false)
   const [showModalConfetti, setShowModalConfetti] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  
+  // ✅ 설명 보기 토글용 상태 추가
+  const [expandedId, setExpandedId] = useState(null)
 
   const API_URL = '/api/market'; const COMMON_URL = '/api/items'
 
@@ -84,6 +83,10 @@ function MarketPage({ lang }) {
       sortOpt: { latest: "🔄 최신 등록순", deadline: "⏳ 마감 임박순", priceLow: "📉 가격 낮은순", priceHigh: "📈 가격 높은순", likes: "❤️ 찜 많은순" },
       currency: "원", freeBadge: "🎁 무료 나눔!", soldOut: "SOLD OUT", sellerPrefix: "👤", locPrefix: "📍 희망처:", deadlinePrefix: "📅 마감:", deadlineNone: "없음",
       btnEdit: "Edit", btnDel: "Del", btnDone: "Complete", btnUndo: "Cancel", btnSave: "수정 저장", btnEditCancel: "취소",
+      
+      // ✅ 설명 보기 텍스트 추가
+      btnDescShow: "💬 상세 설명 보기", btnDescHide: "설명 닫기", descEmpty: "등록된 상세 설명이 없습니다.",
+      
       thItem: "Item", thPrice: "Price", thSeller: "Seller", thStatus: "Status", thAction: "Action", stDone: "거래완료", stSale: "판매중",
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", 
       footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
@@ -109,6 +112,10 @@ function MarketPage({ lang }) {
       sortOpt: { latest: "🔄 Latest", deadline: "⏳ Deadline", priceLow: "📉 Price Low", priceHigh: "📈 Price High", likes: "❤️ Most Liked" },
       currency: " KRW", freeBadge: "🎁 Freebie!", soldOut: "SOLD OUT", sellerPrefix: "👤", locPrefix: "📍 Loc:", deadlinePrefix: "📅 Due:", deadlineNone: "None",
       btnEdit: "Edit", btnDel: "Del", btnDone: "Done", btnUndo: "Undo", btnSave: "Save", btnEditCancel: "Cancel",
+      
+      // ✅ 설명 보기 텍스트 추가
+      btnDescShow: "💬 View Details", btnDescHide: "Close Desc", descEmpty: "No detailed description provided.",
+      
       thItem: "Item", thPrice: "Price", thSeller: "Seller", thStatus: "Status", thAction: "Action", stDone: "Done", stSale: "On Sale",
       footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
       modalTitle: "Market V5 5.0 ver Updates", modalSub: "The ultimate evolution of the Fall '25 Web Programming final project `todos_v4`!",
@@ -137,7 +144,6 @@ function MarketPage({ lang }) {
     }
   }, [tourIndex, current.tourSteps]);
 
-  // ✅ 명언 새로고침 핸들러
   const handleQuoteRefresh = () => {
     setQuoteIndex(Math.floor(Math.random() * MARKET_QUOTES[lang].length));
   };
@@ -275,7 +281,6 @@ function MarketPage({ lang }) {
           </div>
           <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-blue-400 dark:text-blue-500 font-black cursor-pointer hover:text-blue-600 transition tracking-widest">{current.verCheck}</p>
           
-          {/* ✅ 명언 말풍선 배너 UI 복구 & 다국어 지원 */}
           <div className="flex justify-center items-center gap-3 mt-5 md:mt-7 mb-2 px-2">
             <div className="px-5 md:px-8 py-2 md:py-3 border border-blue-400 dark:border-blue-700 rounded-full text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 font-bold text-xs md:text-sm shadow-sm transition-colors text-center break-keep">
               "{MARKET_QUOTES[lang][quoteIndex]}"
@@ -354,12 +359,30 @@ function MarketPage({ lang }) {
                       <p className={`text-2xl md:text-3xl font-black ${item.completed ? 'text-red-400 opacity-70' : 'text-blue-700 dark:text-blue-400'}`}>{item.price === 0 ? current.freeBadge : `${Number(item.price).toLocaleString()}${current.currency}`}</p>
                       <button onClick={() => handleLike(item._id)} className={`flex flex-col items-center hover:scale-110 transition-transform ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-200'}`}><span className="text-2xl drop-shadow-md">♥</span><span className="text-[10px] font-black mt-[-4px]">{item.likes}</span></button>
                     </div> 
-                    <div className="text-xs text-gray-500 dark:text-gray-400 font-bold mb-6 space-y-2 flex-grow z-10">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 font-bold mb-4 space-y-2 flex-grow z-10">
                       <p className="border-b dark:border-gray-700 pb-2">{current.sellerPrefix} {item.sellerName} <span className="text-gray-400 ml-2">{item.studentId}</span></p>
                       <p className="border-b dark:border-gray-700 pb-2">📞 {item.phone}</p>
                       <p className="border-b dark:border-gray-700 pb-2">{current.deadlinePrefix} <span className={new Date(item.deadline) < new Date() ? 'text-red-500' : ''}>{item.deadline || current.deadlineNone}</span></p>
                       <p className="text-blue-500 pb-2">{current.locPrefix} {item.location}</p>
                     </div>
+                    
+                    {/* ✅ 설명 보기 토글 버튼 및 아코디언 영역 */}
+                    <div className="flex flex-col w-full z-10 mb-4">
+                      <button 
+                        onClick={() => setExpandedId(expandedId === item._id ? null : item._id)} 
+                        className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 py-1.5 px-3 rounded-lg text-[10px] font-black w-full flex justify-between items-center hover:bg-blue-100 dark:hover:bg-blue-800 transition shadow-sm border border-blue-100 dark:border-blue-800"
+                      >
+                        <span>{expandedId === item._id ? current.btnDescHide : current.btnDescShow}</span>
+                        <span>{expandedId === item._id ? '▲' : '▼'}</span>
+                      </button>
+                      
+                      {expandedId === item._id && (
+                        <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap border border-gray-200 dark:border-gray-600 shadow-inner font-medium">
+                          {item.description || <span className="text-gray-400 italic">{current.descEmpty}</span>}
+                        </div>
+                      )}
+                    </div>
+
                     <div className="flex gap-2 z-10">
                       <button onClick={async() => {await axios.put(`${COMMON_URL}/${item._id}`,{completed: !item.completed}); fetchItems()}} className={`flex-grow py-2 rounded-xl font-black text-[10px] uppercase shadow-sm ${item.completed?'bg-red-600 text-white':'bg-gray-100 dark:bg-gray-700 text-gray-500 hover:bg-blue-600 hover:text-white transition'}`}>{item.completed ? current.btnUndo : current.btnDone}</button>
                       <button onClick={() => {setEditingId(item._id); setEditForm(item)}} className="px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl text-gray-400 hover:text-blue-500 text-[10px] font-black uppercase transition">{current.btnEdit}</button>
@@ -375,12 +398,27 @@ function MarketPage({ lang }) {
             <table className="w-full text-center min-w-[600px]">
               <thead className="bg-[#002f6c] text-white text-xs font-bold tracking-widest uppercase"><tr><th className="p-4">{current.thItem}</th><th className="p-4">{current.thPrice}</th><th className="p-4">{current.thSeller}</th><th className="p-4">{current.thStatus}</th><th className="p-4">{current.thAction}</th></tr></thead>
               <tbody>
-                {currentItems.map(item => ( 
+                {currentItems.map(item => (
                   <tr key={item._id} className={`border-b dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors ${item.completed ? 'sold-out text-red-500' : ''}`}>
-                    <td className="p-4 font-black text-sm relative">
+                    <td className="p-4 text-left font-black text-sm relative">
                       {item.completed && <div className="absolute top-0 left-0 bg-red-500 text-white font-black text-[8px] px-2 py-0.5 rounded-br-lg shadow-sm">{current.soldOut}</div>}
                       <span className={item.completed ? 'line-through' : 'text-gray-800 dark:text-gray-200'}>{item.title}</span> 
                       <button onClick={() => handleLike(item._id)} className={`ml-2 text-[10px] font-black ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-300'}`}>♥{item.likes}</button>
+                      
+                      {/* ✅ 테이블 뷰에서도 설명 보기 기능 추가 */}
+                      <div className="mt-2">
+                        <button 
+                          onClick={() => setExpandedId(expandedId === item._id ? null : item._id)} 
+                          className="text-[10px] text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 font-bold flex items-center gap-1"
+                        >
+                          {expandedId === item._id ? current.btnDescHide : current.btnDescShow}
+                        </button>
+                        {expandedId === item._id && (
+                          <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 whitespace-pre-wrap shadow-inner border border-gray-100 dark:border-gray-600">
+                            {item.description || <span className="text-gray-400 italic">{current.descEmpty}</span>}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="p-4 font-black text-sm text-blue-600 dark:text-blue-400">{item.price === 0 ? current.freeBadge : `${Number(item.price).toLocaleString()}${current.currency}`}</td>
                     <td className="p-4 font-bold text-gray-500 dark:text-gray-400 text-xs">{item.sellerName} <br/><span className="text-[10px] text-gray-400">{item.phone}</span></td>

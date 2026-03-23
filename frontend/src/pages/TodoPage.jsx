@@ -12,7 +12,7 @@ const PLACEHOLDERS = {
   en: ["What great mission will you undertake?", "Add a small habit for growth", "The moment you write down a goal, it's half success.", "Enter your core goal for today here.", "What do you want to finish first?", "One small mission to make today fruitful!", "What is your first task today to change the world?", "That assignment you've been putting off, let's finish it today!", "Write them down slowly, starting with small things.", "The more specific the goal, the doubled the execution."]
 };
 
-// ✅ 대중적인 명언/명대사 80종 (에러 수정 완료)
+// 🔴 [여기에 아까 제가 드린 80개짜리 명언 배열을 통째로 덮어쓰기 해주세요!] 🔴
 const QUOTES = [
   // 🎬 대중문화 (영화 & 애니메이션)
   { ko: "어제는 역사, 내일은 미스터리, 오늘은 선물. 그래서 우리는 현재(Present)라고 부른다. - 우그웨이 (쿵푸팬더)", en: "Yesterday is history, tomorrow is a mystery, today is a gift. That's why we call it the present. - Oogway (Kung Fu Panda)" },
@@ -111,9 +111,12 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   const [showVersionInfo, setShowVersionInfo] = useState(false); const [showModalConfetti, setShowModalConfetti] = useState(false);
   const [searchTerm, setSearchTerm] = useState(''); 
 
+  // ✅ Drag & Drop 처리를 위한 상태 추가
+  const [dragItemIndex, setDragItemIndex] = useState(null);
+  const [dragOverItemIndex, setDragOverItemIndex] = useState(null);
+
   const API_URL = '/api/todo'; const COMMON_URL = '/api/items';
 
-  // ✅ 다국어 텍스트 사전 (워터마크 번역 포함)
   const t = {
     ko: {
       tourSteps: [
@@ -126,15 +129,14 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       tourSkip: "건너뛰기", tourNext: "다음 보기 ▶", tourEnd: "투어 종료 🎉", help: "💡 도움말", verCheck: "(버전 클릭 시 업데이트 내역 확인)",
       alarm: "30분 전 알람", focus: "집중 타이머", stop: "스톱워치", reset: "RESET", searchP: "🔍 찾으시는 할 일을 검색해보세요!",
       addBtn: "추가하기", newQuote: "🔄 New Quote", remainDay: "일", remainLeft: "남음", expired: "만료됨", expiredIcon: "💀 만료",
-      thImp: "우선순위", thTitle: "미션명", thRemain: "남은 시간", thAct: "관리", btnSave: "저장", btnCancel: "취소", btnEdit: "수정", btnDel: "삭제",
+      thImp: "순서/우선순위", thTitle: "미션명", thRemain: "남은 시간", thAct: "관리", btnSave: "저장", btnCancel: "취소", btnEdit: "수정", btnDel: "삭제",
       impObj: { '긴급': '긴급', '보통': '보통', '낮음': '낮음' },
-      footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", 
-      footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
+      footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
       modalTitle: "Todo V5 5.0 ver 업데이트 내역", modalSub: "25년 2학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
       modalPrevTitle: "🤔 이전 버전", modalPrev1: "❌ 타이머 및 스톱워치 부재", modalPrev2: "❌ 마감 기한 시각화 기능 부재",
       modalCurTitle: "✨ 현재 버전 (V5 5.0)", modalCur1: "✅ 집중 타이머 & 스톱워치 탑재", modalCur2: "✅ 30분 전 알람 및 실시간 카운트다운", modalCur3: "✅ 할 일 통합 검색 기능 추가", modalCur4: "✅ 글로벌 다국어(KOR/ENG) 완벽 지원!",
       modalHistTitle: "🛠️ CWNU PORTAL 발전 과정",
-      modalHistV1: "할 일 등록 및 기본적인 체크리스트 기능 구현", modalHistV2: "중요도 분류 시스템 및 마감 기한 설정 도입", modalHistV3: "리스트/그리드/테이블 다중 뷰 모드 지원", modalHistV4: "정밀 집중 타이머 및 30분 전 스마트 알림 통합", modalHistV5: "글로벌 다국어(KOR/ENG) 완벽 지원 및 UI 고도화",
+      modalHistV1: "할 일 등록 및 기본적인 체크리스트 기능 구현", modalHistV2: "중요도 분류 시스템 및 마감 기한 설정 도입", modalHistV3: "리스트/그리드/테이블 다중 뷰 모드 지원", modalHistV4: "정밀 집중 타이머 및 30분 전 스마트 알림 통합", modalHistV5: "글로벌 다국어 완벽 지원 및 UI 고도화",
       modalFreeTitle: "\"아... 유료인가요?\"", modalFreeDesc1: "아닙니다! 창대인을 위한 완전 무료 서비스입니다!", modalFreeDesc2: "철저한 시간 관리로 당신의 꿈을 앞당기세요!", modalBtn: "확인 완료!"
     },
     en: {
@@ -148,15 +150,14 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       tourSkip: "Skip", tourNext: "Next ▶", tourEnd: "End Tour 🎉", help: "💡 Guide", verCheck: "(Click version to check updates)",
       alarm: "30m Alert", focus: "Focus Timer", stop: "Stopwatch", reset: "RESET", searchP: "🔍 Search for tasks you are looking for!",
       addBtn: "Add Task", newQuote: "🔄 New Quote", remainDay: "d", remainLeft: "left", expired: "Expired", expiredIcon: "💀 Expired",
-      thImp: "Priority", thTitle: "Mission", thRemain: "Remaining Time", thAct: "Action", btnSave: "Save", btnCancel: "Cancel", btnEdit: "Edit", btnDel: "Del",
+      thImp: "Order/Priority", thTitle: "Mission", thRemain: "Remaining Time", thAct: "Action", btnSave: "Save", btnCancel: "Cancel", btnEdit: "Edit", btnDel: "Del",
       impObj: { '긴급': 'Urgent', '보통': 'Normal', '낮음': 'Low' },
-      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", 
-      footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
+      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
       modalTitle: "Todo V5 5.0 ver Updates", modalSub: "The ultimate evolution of the Fall '25 Web Programming final project `todos_v4`!",
       modalPrevTitle: "🤔 Previous Version", modalPrev1: "❌ No timer and stopwatch", modalPrev2: "❌ No visual deadline tracking",
       modalCurTitle: "✨ Current Version (V5 5.0)", modalCur1: "✅ Focus Timer & Stopwatch included", modalCur2: "✅ 30-min alert & real-time countdown", modalCur3: "✅ Integrated task search added", modalCur4: "✅ Global bilingual (KOR/ENG) support!",
       modalHistTitle: "🛠️ CWNU PORTAL Evolution",
-      modalHistV1: "Task registration & basic checklist", modalHistV2: "Priority system & deadline settings", modalHistV3: "List/Grid/Table multi-view support", modalHistV4: "Precision focus timer & smart alerts", modalHistV5: "Full bilingual support (KOR/ENG) & UI enhancement",
+      modalHistV1: "Task registration & basic checklist", modalHistV2: "Priority system & deadline settings", modalHistV3: "List/Grid/Table multi-view support", modalHistV4: "Precision focus timer & smart alerts", modalHistV5: "Full bilingual support & UI enhancement",
       modalFreeTitle: "\"Wait, is this paid?\"", modalFreeDesc1: "No! It's a completely free service for CWNU students!", modalFreeDesc2: "Advance your dreams with thorough time management!", modalBtn: "Confirmed!"
     }
   };
@@ -212,6 +213,34 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
     } else { setTimerIsRunning(false); }
   };
 
+  // ✅ Drag & Drop 핸들러 함수
+  const handleDragStart = (e, index) => {
+    setDragItemIndex(index);
+    // 드래그 고스트 이미지 생성을 위해 약간의 딜레이 허용
+    setTimeout(() => {
+      e.target.classList.add('opacity-40', 'scale-[0.98]');
+    }, 0);
+  };
+  const handleDragEnter = (e, index) => {
+    setDragOverItemIndex(index);
+  };
+  const handleDragEnd = (e) => {
+    e.target.classList.remove('opacity-40', 'scale-[0.98]');
+    if (dragItemIndex !== null && dragOverItemIndex !== null && dragItemIndex !== dragOverItemIndex) {
+      const newFilteredTodos = [...filteredTodos];
+      const draggedItemContent = newFilteredTodos[dragItemIndex];
+      newFilteredTodos.splice(dragItemIndex, 1);
+      newFilteredTodos.splice(dragOverItemIndex, 0, draggedItemContent);
+      
+      // 검색어가 없을 때만 메인 todos 배열 업데이트 (검색 중 순서 변경 방지)
+      if (searchTerm === '') {
+        setTodos(newFilteredTodos);
+      }
+    }
+    setDragItemIndex(null);
+    setDragOverItemIndex(null);
+  };
+
   const filteredTodos = todos.filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
   const totalPages = Math.ceil(filteredTodos.length / itemsPerPage) || 1;
   const currentTodos = filteredTodos.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -228,6 +257,10 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         @keyframes slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
         @keyframes shoot-up { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1); opacity: 0; } }
         .emoji-burst { position: absolute; animation: shoot-up 1.5s ease-out forwards; z-index: 9999; pointer-events: none; }
+        
+        /* Drag & Drop 시각적 피드백 클래스 */
+        .drag-over-top { border-top: 4px solid #6366f1 !important; transform: translateY(2px); transition: all 0.2s; }
+        .drag-over-bottom { border-bottom: 4px solid #6366f1 !important; transform: translateY(-2px); transition: all 0.2s; }
       `}</style>
 
       {tourIndex >= 0 && (
@@ -239,7 +272,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         </div>
       )}
 
-      {/* ✅ 꽉 찬 디테일 모달창 원상복구 및 다국어 패치 */}
       {showVersionInfo && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
           <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-[2rem] max-w-3xl w-full shadow-2xl transform transition-all border-4 border-indigo-50 dark:border-gray-700 max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
@@ -332,35 +364,29 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
           </div>
         </div>
 
-        {/* ✅ 명언 렌더링 구역 시작 */}
         <div className="text-center mb-8 md:mb-10">
           <h2 className="text-xl md:text-[2.5rem] py-2 font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-indigo-800 to-black dark:from-white dark:via-indigo-300 dark:to-gray-300 mb-6 md:mb-8 tracking-tighter flex justify-center items-center">
              <span key={TITLE_MENTIONS[lang][titleMentionIndex]} className="inline-block animate-submit-text-fade">{TITLE_MENTIONS[lang][titleMentionIndex]}</span>
           </h2>
           
           <div className="flex flex-col items-center p-6 md:p-10 rounded-3xl md:rounded-[3rem] border-2 border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800 dark:to-gray-900 shadow-sm relative overflow-hidden">
-            {/* 💡 JS 전처리 로직 (데이터 스플릿) */}
             {(() => {
-                const rawQuoteEn = QUOTES[quoteIndex].en;
+                const rawQuoteEn = QUOTES[quoteIndex]?.en || "";
                 const enParts = rawQuoteEn.split(' - ');
                 const enBody = enParts[0];
                 const enSource = enParts.length > 1 ? enParts.slice(1).join(' - ') : '';
 
-                const rawQuoteKo = QUOTES[quoteIndex].ko;
+                const rawQuoteKo = QUOTES[quoteIndex]?.ko || "";
                 const koParts = rawQuoteKo.split(' - ');
                 const koBody = koParts[0];
                 const koSource = koParts.length > 1 ? koParts.slice(1).join(' - ') : '';
 
                 return (
                     <>
-                        {/* 1️⃣ [영문 명언 구역] */}
                         <div className="flex flex-col items-center mb-6 md:mb-8 px-2 md:px-4 w-full relative group">
-                            {/* 영문 본문: 기존의 크고 화려한 그라데이션 필기체 스타일 */}
                             <p className="text-2xl md:text-[2.5rem] py-2 font-cursive-custom font-black drop-shadow-md text-center leading-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 transition-all duration-300">
                                 "{enBody}"
                             </p>
-                            
-                            {/* 영문 출처: 그라데이션 제거, 아주 작게 우측 하단 배치, 얇고 정갈한 폰트 */}
                             {enSource && (
                                 <p className="self-end text-[11px] md:text-sm font-bold text-gray-500 dark:text-gray-400 font-mono tracking-tighter mt-[-6px] md:mt-[-10px] opacity-80 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                     - {enSource}
@@ -368,14 +394,10 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                             )}
                         </div>
 
-                        {/* 2️⃣ [한글 명언 구역] */}
                         <div className="bg-white/80 dark:bg-gray-800/80 px-6 py-3 md:px-8 md:py-4 rounded-3xl md:rounded-full shadow-sm border border-gray-100 flex flex-col items-center mb-2 w-[95%] md:w-auto md:max-w-[95%]">
-                            {/* 한글 본문: 기존 스타일 유지 */}
                             <p className="text-xl md:text-3xl font-korean-cursive text-gray-700 dark:text-gray-200 font-bold leading-tight text-center break-keep w-full">
                                 {koBody}
                             </p>
-                            
-                            {/* 한글 출처: 줄바꿈 후 작고 회색으로 세련되게 */}
                             {koSource && (
                                 <p className="self-end text-[10px] md:text-xs text-gray-400 dark:text-gray-500 font-medium tracking-tight mt-1 whitespace-nowrap">
                                     - {koSource}
@@ -385,11 +407,9 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                     </>
                 );
             })()}
-            
             <button onClick={handleRandomize} className="mt-6 md:mt-8 text-[10px] md:text-[11px] bg-white dark:bg-gray-700 border-2 border-gray-200 text-gray-500 px-5 py-2 rounded-full font-black hover:text-indigo-600 transition-all hover:scale-105 z-10 uppercase tracking-widest">{current.newQuote}</button>
           </div>
         </div>
-        {/* ✅ 명언 렌더링 구역 끝 */}
 
         <div className="mb-6 w-full relative z-10">
           <input 
@@ -422,10 +442,21 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
               <table className="w-full text-center min-w-[500px] md:min-w-full">
                 <thead className="bg-[#111] text-white text-xs md:text-sm font-bold uppercase tracking-widest"><tr><th className="p-3 md:p-5">{current.thImp}</th><th className="p-3 md:p-5 text-left">{current.thTitle}</th><th className="p-3 md:p-5">{current.thRemain}</th><th className="p-3 md:p-5">{current.thAct}</th></tr></thead>
                 <tbody>
-                {currentTodos.map(todo => { 
-                  const remain = getRemainingTime(todo.todoDeadline); 
+                {currentTodos.map((todo, index) => { 
+                  const remain = getRemainingTime(todo.todoDeadline);
+                  // ✅ Table 행에 Drag & Drop 이벤트 부여
                   return ( 
-                  <tr key={todo._id} className="border-b dark:border-gray-700 hover:bg-indigo-50/30 transition-colors"> 
+                  <tr 
+                    key={todo._id} 
+                    draggable={searchTerm === ''} // 검색 중에는 드래그 방지
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragEnter={(e) => handleDragEnter(e, index)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => e.preventDefault()}
+                    className={`border-b dark:border-gray-700 hover:bg-indigo-50/30 transition-colors cursor-move 
+                      ${dragItemIndex === index ? 'opacity-40 bg-gray-50 dark:bg-gray-800' : ''} 
+                      ${dragOverItemIndex === index && dragItemIndex !== null ? (dragItemIndex < dragOverItemIndex ? 'drag-over-bottom' : 'drag-over-top') : ''}`}
+                  > 
                     {editingId === todo._id ? (
                       <td colSpan="4" className="p-3 md:p-4 bg-indigo-50/50 dark:bg-indigo-900/20">
                         <div className="flex flex-col sm:flex-row gap-2 items-center">
@@ -440,7 +471,10 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                       </td>
                     ) : (
                       <>
-                        <td className="p-3 md:p-5"><span className={`px-2 py-1 md:px-3 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black text-white ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400 text-gray-900':'bg-green-500'}`}>{current.impObj[todo.importance] || todo.importance}</span></td> 
+                        <td className="p-3 md:p-5 flex items-center justify-center gap-2">
+                          <span className="text-gray-300 dark:text-gray-600 mr-1 hidden sm:inline" title="드래그하여 순서 변경">☰</span>
+                          <span className={`px-2 py-1 md:px-3 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black text-white ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400 text-gray-900':'bg-green-500'}`}>{current.impObj[todo.importance] || todo.importance}</span>
+                        </td> 
                         <td className="p-3 md:p-5 text-left font-black text-gray-800 dark:text-gray-100 text-sm md:text-lg">{todo.title}</td> 
                         <td className="p-3 md:p-5 text-sm md:text-base font-black text-indigo-600 dark:text-indigo-300 whitespace-nowrap">{remain === "EXPIRED" ? current.expiredIcon : remain ? `${remain.days}${current.remainDay} ${String(remain.hours).padStart(2,'0')}:${String(remain.mins).padStart(2,'0')}:${String(remain.secs).padStart(2,'0')}.${String(remain.ms).padStart(2,'0')}` : "-"}</td> 
                         <td className="p-3 md:p-5 flex justify-center gap-1.5">
@@ -454,10 +488,21 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                 </tbody></table></div>
           ) : (
             <div className={viewType === 'list' ? "space-y-3 md:space-y-4 mb-8" : "grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-8"}>
-              {currentTodos.map(todo => { 
+              {currentTodos.map((todo, index) => { 
                 const remain = getRemainingTime(todo.todoDeadline); 
+                // ✅ List / Grid 카드에 Drag & Drop 이벤트 부여
                 return ( 
-                <div key={todo._id} className="bg-white dark:bg-gray-800 p-5 md:p-7 rounded-3xl md:rounded-[2.5rem] shadow-md border border-gray-100 dark:border-gray-700 flex flex-col group transition-all hover:-translate-y-1"> 
+                <div 
+                  key={todo._id} 
+                  draggable={searchTerm === ''} // 검색 중에는 드래그 방지
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragEnter={(e) => handleDragEnter(e, index)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={(e) => e.preventDefault()}
+                  className={`bg-white dark:bg-gray-800 p-5 md:p-7 rounded-3xl md:rounded-[2.5rem] shadow-md border border-gray-100 dark:border-gray-700 flex flex-col group transition-all hover:-translate-y-1 cursor-move
+                    ${dragItemIndex === index ? 'opacity-40 bg-gray-50 dark:bg-gray-800 scale-[0.98]' : ''} 
+                    ${dragOverItemIndex === index && dragItemIndex !== null ? (dragItemIndex < dragOverItemIndex ? 'drag-over-bottom' : 'drag-over-top') : ''}`}
+                > 
                   {editingId === todo._id ? (
                     <div className="flex flex-col gap-2 md:gap-3">
                       <select value={editForm.importance} onChange={e=>setEditForm({...editForm, importance: e.target.value})} className="p-2 border-2 border-indigo-100 dark:border-gray-600 dark:bg-gray-700 rounded-xl font-bold text-xs"><option value="긴급">{current.impObj['긴급']}</option><option value="보통">{current.impObj['보통']}</option><option value="낮음">{current.impObj['낮음']}</option></select>
@@ -467,9 +512,13 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center gap-3 w-full"><span className={`min-w-[12px] h-3 rounded-full shadow-inner ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400':'bg-green-500'}`}></span><span className="font-black text-gray-800 dark:text-gray-100 text-lg md:text-xl truncate">{todo.title}</span></div> 
-                      {remain && <div className={`text-sm md:text-base font-black ml-6 mt-2 inline-block px-3 py-1.5 rounded-lg border ${remain === "EXPIRED" ? "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600" : "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border-indigo-100 dark:border-indigo-500/30"}`}>⏱️ {remain === "EXPIRED" ? current.expired : `${remain.days}${current.remainDay} ${String(remain.hours).padStart(2,'0')}:${String(remain.mins).padStart(2,'0')}:${String(remain.secs).padStart(2,'0')}.${String(remain.ms).padStart(2,'0')} ${current.remainLeft}`}</div>} 
-                      <div className="flex gap-2 mt-4 ml-6"><button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl font-black text-[10px] uppercase hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white transition">{current.btnEdit}</button><button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 rounded-xl font-black text-[10px] uppercase hover:bg-red-500 dark:hover:bg-red-600 hover:text-white dark:hover:text-white transition">{current.btnDel}</button></div> 
+                      <div className="flex items-center gap-3 w-full">
+                        <span className="text-gray-300 dark:text-gray-600" title="드래그하여 순서 변경">☰</span>
+                        <span className={`min-w-[12px] h-3 rounded-full shadow-inner ${todo.importance==='긴급'?'bg-red-500':todo.importance==='보통'?'bg-yellow-400':'bg-green-500'}`}></span>
+                        <span className="font-black text-gray-800 dark:text-gray-100 text-lg md:text-xl truncate">{todo.title}</span>
+                      </div> 
+                      {remain && <div className={`text-sm md:text-base font-black ml-9 mt-2 inline-block px-3 py-1.5 rounded-lg border ${remain === "EXPIRED" ? "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600" : "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border-indigo-100 dark:border-indigo-500/30"}`}>⏱️ {remain === "EXPIRED" ? current.expired : `${remain.days}${current.remainDay} ${String(remain.hours).padStart(2,'0')}:${String(remain.mins).padStart(2,'0')}:${String(remain.secs).padStart(2,'0')}.${String(remain.ms).padStart(2,'0')} ${current.remainLeft}`}</div>} 
+                      <div className="flex gap-2 mt-4 ml-9"><button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl font-black text-[10px] uppercase hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white transition">{current.btnEdit}</button><button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 rounded-xl font-black text-[10px] uppercase hover:bg-red-500 dark:hover:bg-red-600 hover:text-white dark:hover:text-white transition">{current.btnDel}</button></div> 
                     </>
                   )}
                 </div> 

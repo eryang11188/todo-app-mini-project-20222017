@@ -61,7 +61,7 @@ function App() {
       : "text-white/70 hover:text-white hover:bg-white/10");
   };
 
-  // ✅ 신규: 헤더 다국어 사전
+  // ✅ 신규: 헤더 다국어 사전 (인스타 텍스트는 이제 SVG로 대체되므로 사용하지 않지만 구조 유지를 위해 둠)
   const t = {
     ko: { market: "MARKET", todo: "TODO", gpa: "GPA 계산기", food: "🍱 학식", lib: "📚 도서관", insta: "📸 인스타" },
     en: { market: "MARKET", todo: "TODO", gpa: "GPA Calc", food: "🍱 Food", lib: "📚 Library", insta: "📸 Insta" }
@@ -95,7 +95,21 @@ function App() {
         <div className="flex gap-2 md:gap-3 items-center w-full md:w-auto justify-center md:justify-end">
           <a href="https://app.changwon.ac.kr/campus/campus_001.do" target="_blank" rel="noreferrer" className="bg-[#634432] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#4d3527] transition">{t[lang].food}</a>
           <a href="https://lib.changwon.ac.kr/" target="_blank" rel="noreferrer" className="bg-[#059669] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#047857] transition">{t[lang].lib}</a>
-          <a href="https://www.instagram.com/cwnu_official/?mi=18361" target="_blank" rel="noreferrer" className="bg-[#d946ef] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#c026d3] transition">{t[lang].insta}</a>
+          
+          {/* ✅ 신규: 인스타그램 SVG 로고 버튼 (텍스트 없음, 호버 시 핑크색 강조) */}
+          <a 
+            href="https://www.instagram.com/cwnu_official/?mi=18361" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="p-1.5 md:p-2 rounded-full text-white/80 hover:text-white hover:bg-[#d946ef] transition-all shadow-sm group"
+            title="CWNU Instagram"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 md:w-5 md:h-5 group-hover:scale-110 transition-transform">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
 
           <button 
             onClick={() => setIsDarkMode(!isDarkMode)} 
@@ -108,7 +122,6 @@ function App() {
 
       <main>
         <Routes>
-          {/* ✅ 모든 페이지에 lang props 전달 */}
           <Route path="/" element={<MainPage lang={lang} />} />
           <Route path="/market" element={<MarketPage lang={lang} />} />
           <Route path="/todo" element={
