@@ -1,4 +1,3 @@
-// backend/index.js 최종본 전체 복사
 if (process.env.NODE_ENV !== 'production') { require('dotenv').config(); }
 const express = require('express');
 const mongoose = require('mongoose');
@@ -34,16 +33,17 @@ app.get('/api/todo', async (req, res) => { res.json(await Item.find({ type: 'tod
 app.post('/api/market', async (req, res) => { const newItem = new Item({ ...req.body, type: 'market' }); await newItem.save(); res.json(newItem); });
 app.post('/api/todo', async (req, res) => { const newItem = new Item({ ...req.body, type: 'todo' }); await newItem.save(); res.json(newItem); });
 
+// 💡 Mongoose 경고 해결: returnDocument: 'after'로 수정
 app.patch('/api/items/:id/like', async (req, res) => { 
   const val = req.body.value || 1;
-  const item = await Item.findByIdAndUpdate(req.params.id, { $inc: { likes: val } }, { new: true }); 
+  const item = await Item.findByIdAndUpdate(req.params.id, { $inc: { likes: val } }, { returnDocument: 'after' }); 
   res.json(item); 
 });
 
-app.put('/api/items/:id', async (req, res) => { const item = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true }); res.json(item); });
+app.put('/api/items/:id', async (req, res) => { const item = await Item.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' }); res.json(item); });
 app.delete('/api/items/:id', async (req, res) => { await Item.findByIdAndDelete(req.params.id); res.json({ message: '삭제' }); });
 
-// ✅ AI 라우터: 무료 티어 에러 방지 및 답변 길이 확장
+// ✅ AI 라우터: 답변 끊김 방지 및 토큰 최적화
 app.post('/api/ai/generate', async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -54,12 +54,9 @@ app.post('/api/ai/generate', async (req, res) => {
 
     const modelRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
     const modelData = await modelRes.json();
-
     if (!modelRes.ok) throw new Error(`API 인증 실패: ${modelData.error?.message}`);
 
     const availableModels = modelData.models.filter(m => m.supportedGenerationMethods.includes("generateContent"));
-    
-    // 💡 에러 주범인 'Pro' 모델을 제외하고, 가장 최신 'Flash' 모델만 찾습니다.
     const flashModels = availableModels.filter(m => m.name.includes("flash") && !m.name.includes("pro"));
     const safeModel = flashModels.find(m => m.name.includes("gemini-3")) || 
                       flashModels.find(m => m.name.includes("gemini-2.5")) || 
@@ -68,16 +65,22 @@ app.post('/api/ai/generate', async (req, res) => {
     if (!safeModel) throw new Error("사용 가능한 AI 모델이 없습니다.");
 
     const targetModelName = safeModel.name.replace('models/', '');
-    console.log(`🤖 [AI 연동] 안정성 100% 모델 선택: ${targetModelName}`);
+    console.log(`🤖 [AI 연동] ${targetModelName} 모델로 생성 시작...`);
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: targetModelName,
-      // 💡 토큰 한도를 800으로 늘려서 AI가 마음껏 길게 설명할 수 있게 풀어줍니다.
-      generationConfig: { maxOutputTokens: 800, temperature: 0.7 } 
+      model: targetModelName
+    });
+
+    // 💡 수술: 토큰을 1024로 늘리고, 가격/장소 등 데이터 추출의 정확도를 위해 temperature를 살짝 낮춤(0.5)
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        maxOutputTokens: 1024,
+        temperature: 0.5,
+      }
     });
     
-    const result = await model.generateContent(prompt);
     res.json({ text: result.response.text() });
 
   } catch (error) {
