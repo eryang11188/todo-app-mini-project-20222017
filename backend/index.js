@@ -1,16 +1,13 @@
-// backend/index.js 전체 복사
+// backend/index.js 최종본 전체 복사
 if (process.env.NODE_ENV !== 'production') { require('dotenv').config(); }
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai'); // ✅ AI 라이브러리 추가
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// ✅ Gemini AI 초기화 (환경변수에서 키 가져오기)
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 mongoose.connect(process.env.MONGODB_URI).then(() => console.log('✅ MongoDB 연결 성공'));
 
@@ -28,7 +25,7 @@ const itemSchema = new mongoose.Schema({
   location: { type: String, default: "" },
   description: { type: String, default: "" },
   likes: { type: Number, default: 0 },
-  createdAt: { type: Date, default: Date.now } // 정렬을 위해 생성일 추가
+  createdAt: { type: Date, default: Date.now }
 });
 const Item = mongoose.model('Item', itemSchema);
 
@@ -37,7 +34,6 @@ app.get('/api/todo', async (req, res) => { res.json(await Item.find({ type: 'tod
 app.post('/api/market', async (req, res) => { const newItem = new Item({ ...req.body, type: 'market' }); await newItem.save(); res.json(newItem); });
 app.post('/api/todo', async (req, res) => { const newItem = new Item({ ...req.body, type: 'todo' }); await newItem.save(); res.json(newItem); });
 
-// 1. 찜하기 토글 API (증가/감소 모두 지원)
 app.patch('/api/items/:id/like', async (req, res) => { 
   const val = req.body.value || 1;
   const item = await Item.findByIdAndUpdate(req.params.id, { $inc: { likes: val } }, { new: true }); 
@@ -47,25 +43,46 @@ app.patch('/api/items/:id/like', async (req, res) => {
 app.put('/api/items/:id', async (req, res) => { const item = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true }); res.json(item); });
 app.delete('/api/items/:id', async (req, res) => { await Item.findByIdAndDelete(req.params.id); res.json({ message: '삭제' }); });
 
-// ✅ 2. AI 자동 생성 전용 API 라우터 추가
+// ✅ AI 라우터: 무료 티어 에러 방지 및 답변 길이 확장
 app.post('/api/ai/generate', async (req, res) => {
   try {
     const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({ error: "프롬프트가 없습니다." });
+
+    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
+    if (!apiKey) throw new Error("API 키가 설정되지 않았습니다.");
+
+    const modelRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const modelData = await modelRes.json();
+
+    if (!modelRes.ok) throw new Error(`API 인증 실패: ${modelData.error?.message}`);
+
+    const availableModels = modelData.models.filter(m => m.supportedGenerationMethods.includes("generateContent"));
     
-    if (!prompt) {
-      return res.status(400).json({ error: "프롬프트가 없습니다." });
-    }
+    // 💡 에러 주범인 'Pro' 모델을 제외하고, 가장 최신 'Flash' 모델만 찾습니다.
+    const flashModels = availableModels.filter(m => m.name.includes("flash") && !m.name.includes("pro"));
+    const safeModel = flashModels.find(m => m.name.includes("gemini-3")) || 
+                      flashModels.find(m => m.name.includes("gemini-2.5")) || 
+                      flashModels[0] || availableModels[0];
+    
+    if (!safeModel) throw new Error("사용 가능한 AI 모델이 없습니다.");
 
-    // 최신 경량 모델 적용 (응답 속도 최적화)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const targetModelName = safeModel.name.replace('models/', '');
+    console.log(`🤖 [AI 연동] 안정성 100% 모델 선택: ${targetModelName}`);
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ 
+      model: targetModelName,
+      // 💡 토큰 한도를 800으로 늘려서 AI가 마음껏 길게 설명할 수 있게 풀어줍니다.
+      generationConfig: { maxOutputTokens: 800, temperature: 0.7 } 
+    });
+    
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const aiText = response.text();
+    res.json({ text: result.response.text() });
 
-    res.json({ text: aiText });
   } catch (error) {
-    console.error("AI 생성 중 에러 발생:", error);
-    res.status(500).json({ error: "AI 응답을 가져오는 데 실패했습니다." });
+    console.error("🚨 AI 생성 에러:", error.message);
+    res.status(500).json({ error: "AI 서버 연동 중 문제 발생", details: error.message });
   }
 });
 
