@@ -11,7 +11,7 @@ const PLACEHOLDERS = {
   en: ["What great mission will you undertake?", "Add a small habit for growth", "The moment you write down a goal, it's half success.", "Enter your core goal for today here.", "What do you want to finish first?", "One small mission to make today fruitful!", "What is your first task today to change the world?", "That assignment you've been putting off, let's finish it today!", "Write them down slowly, starting with small things.", "The more specific the goal, the doubled the execution."]
 };
 
-// 🔴 명언 배열은 비워두었습니다! 나중에 채워주세요.
+// 🔴 [명언 배열]
 const QUOTES = [];
 
 function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, timerIsRunning, setTimerIsRunning }) {
@@ -31,15 +31,20 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   const [showAiBox, setShowAiBox] = useState(false);
   const [chatHistory, setChatHistory] = useState([]); 
   const [followUpInput, setFollowUpInput] = useState('');
-  
-  // 💡 수술 1단계: 전체 화면 스크롤이 아니라, 채팅창 내부 스크롤만 잡기 위해 Ref 변경
   const chatContainerRef = useRef(null);
 
   const API_URL = '/api/todo'; const COMMON_URL = '/api/items';
 
   const t = {
     ko: {
-      tourSteps: [ /* 생략 */ ],
+      tourSteps: [
+        { title: "👋 환영합니다!", desc: "CWNU 포털의 핵심 기능을 안내해 드릴게요.", targetId: "tour-header" }, 
+        { title: "⏱️ 타이머 & 스톱워치", desc: "집중할 시간을 설정하거나 측정이 가능합니다.", targetId: "tour-timer" }, 
+        { title: "🚨 30분 전 알림", desc: "타이머가 30분 이하일 때 적색으로 경고해줍니다.", targetId: "tour-timer-alert" }, 
+        // 💡 도움말(투어)에 AI 비서 기능 안내 추가!
+        { title: "🤖 AI 챗봇 비서 (NEW!)", desc: "질문이나 할 일을 적고 AI 버튼을 눌러 스마트한 답변을 받아보세요!", targetId: "tour-add" }, 
+        { title: "📝 자유로운 뷰", desc: "목록, 그리드, 테이블 형태로 관리가 가능합니다.", targetId: "tour-list-buttons" }
+      ],
       tourSkip: "건너뛰기", tourNext: "다음 보기 ▶", tourEnd: "투어 종료 🎉", help: "💡 도움말", verCheck: "(버전 클릭 시 업데이트 내역 확인)",
       alarm: "30분 전 알람", focus: "집중 타이머", stop: "스톱워치", reset: "RESET", searchP: "🔍 찾으시는 할 일을 검색해보세요!",
       addBtn: "추가하기", newQuote: "🔄 New Quote", remainDay: "일", remainLeft: "남음", expired: "만료됨", expiredIcon: "💀 만료",
@@ -49,13 +54,21 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       modalTitle: "Todo V5 5.0 ver 업데이트 내역", modalSub: "25년 2학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
       modalPrevTitle: "🤔 이전 버전", modalPrev1: "❌ 타이머 및 스톱워치 부재", modalPrev2: "❌ 마감 기한 시각화 기능 부재",
       modalCurTitle: "✨ 현재 버전 (V5 5.0)", modalCur1: "✅ 집중 타이머 & 스톱워치 탑재", modalCur2: "✅ 30분 전 알람 및 실시간 카운트다운", modalCur3: "✅ 할 일 통합 검색 기능 추가", modalCur4: "✅ 글로벌 다국어(KOR/ENG) 완벽 지원!",
+      modalCur5: "🤖 대화형 Gemini AI 비서 전격 도입!", // 💡 모달창 업데이트 내역 추가
       modalHistTitle: "🛠️ CWNU PORTAL 발전 과정",
       modalHistV1: "할 일 등록 및 기본적인 체크리스트 기능 구현", modalHistV2: "중요도 분류 시스템 및 마감 기한 설정 도입", modalHistV3: "리스트/그리드/테이블 다중 뷰 모드 지원", modalHistV4: "정밀 집중 타이머 및 30분 전 스마트 알림 통합", modalHistV5: "글로벌 다국어 완벽 지원 및 UI 고도화",
       modalFreeTitle: "\"아... 유료인가요?\"", modalFreeDesc1: "아닙니다! 창대인을 위한 완전 무료 서비스입니다!", modalFreeDesc2: "철저한 시간 관리로 당신의 꿈을 앞당기세요!", modalBtn: "확인 완료!",
       aiBtn: "✨ AI 비서", aiLoading: "⏳ 생각 중...", aiEmpty: "질문이나 할 일을 먼저 적어주세요!", aiFollowUpP: "AI에게 추가로 물어보세요...", aiClear: "초기화", aiClose: "닫기"
     },
     en: {
-      tourSteps: [ /* 생략 */ ],
+      tourSteps: [
+        { title: "👋 Welcome!", desc: "Let me guide you through the core features.", targetId: "tour-header" }, 
+        { title: "⏱️ Timer & Stopwatch", desc: "Set or measure time to focus.", targetId: "tour-timer" }, 
+        { title: "🚨 30-Min Alert", desc: "Alerts in red when under 30 mins.", targetId: "tour-timer-alert" }, 
+        // 💡 영문 도움말(투어) AI 추가!
+        { title: "🤖 AI Assistant (NEW!)", desc: "Enter a task and click the AI button for smart advice!", targetId: "tour-add" }, 
+        { title: "📝 Free View", desc: "Manage in list, grid, or table formats.", targetId: "tour-list-buttons" }
+      ],
       tourSkip: "Skip", tourNext: "Next ▶", tourEnd: "End Tour 🎉", help: "💡 Guide", verCheck: "(Click version to check updates)",
       alarm: "30m Alert", focus: "Focus Timer", stop: "Stopwatch", reset: "RESET", searchP: "🔍 Search for tasks you are looking for!",
       addBtn: "Add Task", newQuote: "🔄 New Quote", remainDay: "d", remainLeft: "left", expired: "Expired", expiredIcon: "💀 Expired",
@@ -65,6 +78,7 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       modalTitle: "Todo V5 5.0 ver Updates", modalSub: "The ultimate evolution of the Fall '25 Web Programming final project `todos_v4`!",
       modalPrevTitle: "🤔 Previous Version", modalPrev1: "❌ No timer and stopwatch", modalPrev2: "❌ No visual deadline tracking",
       modalCurTitle: "✨ Current Version (V5 5.0)", modalCur1: "✅ Focus Timer & Stopwatch included", modalCur2: "✅ 30-min alert & real-time countdown", modalCur3: "✅ Integrated task search added", modalCur4: "✅ Global bilingual (KOR/ENG) support!",
+      modalCur5: "🤖 Interactive Gemini AI Assistant integrated!", // 💡 모달창 업데이트 내역 추가
       modalHistTitle: "🛠️ CWNU PORTAL Evolution",
       modalHistV1: "Task registration & basic checklist", modalHistV2: "Priority system & deadline settings", modalHistV3: "List/Grid/Table multi-view support", modalHistV4: "Precision focus timer & smart alerts", modalHistV5: "Full bilingual support & UI enhancement",
       modalFreeTitle: "\"Wait, is this paid?\"", modalFreeDesc1: "No! It's a completely free service for CWNU students!", modalFreeDesc2: "Advance your dreams with thorough time management!", modalBtn: "Confirmed!",
@@ -78,12 +92,24 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   useEffect(() => { const intervalId = setInterval(() => { setTitleMentionIndex(p => (p + 1) % TITLE_MENTIONS[lang].length); setPlaceholderIndex(p => (p + 1) % PLACEHOLDERS[lang].length); }, 6000); return () => clearInterval(intervalId); }, [lang]);
   useEffect(() => { if (showVersionInfo) { setShowModalConfetti(true); setTimeout(() => setShowModalConfetti(false), 2500); } }, [showVersionInfo]);
   
-  // 💡 수술 2단계: 화면 전체가 흔들리지 않도록 채팅창 '내부 높이(scrollHeight)'를 계산해서 부드럽게 내립니다.
+  // 화면 전체 스크롤 방지, 채팅창 내부만 스크롤 되게 하기
   useEffect(() => { 
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [chatHistory, isGenerating]); // 답변 생성 중(...) 일 때도 스크롤 내려가게 처리
+  }, [chatHistory, isGenerating]);
+
+  useEffect(() => {
+    if (tourIndex >= 0 && tourIndex < current.tourSteps.length) {
+      if (tourIndex === 2 && timerMode !== 'timer') setTimerMode('timer'); 
+      const el = document.getElementById(current.tourSteps[tourIndex].targetId);
+      if (el) { 
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+        el.classList.add('ring-[6px]', 'ring-indigo-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
+        return () => el.classList.remove('ring-[6px]', 'ring-indigo-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
+      }
+    }
+  }, [tourIndex, timerMode, current.tourSteps]);
 
   const fetchTodos = async () => { try { const res = await axios.get(API_URL); setTodos(res.data) } catch(e){} }
   const handleRandomize = () => { if(QUOTES.length > 0) setQuoteIndex(Math.floor(Math.random() * QUOTES.length)); setPlaceholderIndex(Math.floor(Math.random() * PLACEHOLDERS[lang].length)); }
@@ -199,22 +225,89 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
       `}</style>
 
-      {/* 헤더 생략 */}
+      {tourIndex >= 0 && (
+        <div className="fixed z-[100] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-indigo-400 dark:border-indigo-500 w-[92%] max-w-[350px] bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
+          <h3 className="text-indigo-600 dark:text-indigo-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{current.tourSteps.length})</h3>
+          <h2 className="text-lg md:text-xl font-black mb-2 md:mb-3 dark:text-white">{current.tourSteps[tourIndex].title}</h2>
+          <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm font-bold mb-4 md:mb-5">{current.tourSteps[tourIndex].desc}</p>
+          <div className="flex justify-between gap-2"><button onClick={() => setTourIndex(-1)} className="px-3 py-1 text-gray-400 dark:text-gray-500 font-bold text-xs hover:text-gray-600 dark:hover:text-gray-300">{current.tourSkip}</button><button onClick={() => setTourIndex(p => p+1 >= current.tourSteps.length ? -1 : p+1)} className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 md:px-5 py-2 rounded-xl font-black text-xs shadow-md hover:bg-indigo-700 transition">{tourIndex === current.tourSteps.length - 1 ? current.tourEnd : current.tourNext}</button></div>
+        </div>
+      )}
+
+      {showVersionInfo && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
+          <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-[2rem] max-w-3xl w-full shadow-2xl transform transition-all border-4 border-indigo-50 dark:border-gray-700 max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
+            {showModalConfetti && <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center"><span className="emoji-burst text-6xl">🎉</span></div>}
+            
+            <h3 className="text-2xl md:text-3xl font-black mb-1 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 text-center">{current.modalTitle}</h3>
+            <p className="text-center text-gray-400 dark:text-gray-500 font-bold mb-6 text-[10px] md:text-xs tracking-tighter">{current.modalSub}</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-2">
+              <div className="bg-gray-50 dark:bg-gray-700 p-5 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-600">
+                <h4 className="text-gray-500 dark:text-gray-300 font-black text-sm mb-3 text-center">{current.modalPrevTitle}</h4>
+                <ul className="text-xs font-medium text-gray-500 dark:text-gray-400 space-y-2 text-center">
+                  <li>{current.modalPrev1}</li>
+                  <li>{current.modalPrev2}</li>
+                </ul>
+              </div>
+              <div className="bg-indigo-50 dark:bg-indigo-900/30 p-5 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 shadow-inner">
+                <h4 className="text-indigo-600 dark:text-indigo-400 font-black text-sm mb-3 text-center">{current.modalCurTitle}</h4>
+                <ul className="text-xs font-bold text-gray-700 dark:text-gray-200 space-y-2 text-center">
+                  <li>{current.modalCur1}</li>
+                  <li>{current.modalCur2}</li>
+                  <li>{current.modalCur3}</li>
+                  <li>{current.modalCur4}</li>
+                  {/* 💡 업데이트 모달창 내역 추가 부분 */}
+                  <li className="text-indigo-600 dark:text-indigo-400">{current.modalCur5}</li> 
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-gray-700/50 rounded-2xl p-6 mb-6 border border-gray-100 dark:border-gray-600">
+              <h4 className="text-center font-black text-slate-700 dark:text-slate-300 mb-4 text-sm flex justify-center items-center gap-2">{current.modalHistTitle}</h4>
+              <div className="space-y-3 text-[11px] md:text-xs px-2">
+                <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-indigo-600 font-black min-w-[45px]">V1.0:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV1}</span></p>
+                <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-indigo-600 font-black min-w-[45px]">V2.0:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV2}</span></p>
+                <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-indigo-600 font-black min-w-[45px]">V3.5:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV3}</span></p>
+                <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-indigo-600 font-black min-w-[45px]">V4.0:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV4}</span></p>
+                <p className="flex items-center gap-3 font-bold bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-indigo-600 font-black min-w-[45px]">V5.0:</span><span className="text-slate-800 dark:text-gray-200 italic">{current.modalHistV5}</span></p>
+              </div>
+            </div>
+
+            <div className="bg-indigo-50 dark:bg-indigo-900/30 p-5 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 text-center mb-6 shadow-inner relative overflow-hidden">
+                <h4 className="text-xl font-black text-indigo-800 dark:text-indigo-400 mb-1">{current.modalFreeTitle}</h4>
+                <p className="text-indigo-700 dark:text-indigo-300 font-bold text-xs"><span className="font-black text-sm">{current.modalFreeDesc1}</span><br/>{current.modalFreeDesc2}</p>
+            </div>
+            <button onClick={() => setShowVersionInfo(false)} className="w-full bg-gray-900 dark:bg-gray-700 text-white py-3 md:py-4 rounded-xl font-black text-base md:text-lg hover:bg-black transition shadow-lg">{current.modalBtn}</button>
+          </div>
+        </div>
+      )}
+
       <div className="flex-grow">
         <div id="tour-header" className="text-center mb-6 relative mt-4 md:mt-0">
           <div className="flex items-center justify-center gap-4 mb-2">
             <h2 className="text-4xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
               TODO <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5 5.0</span>
             </h2>
+            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
+              {current.help}
+            </button>
           </div>
+          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-indigo-400 dark:text-indigo-500 font-black cursor-pointer hover:text-indigo-600 transition tracking-widest">{current.verCheck}</p>
         </div>
 
-        {/* 타이머 및 헤더 문구 생략 */}
         <div id="tour-timer" className="bg-[#111] dark:bg-gray-950 text-white p-6 md:p-10 rounded-3xl md:rounded-[4rem] mb-8 md:mb-12 shadow-2xl border-b-[8px] md:border-b-[12px] border-indigo-900 dark:border-indigo-800 text-center relative mt-6 md:mt-8">
+          {timerMode === 'timer' && (
+            <div id="tour-timer-alert" className="absolute top-4 right-4 md:top-8 md:right-10 flex items-center gap-1 md:gap-2 bg-gray-900 p-1.5 md:p-2 rounded-lg md:rounded-xl border border-gray-700 z-10">
+              <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-wider hidden sm:inline ${isAlertEnabled ? 'text-red-400' : 'text-gray-500'}`}>{current.alarm}</span>
+              <label className="relative inline-flex items-center cursor-pointer"><input type="checkbox" className="sr-only peer" checked={isAlertEnabled} onChange={()=>setIsAlertEnabled(!isAlertEnabled)} /><div className="w-7 md:w-9 h-4 md:h-5 bg-gray-700 rounded-full peer peer-checked:bg-red-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 md:after:h-4 after:w-3 md:after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+            </div>
+          )}
           <div className="flex justify-center gap-3 md:gap-4 mb-4 md:mb-6 mt-4 sm:mt-0">
             <button onClick={()=>{setTimerMode('timer'); setTimerTime(0); setTimerIsRunning(false)}} className={`px-4 py-1.5 md:px-5 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black transition-all ${timerMode==='timer'?'bg-blue-600 shadow-lg shadow-blue-500/50':'bg-gray-800 text-gray-500'}`}>{current.focus}</button>
             <button onClick={()=>{setTimerMode('stopwatch'); setTimerTime(0); setTimerIsRunning(false)}} className={`px-4 py-1.5 md:px-5 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black transition-all ${timerMode==='stopwatch'?'bg-indigo-600 shadow-lg shadow-indigo-500/50':'bg-gray-800 text-gray-500'}`}>{current.stop}</button>
           </div>
+          
           {!timerIsRunning && timerMode === 'timer' && timerTime === 0 ? (
             <div className="flex justify-center items-center gap-2 text-5xl md:text-7xl font-black mb-6 md:mb-10 font-mono tracking-tighter">
               <input value={inputs.h} onBlur={()=>handleTimeBlur('h')} onChange={e=>handleTimeInput('h', e.target.value)} className="w-20 md:w-28 bg-transparent text-center border-b-4 border-indigo-700 focus:border-indigo-400 outline-none placeholder-gray-700" placeholder="00" maxLength="2"/>:
@@ -226,6 +319,7 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
               {formatTime(timerTime)}
             </div>
           )}
+          
           <div className="flex justify-center gap-3 md:gap-4">
             <button onClick={handleStartPause} className={`px-8 py-3 md:px-12 md:py-4 rounded-full font-black text-sm md:text-lg transition-all ${timerIsRunning?'bg-red-600 text-white shadow-lg':'bg-white text-black hover:scale-105'}`}>
               {timerIsRunning ? 'PAUSE' : (timerTime > 0 ? 'RESUME' : 'START')}
@@ -234,7 +328,53 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
           </div>
         </div>
 
-        {/* 검색창 */}
+        <div className="text-center mb-8 md:mb-10">
+          <h2 className="text-xl md:text-[2.5rem] py-2 font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-indigo-800 to-black dark:from-white dark:via-indigo-300 dark:to-gray-300 mb-6 md:mb-8 tracking-tighter flex justify-center items-center">
+             <span key={TITLE_MENTIONS[lang][titleMentionIndex]} className="inline-block animate-submit-text-fade">{TITLE_MENTIONS[lang][titleMentionIndex]}</span>
+          </h2>
+          
+          <div className="flex flex-col items-center p-6 md:p-10 rounded-3xl md:rounded-[3rem] border-2 border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800 dark:to-gray-900 shadow-sm relative overflow-hidden">
+            {QUOTES.length > 0 && (() => {
+                const rawQuoteEn = QUOTES[quoteIndex]?.en || "";
+                const enParts = rawQuoteEn.split(' - ');
+                const enBody = enParts[0];
+                const enSource = enParts.length > 1 ? enParts.slice(1).join(' - ') : '';
+
+                const rawQuoteKo = QUOTES[quoteIndex]?.ko || "";
+                const koParts = rawQuoteKo.split(' - ');
+                const koBody = koParts[0];
+                const koSource = koParts.length > 1 ? koParts.slice(1).join(' - ') : '';
+
+                return (
+                    <>
+                        <div className="flex flex-col items-center mb-6 md:mb-8 px-2 md:px-4 w-full relative group">
+                            <p className="text-2xl md:text-[2.5rem] py-2 font-cursive-custom font-black drop-shadow-md text-center leading-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 transition-all duration-300">
+                                "{enBody}"
+                            </p>
+                            {enSource && (
+                                <p className="self-end text-[11px] md:text-sm font-bold text-gray-500 dark:text-gray-400 font-mono tracking-tighter mt-[-6px] md:mt-[-10px] opacity-80 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    - {enSource}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="bg-white/80 dark:bg-gray-800/80 px-6 py-3 md:px-8 md:py-4 rounded-3xl md:rounded-full shadow-sm border border-gray-100 flex flex-col items-center mb-2 w-[95%] md:w-auto md:max-w-[95%]">
+                            <p className="text-xl md:text-3xl font-korean-cursive text-gray-700 dark:text-gray-200 font-bold leading-tight text-center break-keep w-full">
+                                {koBody}
+                            </p>
+                            {koSource && (
+                                <p className="self-end text-[10px] md:text-xs text-gray-400 dark:text-gray-500 font-medium tracking-tight mt-1 whitespace-nowrap">
+                                    - {koSource}
+                                </p>
+                            )}
+                        </div>
+                    </>
+                );
+            })()}
+            <button onClick={handleRandomize} className="mt-6 md:mt-8 text-[10px] md:text-[11px] bg-white dark:bg-gray-700 border-2 border-gray-200 text-gray-500 px-5 py-2 rounded-full font-black hover:text-indigo-600 transition-all hover:scale-105 z-10 uppercase tracking-widest">{current.newQuote}</button>
+          </div>
+        </div>
+
         <div className="mb-6 w-full relative z-10">
           <input 
             type="text" placeholder={current.searchP} value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} 
@@ -282,7 +422,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                 </div>
               </div>
               
-              {/* 💡 수술 3단계: ref를 여기 부모 div에 달아줘서 내부 스크롤만 통제합니다! */}
               <div ref={chatContainerRef} className="flex flex-col gap-3 max-h-[300px] overflow-y-auto custom-scrollbar p-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 mb-3">
                 {chatHistory.length === 0 && isGenerating && (
                    <div className="text-xs font-bold text-gray-400 p-2">{current.aiLoading}</div>
@@ -309,7 +448,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                   type="text" 
                   value={followUpInput} 
                   onChange={(e) => setFollowUpInput(e.target.value)}
-                  // 💡 수술 4단계: 한글 입력기(IME) 조합 중 엔터 치는 것 무시 방어막 추가!
                   onKeyDown={(e) => { 
                     if (e.nativeEvent.isComposing) return;
                     if (e.key === 'Enter') { 
@@ -341,7 +479,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
           </div>
         </div>
 
-        {/* 리스트 렌더링 코드 유지 */}
         <div className="transition-all">
           {viewType === 'table' ? (
             <div className="bg-white dark:bg-gray-800 rounded-3xl md:rounded-[2rem] shadow-xl overflow-x-auto border-2 border-gray-100 dark:border-gray-700 mb-8 w-full">
