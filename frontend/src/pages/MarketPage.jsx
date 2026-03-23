@@ -9,8 +9,16 @@ const MARKET_QUOTES = {
     "네고는 둥글게, 거래는 확실하게!", 
     "오늘 비운 공간, 내일의 여유가 됩니다.", 
     "신뢰는 최고의 거래 조건입니다.",
-    "자취방 이사 전 필수 코스! 물건 비우기 대작전",
-    "안전한 캠퍼스 직거래, 지금 바로 시작하세요."
+    "자취방 이사 전 필수 코스! 방 빼기 전 물건부터 빼세요.",
+    "오늘 안 쓰는 전공책 팔아서 내일 치킨 시켜 먹자!",
+    "잠수는 사절! 쿨거래는 창대인의 기본 소양입니다.",
+    "선배의 손때 묻은 전공책, 후배에겐 A+의 열쇠!",
+    "통장 잔고가 위험할 때, 책상 서랍을 열어보세요.",
+    "충동구매의 최후... 눈물을 머금고 반값에 올립니다.",
+    "버리면 쓰레기, 나누면 지구를 살리는 에코 라이프!",
+    "따뜻한 인사 한마디가 기분 좋은 거래를 만듭니다.",
+    "가성비 넘치는 대학 생활의 비밀 무기, 마켓 직거래.",
+    "판매자에겐 쏠쏠한 용돈을, 구매자에겐 짜릿한 득템을!"
   ],
   en: [
     "An unused item is someone else's treasure.", 
@@ -18,10 +26,20 @@ const MARKET_QUOTES = {
     "Negotiate smoothly, deal surely!", 
     "Space emptied today becomes tomorrow's leisure.", 
     "Trust is the best deal condition.",
-    "A must before moving out! Operation: Empty the room.",
-    "Safe campus direct trading, start right now."
+    "A must before moving out! Empty your items before emptying the room.",
+    "Sell unused textbooks today, order fried chicken tomorrow!",
+    "No ghosting! Cool deals are the basics for CWNU students.",
+    "A senior's well-used textbook is a junior's key to an A+!",
+    "When your bank balance is low, open your desk drawer.",
+    "The end of impulse buying... selling at half price with tears.",
+    "Trash if thrown away, eco-life saving the earth if shared!",
+    "A warm greeting makes a pleasant transaction.",
+    "The secret weapon for cost-effective college life, direct market deals.",
+    "Sweet pocket money for the seller, thrilling finds for the buyer!"
   ]
 };
+
+
 const SUBMIT_MENTIONS = {
   ko: ["내 물건 마켓에 올리기", "신상 등록하고 용돈 벌기", "박스 속 물건 새 주인 찾기", "치킨값 벌러 물건 올리기"],
   en: ["Upload my item to Market", "Register new item & earn money", "Find a new owner for boxed items", "Upload item to earn chicken money"]

@@ -12,12 +12,93 @@ const PLACEHOLDERS = {
   en: ["What great mission will you undertake?", "Add a small habit for growth", "The moment you write down a goal, it's half success.", "Enter your core goal for today here.", "What do you want to finish first?", "One small mission to make today fruitful!", "What is your first task today to change the world?", "That assignment you've been putting off, let's finish it today!", "Write them down slowly, starting with small things.", "The more specific the goal, the doubled the execution."]
 };
 
+// ✅ 대중적인 명언/명대사 80종 (에러 수정 완료)
 const QUOTES = [
-  { en: "Do not put off until tomorrow what you can do today.", ko: "내일의 할 일을 오늘 하라." },
-  { en: "The secret of getting ahead is getting started.", ko: "앞서가는 비밀은 시작하는 것이다." },
-  { en: "Done is better than perfect.", ko: "완성하는 것이 완벽한 것보다 낫다." },
-  { en: "Motivation is what gets you started. Habit is what keeps you going.", ko: "동기부여는 시작하게 만들고, 습관은 계속 나아가게 만든다." },
-  { en: "Turn your wounds into wisdom.", ko: "당신의 상처를 지혜로 바꿔라." }
+  // 🎬 대중문화 (영화 & 애니메이션)
+  { ko: "어제는 역사, 내일은 미스터리, 오늘은 선물. 그래서 우리는 현재(Present)라고 부른다. - 우그웨이 (쿵푸팬더)", en: "Yesterday is history, tomorrow is a mystery, today is a gift. That's why we call it the present. - Oogway (Kung Fu Panda)" },
+  { ko: "하거나, 하지 않거나 둘 중 하나다. '해본다'는 건 없다. - 요다 (스타워즈)", en: "Do or do not. There is no try. - Yoda (Star Wars)" },
+  { ko: "인생은 초콜릿 상자와 같다. 네가 무엇을 고를지 아무도 모르니까. - 포레스트 검프 (포레스트 검프)", en: "Life was like a box of chocolates. You never know what you're gonna get. - Forrest Gump (Forrest Gump)" },
+  { ko: "우리가 왜 떨어지는 줄 아십니까? 다시 일어서는 법을 배우기 위해서죠. - 알프레드 (배트맨 비긴즈)", en: "Why do we fall? So we can learn to pick ourselves up. - Alfred (Batman Begins)" },
+  { ko: "우리의 진정한 모습은 능력이 아니라 선택을 통해 나타난다. - 덤블도어 (해리포터)", en: "It is our choices that show what we truly are, far more than our abilities. - Dumbledore (Harry Potter)" },
+  { ko: "카르페 디엠. 현재를 즐겨라, 소년들이여. - 존 키팅 (죽은 시인의 사회)", en: "Carpe diem. Seize the day, boys. - John Keating (Dead Poets Society)" },
+  { ko: "큰 힘에는 큰 책임이 따른다. - 벤 삼촌 (스파이더맨)", en: "With great power comes great responsibility. - Uncle Ben (Spider-Man)" },
+  { ko: "가장 어두운 시간에도 행복은 존재한다. 불을 켜는 것을 잊지 않는다면. - 덤블도어 (해리포터)", en: "Happiness can be found, even in the darkest of times, if one only remembers to turn on the light. - Dumbledore (Harry Potter)" },
+  { ko: "꿈을 꾸지 않으면 아무것도 일어나지 않는다. - 칼 프레드릭슨 (업)", en: "If you don't dream, nothing happens. - Carl Fredricksen (Up)" },
+  { ko: "누구든 요리할 수 있다. - 오귀스트 구스토 (라따뚜이)", en: "Anyone can cook. - Auguste Gusteau (Ratatouille)" },
+  { ko: "과거는 아플 수 있어. 하지만 넌 과거로부터 도망칠 수도, 배울 수도 있지. - 라피키 (라이온 킹)", en: "Oh yes, the past can hurt. But the way I see it, you can either run from it or learn from it. - Rafiki (The Lion King)" },
+  { ko: "역경 속에서 피어난 꽃이 가장 희귀하고 아름다운 꽃이다. - 황제 (뮬란)", en: "The flower that blooms in adversity is the most rare and beautiful of all. - The Emperor (Mulan)" },
+  { ko: "우리가 할 수 있는 유일한 결정은 우리에게 주어진 시간을 어떻게 쓸 것인가이다. - 간달프 (반지의 제왕)", en: "All we have to decide is what to do with the time that is given us. - Gandalf (The Lord of the Rings)" },
+  { ko: "무한한 공간 저 너머로! - 버즈 라이트이어 (토이 스토리)", en: "To infinity and beyond! - Buzz Lightyear (Toy Story)" },
+  { ko: "바쁘게 살거나, 바쁘게 죽거나. - 앤디 듀프레인 (쇼생크 탈출)", en: "Get busy living or get busy dying. - Andy Dufresne (The Shawshank Redemption)" },
+  { ko: "얼마나 세게 치느냐가 아니라, 얼마나 세게 맞고도 계속 앞으로 나아갈 수 있느냐가 중요하다. - 록키 발보아 (록키 발보아)", en: "It ain't about how hard you hit. It's about how hard you can get hit and keep moving forward. - Rocky Balboa (Rocky Balboa)" },
+  { ko: "당신에게 꿈이 있다면, 그것을 지켜야 한다. - 크리스 가드너 (행복을 찾아서)", en: "You got a dream, you gotta protect it. - Chris Gardner (The Pursuit of Happyness)" },
+  { ko: "계속 헤엄쳐, 그냥 계속 헤엄쳐. - 도리 (니모를 찾아서)", en: "Just keep swimming. - Dory (Finding Nemo)" },
+  { ko: "지금 이 순간 당신이 무엇을 하느냐가 차이를 만든다. - 사라 코너 (터미네이터)", en: "It's what you do right now that makes a difference. - Sarah Connor (Terminator)" },
+  { ko: "내가 누구인지는 내가 하는 행동이 말해준다. - 브루스 웨인 (다크 나이트)", en: "It is not who I am underneath, but what I do that defines me. - Bruce Wayne (The Dark Knight)" },
+
+  // 📖 속담 및 격언
+  { ko: "천 리 길도 한 걸음부터. - 한국 속담", en: "A journey of a thousand miles begins with a single step. - Proverb" },
+  { ko: "고생 끝에 낙이 온다. - 한국 속담", en: "No pain, no gain. - Proverb" },
+  { ko: "시작이 반이다. - 한국 속담", en: "Well begun is half done. - Proverb" },
+  { ko: "빨리 가려면 혼자 가고, 멀리 가려면 함께 가라. - 아프리카 속담", en: "If you want to go fast, go alone. If you want to go far, go together. - African Proverb" },
+  { ko: "일찍 일어나는 새가 벌레를 잡는다. - 서양 속담", en: "The early bird catches the worm. - English Proverb" },
+  { ko: "로마는 하루아침에 이루어지지 않았다. - 서양 속담", en: "Rome wasn't built in a day. - English Proverb" },
+  { ko: "뜻이 있는 곳에 길이 있다. - 서양 속담", en: "Where there is a will, there is a way. - English Proverb" },
+  { ko: "행동은 말보다 더 큰 소리를 낸다. - 서양 속담", en: "Actions speak louder than words. - English Proverb" },
+  { ko: "연습이 완벽을 만든다. - 서양 속담", en: "Practice makes perfect. - English Proverb" },
+  { ko: "모든 구름에는 은빛 테두리가 있다. - 서양 속담", en: "Every cloud has a silver lining. - English Proverb" },
+  { ko: "책의 표지만 보고 내용을 판단하지 마라. - 서양 속담", en: "Don't judge a book by its cover. - English Proverb" },
+  { ko: "뿌린 대로 거둔다. - 서양 속담", en: "As you sow, so shall you reap. - English Proverb" },
+  { ko: "자신의 운명을 사랑하라. (Amor fati) - 라틴어 격언", en: "Love your fate. (Amor fati) - Latin Proverb" },
+  { ko: "죽음을 기억하라. (Memento mori) - 라틴어 격언", en: "Remember that you must die. (Memento mori) - Latin Proverb" },
+  { ko: "이 또한 지나가리라. - 페르시아 격언", en: "This too shall pass. - Persian Proverb" },
+
+  // 🔥 동기부여 및 철학 (위인, 리더, 작가 등)
+  { ko: "천재는 1%의 영감과 99%의 노력으로 이루어진다. - 토머스 에디슨", en: "Genius is one percent inspiration and ninety-nine percent perspiration. - Thomas Edison" },
+  { ko: "내일의 할 일을 오늘 하라. - 벤저민 프랭클린", en: "Do not put off until tomorrow what you can do today. - Benjamin Franklin" },
+  { ko: "끝날 때까지는 끝난 게 아니다. - 요기 베라", en: "It ain't over till it's over. - Yogi Berra" },
+  { ko: "아무것도 하지 않으면 아무 일도 일어나지 않는다. - 기시미 이치로", en: "Nothing happens if you do nothing. - Ichiro Kishimi" },
+  { ko: "포기하지 않는 한 실패한 것이 아니다. - 알베르트 아인슈타인", en: "You never fail until you stop trying. - Albert Einstein" },
+  { ko: "늘 갈망하고 우직하게 나아가라. - 스티브 잡스", en: "Stay hungry, stay foolish. - Steve Jobs" },
+  { ko: "당신의 시간은 한정되어 있다. 남의 삶을 사느라 시간을 낭비하지 마라. - 스티브 잡스", en: "Your time is limited, so don't waste it living someone else's life. - Steve Jobs" },
+  { ko: "무언가가 충분히 중요하다면, 확률이 당신 편이 아니더라도 그 일을 해야 한다. - 일론 머스크", en: "When something is important enough, you do it even if the odds are not in your favor. - Elon Musk" },
+  { ko: "성공을 축하하는 것도 좋지만, 실패의 교훈에 주의를 기울이는 것이 더 중요하다. - 제프 베이조스", en: "It's fine to celebrate success but it is more important to heed the lessons of failure. - Jeff Bezos" },
+  { ko: "가장 큰 위험은 아무런 위험도 감수하지 않는 것이다. - 마크 저커버그", en: "The biggest risk is not taking any risk. - Mark Zuckerberg" },
+  { ko: "시작하는 방법은 말하는 것을 그만두고 행동하는 것이다. - 월트 디즈니", en: "The way to get started is to quit talking and begin doing. - Walt Disney" },
+  { ko: "항상 완성되기 전까지는 불가능해 보인다. - 넬슨 만델라", en: "It always seems impossible until it's done. - Nelson Mandela" },
+  { ko: "나는 천천히 걷지만, 결코 뒷걸음질 치지 않는다. - 에이브러햄 링컨", en: "I am a slow walker, but I never walk back. - Abraham Lincoln" },
+  { ko: "살아가는 데 있어 가장 큰 영광은 한 번도 넘어지지 않는 것이 아니라, 넘어질 때마다 일어서는 데 있다. - 넬슨 만델라", en: "The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela" },
+  { ko: "당신이 세상에서 보고 싶은 변화가 되어라. - 마하트마 간디", en: "Be the change that you wish to see in the world. - Mahatma Gandhi" },
+  { ko: "날 수 없다면 뛰어라. 뛸 수 없다면 걸어라. 걸을 수 없다면 기어라. 무엇을 하든 계속 앞으로 나아가라. - 마틴 루터 킹 주니어", en: "If you can't fly then run, if you can't run then walk, if you can't walk then crawl, but whatever you do you have to keep moving forward. - Martin Luther King Jr." },
+  { ko: "반성하지 않는 삶은 살 가치가 없다. - 소크라테스", en: "The unexamined life is not worth living. - Socrates" },
+  { ko: "훌륭함은 행동이 아니라 습관이다. - 아리스토텔레스", en: "Quality is not an act, it is a habit. - Aristotle" },
+  { ko: "살아야 할 이유를 아는 사람은 어떠한 어려움도 견뎌낼 수 있다. - 프리드리히 니체", en: "He who has a why to live can bear almost any how. - Friedrich Nietzsche" },
+  { ko: "나는 생각한다, 고로 나는 존재한다. - 르네 데카르트", en: "I think, therefore I am. - Rene Descartes" },
+  { ko: "가장 어두운 밤도 언젠가 끝나고 태양은 떠오를 것이다. - 빅토르 위고", en: "Even the darkest night will end and the sun will rise. - Victor Hugo" },
+  { ko: "앞서가는 비밀은 시작하는 것이다. - 마크 트웨인", en: "The secret of getting ahead is getting started. - Mark Twain" },
+  { ko: "인생에서 가장 중요한 두 날은 당신이 태어난 날과 그 이유를 알아낸 날이다. - 마크 트웨인", en: "The two most important days in your life are the day you are born and the day you find out why. - Mark Twain" },
+  { ko: "목표를 달성해서 얻는 것보다 목표를 달성하는 과정에서 어떤 사람이 되느냐가 훨씬 더 중요하다. - 헨리 데이비드 소로", en: "What you get by achieving your goals is not as important as what you become by achieving your goals. - Henry David Thoreau" },
+  { ko: "스스로 자신이 되어라. 다른 사람의 자리는 이미 다 찼다. - 오스카 와일드", en: "Be yourself; everyone else is already taken. - Oscar Wilde" },
+  { ko: "살아남는 종은 가장 강한 종도, 가장 똑똑한 종도 아니다. 변화에 가장 잘 적응하는 종이다. - 찰스 다윈", en: "It is not the strongest of the species that survives, nor the most intelligent, but the one most responsive to change. - Charles Darwin" },
+  { ko: "지능은 변화에 적응하는 능력이다. - 스티븐 호킹", en: "Intelligence is the ability to adapt to change. - Stephen Hawking" },
+  { ko: "상상력은 지식보다 중요하다. - 알베르트 아인슈타인", en: "Imagination is more important than knowledge. - Albert Einstein" },
+  { ko: "우리 모두에게 삶은 쉽지 않다. 그러나 그게 대수인가? 우리는 끈기를 가져야 하고, 무엇보다도 자신을 믿어야 한다. - 마리 퀴리", en: "Life is not easy for any of us. But what of that? We must have perseverance and above all confidence in ourselves. - Marie Curie" },
+  { ko: "스스로를 아는 것이 모든 지혜의 시작이다. - 아리스토텔레스", en: "Knowing yourself is the beginning of all wisdom. - Aristotle" },
+  { ko: "천천히 가는 것을 두려워하지 말고, 멈추는 것을 두려워하라. - 중국 속담", en: "Be not afraid of growing slowly, be afraid only of standing still. - Chinese Proverb" },
+  { ko: "승리하는 군대는 먼저 이겨놓고 싸움을 하며, 패배하는 군대는 먼저 싸움을 걸고 이길 방법을 찾는다. - 손자", en: "Victorious warriors win first and then go to war, while defeated warriors go to war first and then seek to win. - Sun Tzu" },
+  { ko: "부유함이란 많은 것을 소유하는 것이 아니라 적게 원하는 것에 있다. - 에픽테토스", en: "Wealth consists not in having great possessions, but in having few wants. - Epictetus" },
+  { ko: "당신은 외부 사건이 아니라 당신의 마음에 대한 지배력을 가지고 있다. 이를 깨달으면 힘을 얻게 될 것이다. - 마르쿠스 아우렐리우스", en: "You have power over your mind - not outside events. Realize this, and you will find strength. - Marcus Aurelius" },
+  { ko: "좋은 사람이란 어떤 사람인가 논쟁하느라 시간을 낭비하지 마라. 그냥 좋은 사람이 되어라. - 세네카", en: "Waste no more time arguing what a good man should be. Be one. - Seneca" },
+  { ko: "멈추지 않는 한 얼마나 천천히 가는지는 중요하지 않다. - 공자", en: "It does not matter how slowly you go as long as you do not stop. - Confucius" },
+  { ko: "아는 것만으로는 충분하지 않다. 적용해야 한다. 의지만으로는 충분하지 않다. 행동해야 한다. - 이소룡", en: "Knowing is not enough, we must apply. Willing is not enough, we must do. - Bruce Lee" },
+  { ko: "오늘 당신이 하는 일이 당신의 모든 내일을 향상시킬 수 있다. - 랄프 마스턴", en: "What you do today can improve all your tomorrows. - Ralph Marston" },
+  { ko: "변화의 비밀은 오래된 것과 싸우는 데 에너지를 집중하는 것이 아니라 새로운 것을 만드는 데 집중하는 것이다. - 소크라테스", en: "The secret of change is to focus all of your energy, not on fighting the old, but on building the new. - Socrates" },
+  { ko: "당신이 할 수 있다고 믿든 할 수 없다고 믿든, 당신의 믿음은 항상 옳다. - 헨리 포드", en: "Whether you think you can or you think you can't, you're right. - Henry Ford" },
+  { ko: "기회는 일어나는 것이 아니라 당신이 만들어내는 것이다. - 크리스 그로서", en: "Opportunities don't happen. You create them. - Chris Grosser" },
+  { ko: "성공으로 가는 길과 실패로 가는 길은 거의 똑같다. - 콜린 R. 데이비스", en: "The road to success and the road to failure are almost exactly the same. - Colin R. Davis" },
+  { ko: "나는 실패한 적이 없다. 단지 작동하지 않는 10,000가지 방법을 발견했을 뿐이다. - 토머스 에디슨", en: "I have not failed. I've just found 10,000 ways that won't work. - Thomas Edison" },
+  { ko: "성공은 최종적인 것이 아니며, 실패는 치명적인 것이 아니다. 중요한 것은 계속하려는 용기이다. - 윈스턴 처칠", en: "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill" },
+  { ko: "위대한 일을 할 수 없다면 작은 일을 위대하게 하라. - 나폴레옹 힐", en: "If you cannot do great things, do small things in a great way. - Napoleon Hill" }
 ];
 
 function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, timerIsRunning, setTimerIsRunning }) {
@@ -47,12 +128,8 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       addBtn: "추가하기", newQuote: "🔄 New Quote", remainDay: "일", remainLeft: "남음", expired: "만료됨", expiredIcon: "💀 만료",
       thImp: "우선순위", thTitle: "미션명", thRemain: "남은 시간", thAct: "관리", btnSave: "저장", btnCancel: "취소", btnEdit: "수정", btnDel: "삭제",
       impObj: { '긴급': '긴급', '보통': '보통', '낮음': '낮음' },
-      
-      // ✅ 워터마크 한국어 번역
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", 
       footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
-      
-      // 모달 번역 텍스트
       modalTitle: "Todo V5 5.0 ver 업데이트 내역", modalSub: "25년 2학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
       modalPrevTitle: "🤔 이전 버전", modalPrev1: "❌ 타이머 및 스톱워치 부재", modalPrev2: "❌ 마감 기한 시각화 기능 부재",
       modalCurTitle: "✨ 현재 버전 (V5 5.0)", modalCur1: "✅ 집중 타이머 & 스톱워치 탑재", modalCur2: "✅ 30분 전 알람 및 실시간 카운트다운", modalCur3: "✅ 할 일 통합 검색 기능 추가", modalCur4: "✅ 글로벌 다국어(KOR/ENG) 완벽 지원!",
@@ -73,12 +150,8 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       addBtn: "Add Task", newQuote: "🔄 New Quote", remainDay: "d", remainLeft: "left", expired: "Expired", expiredIcon: "💀 Expired",
       thImp: "Priority", thTitle: "Mission", thRemain: "Remaining Time", thAct: "Action", btnSave: "Save", btnCancel: "Cancel", btnEdit: "Edit", btnDel: "Del",
       impObj: { '긴급': 'Urgent', '보통': 'Normal', '낮음': 'Low' },
-      
-      // ✅ 워터마크 영어 (기존 유지)
       footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", 
       footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
-      
-      // 모달 번역 텍스트
       modalTitle: "Todo V5 5.0 ver Updates", modalSub: "The ultimate evolution of the Fall '25 Web Programming final project `todos_v4`!",
       modalPrevTitle: "🤔 Previous Version", modalPrev1: "❌ No timer and stopwatch", modalPrev2: "❌ No visual deadline tracking",
       modalCurTitle: "✨ Current Version (V5 5.0)", modalCur1: "✅ Focus Timer & Stopwatch included", modalCur2: "✅ 30-min alert & real-time countdown", modalCur3: "✅ Integrated task search added", modalCur4: "✅ Global bilingual (KOR/ENG) support!",
@@ -259,16 +332,64 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
           </div>
         </div>
 
+        {/* ✅ 명언 렌더링 구역 시작 */}
         <div className="text-center mb-8 md:mb-10">
           <h2 className="text-xl md:text-[2.5rem] py-2 font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-indigo-800 to-black dark:from-white dark:via-indigo-300 dark:to-gray-300 mb-6 md:mb-8 tracking-tighter flex justify-center items-center">
              <span key={TITLE_MENTIONS[lang][titleMentionIndex]} className="inline-block animate-submit-text-fade">{TITLE_MENTIONS[lang][titleMentionIndex]}</span>
           </h2>
+          
           <div className="flex flex-col items-center p-6 md:p-10 rounded-3xl md:rounded-[3rem] border-2 border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-b from-white to-indigo-50/50 dark:from-gray-800 dark:to-gray-900 shadow-sm relative overflow-hidden">
-            <p className="text-2xl md:text-[2.5rem] py-2 font-cursive-custom font-black mb-4 md:mb-5 drop-shadow-md text-center px-2 md:px-4 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600">"{QUOTES[quoteIndex].en}"</p>
-            <p className="text-xl md:text-3xl font-korean-cursive text-gray-700 dark:text-gray-200 font-bold bg-white/80 dark:bg-gray-800/80 px-6 py-2 md:px-8 md:py-3 rounded-full shadow-sm border border-gray-100">{QUOTES[quoteIndex].ko}</p>
+            {/* 💡 JS 전처리 로직 (데이터 스플릿) */}
+            {(() => {
+                const rawQuoteEn = QUOTES[quoteIndex].en;
+                const enParts = rawQuoteEn.split(' - ');
+                const enBody = enParts[0];
+                const enSource = enParts.length > 1 ? enParts.slice(1).join(' - ') : '';
+
+                const rawQuoteKo = QUOTES[quoteIndex].ko;
+                const koParts = rawQuoteKo.split(' - ');
+                const koBody = koParts[0];
+                const koSource = koParts.length > 1 ? koParts.slice(1).join(' - ') : '';
+
+                return (
+                    <>
+                        {/* 1️⃣ [영문 명언 구역] */}
+                        <div className="flex flex-col items-center mb-6 md:mb-8 px-2 md:px-4 w-full relative group">
+                            {/* 영문 본문: 기존의 크고 화려한 그라데이션 필기체 스타일 */}
+                            <p className="text-2xl md:text-[2.5rem] py-2 font-cursive-custom font-black drop-shadow-md text-center leading-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 transition-all duration-300">
+                                "{enBody}"
+                            </p>
+                            
+                            {/* 영문 출처: 그라데이션 제거, 아주 작게 우측 하단 배치, 얇고 정갈한 폰트 */}
+                            {enSource && (
+                                <p className="self-end text-[11px] md:text-sm font-bold text-gray-500 dark:text-gray-400 font-mono tracking-tighter mt-[-6px] md:mt-[-10px] opacity-80 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    - {enSource}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* 2️⃣ [한글 명언 구역] */}
+                        <div className="bg-white/80 dark:bg-gray-800/80 px-6 py-3 md:px-8 md:py-4 rounded-3xl md:rounded-full shadow-sm border border-gray-100 flex flex-col items-center mb-2 w-[95%] md:w-auto md:max-w-[95%]">
+                            {/* 한글 본문: 기존 스타일 유지 */}
+                            <p className="text-xl md:text-3xl font-korean-cursive text-gray-700 dark:text-gray-200 font-bold leading-tight text-center break-keep w-full">
+                                {koBody}
+                            </p>
+                            
+                            {/* 한글 출처: 줄바꿈 후 작고 회색으로 세련되게 */}
+                            {koSource && (
+                                <p className="self-end text-[10px] md:text-xs text-gray-400 dark:text-gray-500 font-medium tracking-tight mt-1 whitespace-nowrap">
+                                    - {koSource}
+                                </p>
+                            )}
+                        </div>
+                    </>
+                );
+            })()}
+            
             <button onClick={handleRandomize} className="mt-6 md:mt-8 text-[10px] md:text-[11px] bg-white dark:bg-gray-700 border-2 border-gray-200 text-gray-500 px-5 py-2 rounded-full font-black hover:text-indigo-600 transition-all hover:scale-105 z-10 uppercase tracking-widest">{current.newQuote}</button>
           </div>
         </div>
+        {/* ✅ 명언 렌더링 구역 끝 */}
 
         <div className="mb-6 w-full relative z-10">
           <input 
