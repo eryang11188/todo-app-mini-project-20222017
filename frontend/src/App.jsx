@@ -63,8 +63,8 @@ function App() {
 
   // ✅ 신규: 헤더 다국어 사전 (인스타 텍스트는 이제 SVG로 대체되므로 사용하지 않지만 구조 유지를 위해 둠)
   const t = {
-    ko: { market: "MARKET", todo: "TODO", gpa: "GPA 계산기", food: "🍱 학식", lib: "📚 도서관", insta: "📸 인스타" },
-    en: { market: "MARKET", todo: "TODO", gpa: "GPA Calc", food: "🍱 Food", lib: "📚 Library", insta: "📸 Insta" }
+    ko: { market: "MARKET", todo: "TODO", gpa: "GPA 계산기", food: "학식↗", lib: " 도서관↗", insta: "📸 인스타" },
+    en: { market: "MARKET", todo: "TODO", gpa: "GPA Calc", food: "Food", lib: " Library", insta: "📸 Insta" }
   };
 
   return (
@@ -73,7 +73,7 @@ function App() {
         
         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
           <h1 className="text-xl md:text-2xl font-black tracking-tighter cursor-pointer" onClick={() => navigate('/')}>
-            CWNU PORTAL <span className="text-red-500 italic ml-1 md:ml-2 text-sm md:text-base animate-[pulse_2s_ease-in-out_infinite] opacity-90">V5 5.0</span>
+            CWNU PORTAL <span className="text-red-500 italic ml-1 md:ml-2 text-sm md:text-base animate-[pulse_2s_ease-in-out_infinite] opacity-90">6.0</span>
           </h1>
           <div className="flex gap-2">
             {/* ✅ 언어 토글 버튼 */}
