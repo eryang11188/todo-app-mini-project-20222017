@@ -246,7 +246,7 @@ function MarketPage({ lang }) {
            [절대 규칙 2]: 텍스트에 이모지(😎, ✨ 등)는 절대 사용하지 마. 단, JSON 문법에 필요한 따옴표나 기호는 정상적으로 작성해. 매우 건조하고 진중한 텍스트로만 작성할 것.
            마크다운(\`\`\`) 기호, 서론, 결론 등 다른 텍스트는 1글자도 포함하면 안 돼.
            {
-             "message": "사용자에게 할 대답 (반드시 이런 뉘앙스로 작성: '요청하신 정보를 바탕으로 폼에 들어갈 내용을 준비했습니다! 아래 버튼을 눌러 자동 입력을 완료해 보세요.')",
+             "message": "사용자에게 할 대답 (물품 등록이나 폼 입력과 관련된 내용이면 '요청하신 정보를 바탕으로 폼에 들어갈 내용을 준비했습니다! 아래 버튼을 눌러 자동 입력을 완료해 보세요.'라고 안내하고, 단순한 인사나 일상 대화라면 상황에 맞게 자연스럽고 친절하게 대답할 것. 단, 이모지는 쓰지 마.)",
              "extracted": {
                "title": "추출된 물품명 (없으면 빈 문자열)",
                "price": "추출된 가격 (숫자만 작성. '무료/나눔'이면 'free', 없으면 빈 문자열)",
@@ -264,7 +264,7 @@ function MarketPage({ lang }) {
            [RULE 1]: NO markdown (\`\`\`), NO extra text. MUST output complete JSON until the closing bracket (}).
            [RULE 2]: ABSOLUTELY NO emojis. Use a dry, clean, and formal tone.
            {
-             "message": "Friendly response to user (MUST use this exact tone: 'I have prepared the form details based on your input! Click the button below to apply them.')",
+             "message": "Friendly response to user. (If the user provides item details, use EXACTLY: 'I have prepared the form details based on your input! Click the button below to apply them.' If it is just a casual chat or greeting, respond naturally and kindly without emojis.)",
              "extracted": {
                "title": "Item name or empty string",
                "price": "Numbers only, 'free' if freebie, or empty string",
