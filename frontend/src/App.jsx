@@ -10,6 +10,7 @@ import LostPage from './pages/LostPage';
 function App() {
   // [스위치 유동적으로] 내 컴퓨터(localhost)가 아닐 때만 true(차단)로 작동
   // 나중에 완전히 공개하고 싶을 땐 맨 뒤의 true를 false로만 바꾸면 된다.
+ 
   const isOff = window.location.hostname !== 'localhost' && true;
 
   if (isOff) {
