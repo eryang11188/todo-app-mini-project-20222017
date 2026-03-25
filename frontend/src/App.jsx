@@ -6,6 +6,23 @@ import TodoPage from './pages/TodoPage';
 import GpaPage from './pages/GpaPage';
 
 function App() {
+
+  // [스위치] true: 차단 / false: 정상 오픈
+  const isOff = true; 
+
+  if (isOff) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center text-white text-center p-5 z-[9999] relative">
+        <span className="text-6xl mb-6 animate-bounce"></span>
+        <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-tighter">
+          CWNU 포털 <span className="text-blue-500">업데이트 중</span>
+        </h1>
+        <p className="text-gray-400 font-bold text-lg">
+          더 멋진 기능으로 찾아오겠습니다. 조금만 기다려주세요! 
+        </p>
+      </div>
+    );
+  }
   const navigate = useNavigate();
   const location = useLocation();
 
