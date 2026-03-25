@@ -47,16 +47,22 @@ function LostPage({ lang }) {
   const chatContainerRef = useRef(null);
   const textareaRef = useRef(null); 
 
+  // ✅ 업데이트 내역 모달 관련 상태 추가
+  const [showVersionInfo, setShowVersionInfo] = useState(false)
+  const [showModalConfetti, setShowModalConfetti] = useState(false)
+
   const API_URL = '/api/lost'; const COMMON_URL = '/api/items'
 
   const t = {
     ko: {
       tourSteps: [
-        { title: "👋 환영합니다!", desc: "분실물 센터의 기능을 안내해 드릴게요.", targetId: "tour-header" }, 
-        { title: "🤖 AI 자동 작성", desc: "분실/습득 상황을 말하면 폼을 알아서 채워줍니다!", targetId: "tour-ai-btn" }, 
-        { title: "📍 장소 및 일시", desc: "물건을 잃어버리거나 주운 장소와 시간을 적어주세요.", targetId: "tour-location" }, 
+        { title: "👋 환영합니다!", desc: "분실물 센터의 핵심 기능을 안내해 드릴게요.", targetId: "tour-header" }, 
+        { title: "🤖 AI 습득/분실글 작성", desc: "주운 물건이나 잃어버린 물건을 AI에게 말해보세요!", targetId: "tour-ai-btn" }, 
+        { title: "🎁 사례금 설정", desc: "사례금을 설정하거나 '사례금 없음'을 선택할 수 있습니다.", targetId: "tour-freebie" }, 
+        { title: "📅 일시 지정", desc: "클릭하여 분실/습득 날짜를 정확히 지정하세요.", targetId: "tour-deadline" }, 
+        { title: "🔄 똑똑한 정렬", desc: "최신순, 일자순 등으로 원하는 물품을 골라보세요.", targetId: "tour-sort" }
       ],
-      tourSkip: "건너뛰기", tourNext: "다음 보기 ▶", tourEnd: "투어 종료 🎉", help: "💡 도움말", verCheck: "(버전 클릭 시 업데이트 내역 확인)",
+      tourSkip: "건너뛰기", tourNext: "다음 보기 ▶", tourEnd: "투어 종료 🎉", help: "💡 도움말", verCheck: "(NEW 클릭 시 업데이트 내역 확인)",
       phTitle: "[분실/습득] 물품명 (예: [습득] 검은색 에어팟)", phPrice: "사례금 (선택사항, 숫자만)", phFree: "사례금 없음", phId: "학번", phSeller: "작성자명", phPhone: "연락처", phLoc: "분실/습득 장소 (예: 도서관 2층)", phDesc: "상세 설명 (색상, 특징, 보관 장소 등)",
       btnFree: "사례금 없음", btnCancel: "취소", searchP: "찾으시는 분실물을 검색해보세요! (에어팟, 지갑 등)",
       sortOpt: { latest: "최신 등록순", deadline: "분실/습득 일자순", priceHigh: "사례금 높은순", likes: "관심 많은순 👀" },
@@ -64,8 +70,15 @@ function LostPage({ lang }) {
       btnEdit: "수정", btnDel: "삭제", btnDone: "해결완료", btnUndo: "진행중으로 변경", btnSave: "수정 저장", btnEditCancel: "취소",
       btnDescShow: "💬 자세히 보기", btnDescHide: "자세히 보기 닫기", descEmpty: "등록된 상세 설명이 없습니다.",
       thItem: "Item", thPrice: "Reward", thSeller: "Author", thStatus: "Status", thAction: "Action", stDone: "해결됨", stSale: "찾는중",
-      footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", 
-      footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
+      footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
+      
+      // ✅ 분실물 센터 전용 모달 텍스트
+      modalTitle: "Lost & Found 신규 오픈!", modalSub: "마켓의 강력한 기능을 그대로 이식한 똑똑한 분실물 센터",
+      modalPrevTitle: "🤔 이전 분실물 찾기 방식", modalPrev1: "❌ 에브리타임, 와글 등 이곳저곳 분산된 정보", modalPrev2: "❌ 직관적이지 않은 텍스트 위주 게시판", modalPrev3: "❌ AI 도움 없이 일일이 작성해야 하는 불편함",
+      modalCurTitle: "✨ CWNU 전용 분실물 센터", modalCur1: "✅ 마켓과 통일된 예쁘고 직관적인 카드 UI!", modalCur2: "✅ 대충 말해도 AI가 찰떡같이 찾아주는 폼 자동완성!", modalCur3: "✅ 해결 완료 / 찾는 중 직관적인 상태 관리!", modalCur4: "✅ 실시간 미리보기로 완벽한 수정 기능 지원!", modalCur5: "🤖 캠퍼스 통합 데이터베이스 연동 완료!",
+      modalHistTitle: "🛠️ LOST & FOUND 업데이트", modalHistV1: "CWNU 포털에 분실물 센터 신규 오픈 및 AI 비서 도입 완료",
+      modalFreeTitle: "\"아니 이게..무료라고요!?\"", modalFreeDesc1: "당연하죠! 창대인을 위한 따뜻한 공간입니다!", modalFreeDesc2: "소중한 물건을 찾고 따뜻한 매너를 나눠보세요!", modalBtn: "확인 완료!",
+      
       aiOpenBtn: " AI 비서에게 분실/습득글 작성 맡기기", aiLoading: "⏳ 상황을 분석하고 폼을 채우는 중...", aiEmpty: "채팅창에 정보를 입력해주세요!", aiFollowUpP: "무엇을 언제 어디서 잃어버렸는지/주웠는지 말해주세요!", aiClear: "대화 초기화", aiClose: "AI 닫기", aiApply: "이 글로 설명 채우기",
       aiConfirm: "✨ 이 정보를 폼에 추가하시겠습니까?", btnYes: "예, 추가하기", btnNo: "아니오"
     },
@@ -73,9 +86,11 @@ function LostPage({ lang }) {
       tourSteps: [
         { title: "👋 Welcome!", desc: "Let me guide you through the Lost & Found.", targetId: "tour-header" }, 
         { title: "🤖 AI Auto-fill", desc: "Describe the situation, and AI fills the form!", targetId: "tour-ai-btn" }, 
-        { title: "📍 Location & Time", desc: "Enter where and when it happened.", targetId: "tour-location" }, 
+        { title: "🎁 Reward", desc: "Set a reward or choose 'No Reward'.", targetId: "tour-freebie" }, 
+        { title: "📅 Time", desc: "Specify when you lost/found it.", targetId: "tour-deadline" }, 
+        { title: "🔄 Smart Sort", desc: "Sort by latest, date, etc.", targetId: "tour-sort" }
       ],
-      tourSkip: "Skip", tourNext: "Next ▶", tourEnd: "End Tour 🎉", help: "💡 Guide", verCheck: "(Click version to check updates)",
+      tourSkip: "Skip", tourNext: "Next ▶", tourEnd: "End Tour 🎉", help: "💡 Guide", verCheck: "(Click NEW to check updates)",
       phTitle: "[Lost/Found] Item Name", phPrice: "Reward (Optional, numbers)", phFree: "No Reward", phId: "Student ID", phSeller: "Author Name", phPhone: "Phone Number", phLoc: "Location (e.g., Library 2F)", phDesc: "Description (Color, Features, etc.)",
       btnFree: "No Reward", btnCancel: "Cancel", searchP: "Search for lost items! (AirPods, Wallet, etc.)",
       sortOpt: { latest: "Latest", deadline: "Date", priceHigh: "Highest Reward", likes: "Most Viewed 👀" },
@@ -83,8 +98,14 @@ function LostPage({ lang }) {
       btnEdit: "Edit", btnDel: "Del", btnDone: "Resolved", btnUndo: "Undo", btnSave: "Save", btnEditCancel: "Cancel",
       btnDescShow: "💬 View Details", btnDescHide: "Close Details", descEmpty: "No description provided.",
       thItem: "Item", thPrice: "Reward", thSeller: "Author", thStatus: "Status", thAction: "Action", stDone: "Resolved", stSale: "Looking",
-      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", 
-      footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
+      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
+      
+      modalTitle: "Lost & Found Newly Opened!", modalSub: "Smart Lost & Found using Market features!",
+      modalPrevTitle: "🤔 Previous Ways", modalPrev1: "❌ Information scattered everywhere", modalPrev2: "❌ Unintuitive text-based boards", modalPrev3: "❌ Inconvenient manual writing",
+      modalCurTitle: "✨ CWNU Lost & Found", modalCur1: "✅ Intuitive Card UI unified with Market!", modalCur2: "✅ AI Auto-fill understands your situation!", modalCur3: "✅ Intuitive Resolved / Looking status!", modalCur4: "✅ Perfect edit function with live preview!", modalCur5: "🤖 Integrated Campus Database!",
+      modalHistTitle: "🛠️ LOST & FOUND Updates", modalHistV1: "Newly opened Lost & Found with AI Assistant",
+      modalFreeTitle: "\"Is this free?\"", modalFreeDesc1: "Of course! A warm space for CWNU students!", modalFreeDesc2: "Find precious items and share warm manners!", modalBtn: "Confirmed!",
+      
       aiOpenBtn: " Let AI write the post", aiLoading: "⏳ Analyzing and filling form...", aiEmpty: "Please type something!", aiFollowUpP: "Tell me what, when, and where!", aiClear: "Clear", aiClose: "Close AI", aiApply: "Apply to Description",
       aiConfirm: "✨ Apply this info to the form?", btnYes: "Yes, apply", btnNo: "No"
     }
@@ -104,6 +125,21 @@ function LostPage({ lang }) {
   useEffect(() => { 
     if (chatContainerRef.current) { chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight; }
   }, [chatHistory, isGenerating]);
+
+  // ✅ 모달 폭죽 효과
+  useEffect(() => { if (showVersionInfo) { setShowModalConfetti(true); setTimeout(() => setShowModalConfetti(false), 2500); } }, [showVersionInfo]);
+
+  // ✅ 도움말 튜토리얼 포커스
+  useEffect(() => {
+    if (tourIndex >= 0 && tourIndex < current.tourSteps.length) {
+      const el = document.getElementById(current.tourSteps[tourIndex].targetId);
+      if (el) { 
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+        el.classList.add('ring-[6px]', 'ring-orange-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
+        return () => { el.classList.remove('ring-[6px]', 'ring-orange-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); }; 
+      }
+    }
+  }, [tourIndex, lang, current.tourSteps]);
 
   const handleQuoteRefresh = () => { 
     if (LOST_QUOTES[lang]?.length > 0) setQuoteIndex(Math.floor(Math.random() * LOST_QUOTES[lang].length)); 
@@ -238,19 +274,94 @@ function LostPage({ lang }) {
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 flex flex-col min-h-screen relative text-gray-900 dark:text-gray-100 transition-colors">
       <style>{`
+        .tour-popup { animation: tour-slide-up 0.4s forwards; }
+        @keyframes tour-slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes slide-up { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes shoot-up { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1); opacity: 0; } }
+        .emoji-burst { position: absolute; animation: shoot-up 1.5s ease-out forwards; z-index: 9999; pointer-events: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 10px; }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; }
       `}</style>
       
+      {/* ✅ 도움말 튜토리얼 팝업 */}
+      {tourIndex >= 0 && (
+        <div className="fixed z-[100] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-orange-400 dark:border-orange-500 w-[92%] max-w-[350px] bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
+          <h3 className="text-orange-600 dark:text-orange-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{current.tourSteps.length})</h3>
+          <h2 className="text-lg md:text-xl font-black mb-2 md:mb-3 dark:text-white">{current.tourSteps[tourIndex].title}</h2>
+          <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm font-bold mb-4 md:mb-5">{current.tourSteps[tourIndex].desc}</p>
+          <div className="flex justify-between gap-2">
+            <button onClick={() => setTourIndex(-1)} className="px-3 py-1 text-gray-400 dark:text-gray-500 font-bold text-xs hover:text-gray-600 dark:hover:text-gray-300">{current.tourSkip}</button>
+            <button onClick={() => setTourIndex(p => p+1 >= current.tourSteps.length ? -1 : p+1)} className="bg-orange-600 dark:bg-orange-500 text-white px-4 md:px-5 py-2 rounded-xl font-black text-xs shadow-md hover:bg-orange-700 transition">{tourIndex === current.tourSteps.length - 1 ? current.tourEnd : current.tourNext}</button>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ 업데이트 내역 모달창 (오렌지 테마) */}
+      {showVersionInfo && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
+          <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl md:rounded-[2rem] max-w-3xl w-full shadow-2xl transform transition-all border-4 border-orange-50 dark:border-gray-700 max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
+            {showModalConfetti && <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center"><span className="emoji-burst text-6xl">🎉</span></div>}
+            
+            <h3 className="text-2xl md:text-3xl font-black mb-1 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500 text-center">{current.modalTitle}</h3>
+            <p className="text-center text-gray-400 dark:text-gray-500 font-bold mb-6 text-[10px] md:text-xs tracking-tighter">{current.modalSub}</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-2">
+              <div className="bg-gray-50 dark:bg-gray-700 p-5 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-600">
+                <h4 className="text-gray-500 dark:text-gray-300 font-black text-sm mb-3 text-center">{current.modalPrevTitle}</h4>
+                <ul className="text-xs font-medium text-gray-500 dark:text-gray-400 space-y-2">
+                  <li>{current.modalPrev1}</li>
+                  <li>{current.modalPrev2}</li>
+                  <li>{current.modalPrev3}</li>
+                </ul>
+              </div>
+              <div className="bg-orange-50 dark:bg-orange-900/30 p-5 rounded-2xl border-2 border-orange-200 dark:border-orange-800 shadow-inner">
+                <h4 className="text-orange-600 dark:text-orange-400 font-black text-sm mb-3 text-center">{current.modalCurTitle}</h4>
+                <ul className="text-xs font-bold text-gray-700 dark:text-gray-200 space-y-2">
+                  <li>{current.modalCur1}</li>
+                  <li>{current.modalCur2}</li>
+                  <li>{current.modalCur3}</li>
+                  <li>{current.modalCur4}</li>
+                  <li className="text-orange-600 dark:text-orange-400">{current.modalCur5}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-gray-700/50 rounded-2xl p-6 mb-6 border border-gray-100 dark:border-gray-600">
+              <h4 className="text-center font-black text-slate-700 dark:text-slate-300 mb-4 text-sm flex justify-center items-center gap-2">{current.modalHistTitle}</h4>
+              <div className="space-y-3 text-[11px] md:text-xs px-2">
+                <p className="flex items-center gap-3 font-bold bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-orange-600 font-black min-w-[45px]">V1.0:</span><span className="text-slate-800 dark:text-gray-200 italic">{current.modalHistV1}</span></p>
+              </div>
+            </div>
+
+            <div className="bg-orange-50 dark:bg-orange-900/30 p-5 rounded-2xl border-2 border-orange-200 dark:border-orange-800 text-center mb-6 shadow-inner relative overflow-hidden">
+                <h4 className="text-xl font-black text-orange-800 dark:text-orange-400 mb-1">{current.modalFreeTitle}</h4>
+                <p className="text-orange-700 dark:text-orange-300 font-bold text-xs"><span className="font-black text-sm">{current.modalFreeDesc1}</span><br/>{current.modalFreeDesc2}</p>
+            </div>
+            <button onClick={() => setShowVersionInfo(false)} className="w-full bg-gray-900 dark:bg-gray-700 text-white py-3 md:py-4 rounded-xl font-black text-base md:text-lg hover:bg-black transition shadow-lg">{current.modalBtn}</button>
+          </div>
+        </div>
+      )}
+
       <div className="flex-grow">
+        
+        {/* ✅ 헤더 (타이틀, 도움말, NEW 배지) */}
         <div id="tour-header" className="text-center mb-6 md:mb-8 relative mt-4 md:mt-0">
           <div className="flex items-center justify-center gap-4 mb-2">
             <h2 className="text-3xl md:text-5xl font-black text-orange-600 dark:text-orange-400 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
               LOST & FOUND 
+              {/* ✅ NEW 배지 추가 */}
+              <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-4 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">
+                NEW
+              </span>
             </h2>
+            {/* ✅ 도움말 버튼 추가 */}
+            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
+              {current.help}
+            </button>
           </div>
+          <p onClick={() => setShowVersionInfo(true)} className="text-[10px] md:text-xs text-orange-400 dark:text-orange-500 font-black cursor-pointer hover:text-orange-600 transition tracking-widest">{current.verCheck}</p>
           
           {LOST_QUOTES[lang]?.length > 0 && (
             <div className="flex justify-center items-center gap-3 mt-5 md:mt-7 mb-2 px-2">
@@ -262,6 +373,7 @@ function LostPage({ lang }) {
           )}
         </div>
 
+        {/* 폼 (생략 없이 전체 포함) */}
         <form onSubmit={addItem} className="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl mb-6 md:mb-10 flex flex-col gap-3 md:gap-5 border border-orange-100 dark:border-gray-700 relative z-10 mt-4">
           <div id="tour-ai-btn" className="w-full mb-2">
             {!showAiBox ? (
@@ -314,11 +426,11 @@ function LostPage({ lang }) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 w-full">
             <input placeholder={current.phTitle} value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="md:col-span-1 border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-orange-400 font-bold dark:bg-gray-700"/>
-            <div className="flex gap-2 md:col-span-1">
+            <div id="tour-freebie" className="flex gap-2 md:col-span-1">
               <input placeholder={form.price === 'free' ? current.phFree : current.phPrice} type={form.price === 'free' ? "text" : "number"} min="0" value={form.price === 'free' ? '' : form.price} onChange={e=>setForm({...form, price: e.target.value})} className={`border-2 p-3 rounded-2xl outline-none focus:border-orange-400 flex-grow ${form.price === 'free' ? 'border-gray-300 bg-gray-100 text-gray-500 font-black' : 'border-gray-100 dark:bg-gray-700'}`} disabled={form.price === 'free'}/>
               <button type="button" onClick={handleFreebie} className={`${form.price === 'free' ? 'bg-orange-500' : 'bg-gray-400'} text-white font-black text-xs px-4 rounded-2xl shadow-lg`}>{form.price === 'free' ? current.btnCancel : current.btnFree}</button>
             </div>
-            <input id="tour-location" type="date" value={form.deadline} onChange={e=>setForm({...form, deadline: e.target.value})} className="md:col-span-1 border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-orange-400 text-gray-500 dark:bg-gray-700"/>
+            <input id="tour-deadline" type="date" value={form.deadline} onChange={e=>setForm({...form, deadline: e.target.value})} className="md:col-span-1 border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-orange-400 text-gray-500 dark:bg-gray-700"/>
             <input placeholder={current.phId} value={form.studentId} onChange={e=>setForm({...form, studentId: e.target.value})} className="border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-orange-400 dark:bg-gray-700"/>
             <input placeholder={current.phSeller} value={form.sellerName} onChange={e=>setForm({...form, sellerName: e.target.value})} className="border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-orange-400 dark:bg-gray-700"/>
             <input placeholder={current.phPhone} value={form.phone} onChange={e=>setForm({...form, phone: handlePhoneChange(e.target.value)})} className="border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-orange-400 dark:bg-gray-700"/>
@@ -335,7 +447,7 @@ function LostPage({ lang }) {
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6 relative z-10">
-          <select value={sortType} onChange={(e) => {setSortType(e.target.value); setCurrentPage(1);}} className="bg-white border-2 border-orange-100 px-4 py-2 rounded-xl font-black text-xs outline-none shadow-sm dark:bg-gray-800">
+          <select id="tour-sort" value={sortType} onChange={(e) => {setSortType(e.target.value); setCurrentPage(1);}} className="bg-white border-2 border-orange-100 px-4 py-2 rounded-xl font-black text-xs outline-none shadow-sm dark:bg-gray-800">
             <option value="latest">{current.sortOpt.latest}</option><option value="deadline">{current.sortOpt.deadline}</option><option value="priceHigh">{current.sortOpt.priceHigh}</option><option value="likes">{current.sortOpt.likes}</option>
           </select>
           <div className="flex gap-2">
@@ -350,11 +462,8 @@ function LostPage({ lang }) {
               <div key={item._id} className={`p-6 md:p-8 rounded-[3rem] border-4 hover:-translate-y-1 hover:shadow-2xl flex flex-col relative overflow-hidden ${item.completed ? 'border-gray-400 bg-gray-50' : 'border-orange-50 bg-white dark:bg-gray-800'}`}> 
                 {item.completed && <div className="absolute -right-10 top-10 bg-gray-500 text-white font-black text-xs py-1 px-12 rotate-45 shadow-lg z-10">{current.soldOut}</div>}
                 
-                {/* 👇 ✅ 실시간 미리보기 + 모든 정보 수정 폼 (레전드 UX) */}
                 {editingId === item._id ? (
                   <div className="flex flex-col gap-4 z-10 w-full animate-[slide-up_0.2s_ease-out]">
-                    
-                    {/* 실시간 미리보기 카드 */}
                     <div className="border-2 border-orange-300 border-dashed p-4 rounded-2xl bg-orange-50/50 dark:bg-gray-800/50 relative pointer-events-none opacity-90 shadow-sm mt-2">
                       <div className="absolute -top-3 left-4 bg-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm">👀 실시간 수정 미리보기</div>
                       <div className="flex justify-between items-start mb-3 mt-1"><h3 className="text-lg font-black text-gray-800 dark:text-gray-100">{editForm.title || '제목을 입력하세요'}</h3></div> 
@@ -372,7 +481,6 @@ function LostPage({ lang }) {
                       </div>
                     </div>
 
-                    {/* 모든 필드 수정 폼 */}
                     <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-2xl border border-gray-200 dark:border-gray-600 flex flex-col gap-2.5 shadow-inner pointer-events-auto">
                       <input className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800 p-2 rounded-xl text-xs font-bold w-full outline-none focus:border-orange-400 transition-colors" placeholder={current.phTitle} value={editForm.title} onChange={e=>setEditForm({...editForm, title: e.target.value})} />
                       <div className="flex gap-2">
@@ -459,7 +567,7 @@ function LostPage({ lang }) {
                     <td className="p-4"><span className={`px-4 py-1 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-gray-500 text-white' : 'bg-orange-500 text-white'}`}>{item.completed ? current.stDone : current.stSale}</span></td>
                     <td className="p-4 flex gap-1 justify-center">
                       <button type="button" onClick={() => {
-                        setViewType('card'); // 테이블 뷰에서 수정 누르면 카드뷰로 자동 전환! (개꿀 UX)
+                        setViewType('card');
                         setEditingId(item._id); 
                         setEditForm({...item});
                       }} className="text-orange-400 hover:text-orange-500 bg-orange-50 px-3 py-1 rounded-full font-black text-[9px]">수정</button>
