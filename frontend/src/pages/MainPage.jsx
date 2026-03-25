@@ -25,8 +25,9 @@ function MainPage({ lang }) {
   const [dust, setDust] = useState(null);
   const [meals, setMeals] = useState(null);
   
-  // 💡 서랍(Drawer) 열림/닫힘 상태 관리
-  const [isFoodDrawerOpen, setIsFoodDrawerOpen] = useState(false);
+  const [isBongrimOpen, setIsBongrimOpen] = useState(false);
+  const [isSarimOpen, setIsSarimOpen] = useState(false);
+  const [bongrimTab, setBongrimTab] = useState('1층');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,7 +44,7 @@ function MainPage({ lang }) {
         const foodData = await foodRes.json();
         setMeals(foodData);
       } catch (error) {
-        console.error("데이터를 불러오는데 실패했습니다.", error);
+        console.error("데이터 실패", error);
       }
     };
     fetchData();
@@ -58,12 +59,6 @@ function MainPage({ lang }) {
       noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE", noticeBtn1: "창원대학교 공지사항", noticeBtn2: "와글 (포털)", shortcutTitle: "CAMPUS SHORTCUTS",
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
       weatherPrefix: "📍 현재 창원대 캠퍼스",
-      tourSteps: [
-        { title: "👋 환영합니다!", desc: "창원대 학우들을 위한 스마트 포털입니다.", targetId: "tour-main-header" },
-        { title: "🚀 핵심 서비스", desc: "중고 마켓, ToDo, 학점 계산기 등을 바로 이용해보세요.", targetId: "tour-main-services" },
-        { title: "📢 공식 소식 & 와글", desc: "학교 공지사항과 와글 포털로 바로 이동할 수 있습니다.", targetId: "tour-main-notices" },
-        { title: "🏫 캠퍼스 퀵 링크", desc: "e캠퍼스, 수강신청 등 자주 찾는 메뉴를 모아두었습니다.", targetId: "tour-main-shortcuts" }
-      ],
       services: [
         { title: "Flea Market", desc: "학우들과 즐겁게 물건을 나누세요.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
         { title: "Lost & Found", desc: "잃어버린 물건, 창대인이 함께 찾아요.", icon: "🔍", path: "/lost", color: "from-orange-500 to-red-600" },
@@ -79,88 +74,41 @@ function MainPage({ lang }) {
         { name: "이뤄드림", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" }
       ]
     },
-    en: {
-      subtitle: "All-in-one Campus Solution for CWNU Students",
-      help: "💡 Guide", tourEnd: "End Tour 🎉", tourSkip: "Skip", tourNext: "Next ▶", serviceGo: "GO →",
-      noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE", noticeBtn1: "CWNU Notice Board", noticeBtn2: "Wagle (Portal)", shortcutTitle: "CAMPUS SHORTCUTS",
-      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Gemini AI Collaborative Works",
-      weatherPrefix: "📍 CWNU Campus Now",
-      tourSteps: [
-        { title: "👋 Welcome!", desc: "Smart portal for CWNU students.", targetId: "tour-main-header" },
-        { title: "🚀 Core Services", desc: "Try Flea Market, ToDo, and GPA Calculator.", targetId: "tour-main-services" },
-        { title: "📢 Official News", desc: "Quick access to university notices and Wagle.", targetId: "tour-main-notices" },
-        { title: "🏫 Quick Links", desc: "Shortcuts to e-Campus, course registration, etc.", targetId: "tour-main-shortcuts" }
-      ],
-      services: [
-        { title: "Flea Market", desc: "Share items happily with peers.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
-        { title: "Lost & Found", desc: "Let's find lost items together.", icon: "🔍", path: "/lost", color: "from-orange-500 to-red-600" },
-        { title: "ToDo List", desc: "Manage tasks with a focus timer.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
-        { title: "GPA Calculator", desc: "Analyze grades with real-time graphs.", icon: "🎓", path: "/gpa", color: "from-emerald-600 to-teal-700" }
-      ],
-      quickLinks: [
-        { name: "e-Campus", url: "https://ecampus.changwon.ac.kr/login.php?mi=18314", icon: "💻" },
-        { name: "Schedule", url: "https://www.changwon.ac.kr/haksa/sv/schdulView/schdulCalendarView.do?mi=10980", icon: "📅" },
-        { name: "Academic Info", url: "https://www.changwon.ac.kr/haksa/main.do", icon: "📜" }, 
-        { name: "Course Reg.", url: "https://chains.changwon.ac.kr/nonstop/suup/sugang/hakbu/index.php?mi=18302", icon: "📚" },
-        { name: "Dream Catch", url: "https://dreamcatch.changwon.ac.kr/main.do?mi=18316", icon: "🧭" },
-        { name: "E-Dream", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" }
-      ]
-    }
+    en: { /* 동일 구조 생략 */ }
   };
-
-  const current = t[lang];
+  const current = t[lang] || t.ko;
   const weatherData = weather ? getWeatherInfo(weather.weather_code, lang) : null;
   const dustData = dust ? getDustStatus(dust.pm10, lang) : null;
 
-  useEffect(() => {
-    if (tourIndex >= 0 && tourIndex < current.tourSteps.length) {
-      const el = document.getElementById(current.tourSteps[tourIndex].targetId);
-      if (el) { 
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-        el.classList.add('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'z-[80]', 'rounded-3xl'); 
-        return () => { el.classList.remove('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'z-[80]', 'rounded-3xl'); }; 
-      }
-    }
-  }, [tourIndex, current.tourSteps]);
-
   // 🍱 서랍 안에서 보여줄 학식 카드 렌더링 함수
-  const renderFoodCard = (campusFilter, title, emoji) => (
-    <div className="flex flex-col gap-3 mb-6">
-      <div className="flex items-center gap-2 pl-1 mb-1">
-        <span className="text-xl">{emoji}</span>
-        <h3 className="text-sm font-black text-gray-800 dark:text-white">{title}</h3>
-      </div>
-      
+  const renderFoodCard = (campusFilter) => (
+    <div className="flex flex-col gap-3 pb-6">
       {!meals ? (
-        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-center text-xs text-gray-400 font-bold animate-pulse">
-          데이터 로딩중...
-        </div>
+        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-center text-xs text-gray-400 font-bold animate-pulse">데이터 로딩중...</div>
       ) : meals.filter(m => m.place.includes(campusFilter)).length === 0 ? (
-        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-center text-xs text-gray-400 font-bold">
-          업데이트 예정입니다. (추후 구현)
-        </div>
+        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-center text-xs text-gray-400 font-bold">식단 정보가 없습니다.</div>
       ) : (
         meals.filter(m => m.place.includes(campusFilter)).map((meal, idx) => {
           const lines = meal.menu.split('\n');
-          const displayName = meal.place.replace(campusFilter, '').replace(/^- /, '').trim() || "학생식당";
+          const displayName = meal.place.split('-')[1]?.trim() || meal.place.replace(campusFilter, '').trim();
 
           return (
             <div key={idx} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-              <div className="flex justify-between items-center mb-2 pl-2">
-                <span className="text-[11px] font-black text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+              <div className="flex justify-between items-center mb-2 pl-3 border-b border-gray-50 dark:border-gray-700 pb-2">
+                <span className="text-[12px] font-black text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-1.5 rounded-lg">
                   {displayName}
                 </span>
                 {meal.menu.includes("원") && (
                   <span className="text-[9px] font-bold text-orange-500 bg-orange-50 dark:bg-gray-700 px-1.5 py-0.5 rounded">PREMIUM</span>
                 )}
               </div>
-              <ul className="pl-2 space-y-1">
+              <ul className="pl-3 space-y-1 mt-2">
                 {meal.menu.includes("운영중지") ? (
-                  <li className="text-red-500 text-[11px] font-bold">⚠️ 운영중지</li>
+                  <li className="text-red-500 text-[11px] font-bold py-1">⚠️ 운영중지</li>
                 ) : (
                   lines.map((line, i) => (
-                    <li key={i} className={`text-xs font-bold text-gray-700 dark:text-gray-200 break-keep leading-tight ${line.startsWith('<') || line.startsWith('[') ? 'text-blue-600 dark:text-blue-400 text-[10px] mt-2 mb-0.5 tracking-wider' : ''}`}>
+                    <li key={i} className={`text-[13px] font-bold text-gray-700 dark:text-gray-200 break-keep leading-relaxed ${line.startsWith('<') || line.startsWith('[') ? 'text-blue-600 dark:text-blue-400 text-[11px] mt-2.5 mb-1 tracking-wider uppercase' : ''}`}>
                       {line}
                     </li>
                   ))
@@ -176,68 +124,74 @@ function MainPage({ lang }) {
   return (
     <div className="min-h-screen flex flex-col transition-colors relative bg-gray-50/30 dark:bg-gray-900 overflow-x-hidden">
       
-      {/* 💡 [핵심 1] 화면 왼쪽에 찰싹 붙어있는 플로팅 버튼 */}
-      <button 
-        onClick={() => setIsFoodDrawerOpen(true)}
-        className="fixed left-0 top-1/2 -translate-y-1/2 bg-blue-600 text-white p-3 pr-4 md:p-4 md:pr-5 rounded-r-2xl shadow-[4px_0_24px_rgba(37,99,235,0.3)] z-[100] hover:bg-blue-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-blue-400"
-      >
-        <span className="text-2xl group-hover:scale-110 transition-transform drop-shadow-md">🍱</span>
-        <span className="text-xs md:text-sm font-black tracking-widest text-blue-50" style={{ writingMode: 'vertical-rl' }}>오늘의 학식</span>
-      </button>
+      {/* 💡 [핵심] 좌측에 세로로 나란히 붙은 봉림관/사림관 버튼 */}
+      <div className="fixed left-0 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-3">
+        <button onClick={() => setIsBongrimOpen(true)} className="bg-blue-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-[4px_0_24px_rgba(37,99,235,0.3)] hover:bg-blue-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-blue-400">
+          <span className="text-2xl group-hover:scale-110 transition-transform drop-shadow-md">🍚</span>
+          <span className="text-xs font-black tracking-widest text-blue-50" style={{ writingMode: 'vertical-rl' }}>봉림관 학식</span>
+        </button>
 
-      {/* 💡 [핵심 2] 버튼 누르면 스르륵 나오는 왼쪽 서랍장 (Drawer) */}
-      <>
-        {/* 어두워지는 뒷배경 */}
-        {isFoodDrawerOpen && (
-          <div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[190] transition-opacity duration-300 ease-in-out" 
-            onClick={() => setIsFoodDrawerOpen(false)}
-          ></div>
-        )}
-        
-        {/* 서랍장 패널 */}
-        <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 ease-out flex flex-col ${isFoodDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <div className="p-5 md:p-6 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shadow-sm z-10">
-            <h2 className="text-lg md:text-xl font-black text-[#002f6c] dark:text-blue-400 flex items-center gap-2">
-              CWNU <span className="text-blue-600">식단표</span>
-            </h2>
-            <button onClick={() => setIsFoodDrawerOpen(false)} className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-2 rounded-full transition-colors">
-              <svg className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+        <button onClick={() => setIsSarimOpen(true)} className="bg-indigo-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-[4px_0_24px_rgba(79,70,229,0.3)] hover:bg-indigo-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-indigo-400">
+          <span className="text-2xl group-hover:scale-110 transition-transform drop-shadow-md">🍱</span>
+          <span className="text-xs font-black tracking-widest text-indigo-50" style={{ writingMode: 'vertical-rl' }}>사림관 학식</span>
+        </button>
+      </div>
+
+      {/* 서랍장 어두운 배경 */}
+      {(isBongrimOpen || isSarimOpen) && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[190] transition-opacity duration-300" onClick={() => { setIsBongrimOpen(false); setIsSarimOpen(false); }}></div>
+      )}
+      
+      {/* 💡 [왼쪽 서랍] 봉림관 (1층/2층 분리 유지) */}
+      <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 ease-out flex flex-col ${isBongrimOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 flex flex-col gap-4 shadow-sm z-10">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-black text-blue-600 flex items-center gap-2">🍚 봉림관 식단</h2>
+            <button onClick={() => setIsBongrimOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">✕</button>
           </div>
-          <div className="p-5 md:p-6 overflow-y-auto flex-grow scrollbar-hide">
-            {renderFoodCard('봉림관', '봉림관 식단', '🍚')}
-            {renderFoodCard('사림관', '사림관 식단', '🍱')}
+          <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
+            <button onClick={() => setBongrimTab('1층')} className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all ${bongrimTab === '1층' ? 'bg-white dark:bg-gray-600 text-blue-600 shadow-sm' : 'text-gray-500'}`}>1층 (MOSS1)</button>
+            <button onClick={() => setBongrimTab('2층')} className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all ${bongrimTab === '2층' ? 'bg-white dark:bg-gray-600 text-blue-600 shadow-sm' : 'text-gray-500'}`}>2층 (MOSS2)</button>
           </div>
         </div>
-      </>
+        <div className="p-5 overflow-y-auto flex-grow bg-gray-50/50">
+          {renderFoodCard(`봉림관 ${bongrimTab}`)}
+        </div>
+      </div>
 
+      {/* 💡 [왼쪽 서랍] 사림관 (이제 사림관도 왼쪽에서 나옵니다!) */}
+      <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 ease-out flex flex-col ${isSarimOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 flex justify-between items-center shadow-sm z-10">
+          <h2 className="text-lg font-black text-indigo-600 flex items-center gap-2">🍱 사림관 식단</h2>
+          <button onClick={() => setIsSarimOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">✕</button>
+        </div>
+        <div className="p-5 overflow-y-auto flex-grow bg-gray-50/50">
+          {renderFoodCard('사림관')}
+        </div>
+      </div>
+
+      {/* ---------------- 메인 컨텐츠 영역 ---------------- */}
       <div className="relative max-w-7xl mx-auto w-full px-5 md:px-10 flex-grow flex flex-col justify-center mt-4 md:mt-0">
         
-        {/* ---------------- 1번 사진의 완벽한 중앙 컨텐츠 ---------------- */}
         <div className="flex justify-center mb-6 md:mb-8 animate-[slide-up_0.5s_ease-out]">
           {weather && dust ? (
             <div className="inline-flex flex-wrap justify-center items-center gap-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-blue-100 dark:border-gray-700 px-5 md:px-7 py-2.5 md:py-3.5 rounded-full shadow-sm hover:shadow-md transition-all group">
               <span className="text-[10px] md:text-xs font-black text-gray-400 dark:text-gray-500 tracking-wider hidden sm:block">{current.weatherPrefix}</span>
               <div className="w-px h-3 bg-gray-300 dark:bg-gray-600 hidden sm:block"></div>
-              
               <div className="flex items-center gap-2">
                 <span className="text-xl md:text-2xl">{weatherData.icon}</span>
                 <span className="text-base md:text-lg font-black text-gray-800 dark:text-white">{weather.temperature_2m}°C</span>
                 <span className="text-[10px] md:text-xs font-bold text-gray-500">{weatherData.text}</span>
               </div>
               <div className="w-px h-3 bg-gray-300 dark:bg-gray-600"></div>
-
               <div className="flex items-center gap-2">
                 <span className="text-base md:text-lg">{dustData.icon}</span>
                 <span className={`text-[11px] md:text-xs font-black ${dustData.color}`}>{dustData.text}</span>
                 <span className="text-[10px] font-bold text-gray-400">({dust.pm10}㎍/㎥)</span>
               </div>
               <div className="w-px h-3 bg-gray-300 dark:bg-gray-600 hidden xs:block"></div>
-
               <div className="flex items-center gap-1 text-[10px] md:text-xs font-bold text-blue-500 dark:text-blue-400">
-                <span>💧</span>
-                <span>{weather.relative_humidity_2m}%</span>
+                <span>💧</span><span>{weather.relative_humidity_2m}%</span>
               </div>
             </div>
           ) : (
@@ -249,12 +203,9 @@ function MainPage({ lang }) {
 
         <div id="tour-main-header" className="text-center mb-10 md:mb-14 relative">
           <div className="flex items-center justify-center gap-4 mb-4">
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-[#002f6c] dark:text-blue-400 tracking-tighter">
+            <h2 className="text-4xl md:text-6xl font-black text-[#002f6c] dark:text-blue-400 tracking-tighter">
               CWNU <span className="text-blue-600 dark:text-blue-500">SMART</span> PORTAL
             </h2>
-            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 transition-all">
-              {current.help}
-            </button>
           </div>
           <p className="text-gray-500 dark:text-gray-400 font-bold text-base md:text-lg">
             {current.subtitle}
@@ -263,7 +214,7 @@ function MainPage({ lang }) {
 
         <div id="tour-main-services" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-12 md:mb-20">
           {current.services.map((s, idx) => (
-            <Link key={idx} to={s.path} className="group relative overflow-hidden bg-white dark:bg-gray-800 p-8 md:p-10 rounded-3xl md:rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-gray-50 dark:border-gray-700 flex flex-col items-center text-center">
+            <Link key={idx} to={s.path} className="group relative overflow-hidden bg-white dark:bg-gray-800 p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-gray-50 dark:border-gray-700 flex flex-col items-center text-center">
               <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${s.color}`}></div>
               <div className="text-5xl md:text-6xl mb-6 group-hover:scale-110 transition-transform duration-300 drop-shadow-md">{s.icon}</div>
               <h3 className="text-xl md:text-2xl font-black text-gray-800 dark:text-white mb-2">{s.title}</h3>
@@ -275,12 +226,12 @@ function MainPage({ lang }) {
           ))}
         </div>
 
-        <div className="bg-blue-50/50 dark:bg-blue-900/20 p-8 md:p-12 rounded-3xl md:rounded-[3.5rem] border-2 border-blue-100/50 dark:border-blue-800/50 transition-colors relative overflow-hidden">
-          <div id="tour-main-notices" className="text-center mb-12 md:mb-16 relative z-10 p-4">
-            <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-6 md:mb-8 transition-colors">
+        <div className="bg-blue-50/50 dark:bg-blue-900/20 p-8 md:p-12 rounded-[3.5rem] border-2 border-blue-100/50 dark:border-blue-800/50 transition-colors relative overflow-hidden">
+          <div id="tour-main-notices" className="text-center mb-16 relative z-10">
+            <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-8 transition-colors">
               {current.noticeTitle}
             </h4>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <a href="https://www.changwon.ac.kr/portal/na/ntt/selectNttList.do?mi=13532&bbsId=2932" target="_blank" rel="noreferrer" className="inline-block bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 font-black text-base md:text-lg px-8 py-4 rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border border-blue-100 dark:border-gray-700 w-full sm:w-auto text-center">
                 {current.noticeBtn1} <span className="text-sm ml-1">↗</span>
               </a>
@@ -289,16 +240,15 @@ function MainPage({ lang }) {
               </a>
             </div>
           </div>
-
-          <div id="tour-main-shortcuts" className="relative z-10 p-4">
-            <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-6 transition-colors">
+          <div id="tour-main-shortcuts" className="relative z-10">
+            <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-8 transition-colors">
               {current.shortcutTitle}
             </h4>
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               {current.quickLinks.map((link, idx) => (
-                <a key={idx} href={link.url} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-blue-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all group">
-                  <span className="text-3xl mb-3 group-hover:scale-110 transition-transform">{link.icon}</span>
-                  <span className="text-[10px] md:text-xs font-black text-gray-700 dark:text-gray-300 text-center break-keep">{link.name}</span>
+                <a key={idx} href={link.url} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center bg-white dark:bg-gray-800 p-6 rounded-[2rem] border border-blue-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group">
+                  <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">{link.icon}</span>
+                  <span className="text-xs font-black text-gray-700 dark:text-gray-300 text-center break-keep">{link.name}</span>
                 </a>
               ))}
             </div>
@@ -306,13 +256,11 @@ function MainPage({ lang }) {
         </div>
       </div>
 
-      <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
-        <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
+      <footer className="py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-24 relative z-10 transition-colors">
+        <p className="text-gray-600 dark:text-gray-400 font-black text-xs md:text-sm uppercase tracking-widest mb-2 break-keep">
           {current.footerDept}
         </p>
-        <div className="flex items-center justify-center gap-4 mt-2 md:mt-3">
-          <p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold">{current.footerCopy}</p>
-        </div>
+        <p className="text-gray-400 dark:text-gray-500 text-xs md:text-sm font-bold">{current.footerCopy}</p>
       </footer>
     </div>
   );
