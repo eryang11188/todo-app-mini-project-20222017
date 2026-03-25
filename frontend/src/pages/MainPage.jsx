@@ -223,7 +223,7 @@ function MainPage({ lang }) {
       {/* ✨ 마우스를 올리면(hover) 나타나는 툴팁 박스 */}
       <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center animate-bounce">
         <span className="relative z-10 p-2 text-xs leading-none text-white whitespace-no-wrap bg-gray-800 dark:bg-gray-700 shadow-lg rounded-md font-bold">
-          Github Profile
+          Github
         </span>
         {/* 삼각형 꼬리 */}
         <div className="w-3 h-3 -mt-2 rotate-45 bg-gray-800 dark:bg-gray-700"></div>

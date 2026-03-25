@@ -62,10 +62,10 @@ function App() {
   };
 
   // ✅ 신규: 헤더 다국어 사전 (인스타 텍스트는 이제 SVG로 대체되므로 사용하지 않지만 구조 유지를 위해 둠)
-  const t = {
-    ko: { market: "MARKET", todo: "TODO", gpa: "GPA 계산기", food: "학식↗", lib: " 도서관↗", insta: "📸 인스타" },
-    en: { market: "MARKET", todo: "TODO", gpa: "GPA Calc", food: "Food↗", lib: " Library↗", insta: "📸 Insta" }
-  };
+ const t = {
+  ko: { market: "MARKET", todo: "TODO", gpa: "GPA 계산기", copykiller: "카피킬러↗", food: "학식↗", lib: " 도서관↗", insta: "📸 인스타" },
+  en: { market: "MARKET", todo: "TODO", gpa: "GPA Calc", copykiller: "CopyKiller↗", food: "Food↗", lib: " Library↗", insta: "📸 Insta" }
+};
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark' : ''} bg-white dark:bg-gray-900 transition-colors`}>
@@ -93,6 +93,12 @@ function App() {
         )}
 
         <div className="flex gap-2 md:gap-3 items-center w-full md:w-auto justify-center md:justify-end">
+          
+          
+          {/* ✅ 여기에 카피킬러 버튼을 똭! 끼워 넣으세요 (학식 바로 왼쪽 위치) */}
+  <a href="https://changwongrad.copykiller.com/welcome" target="_blank" rel="noreferrer" className="bg-[#be123c] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#9f1239] transition">
+    📝 {t[lang].copykiller}
+  </a>
           <a href="https://app.changwon.ac.kr/campus/campus_001.do" target="_blank" rel="noreferrer" className="bg-[#634432] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#4d3527] transition">{t[lang].food}</a>
           <a href="https://lib.changwon.ac.kr/" target="_blank" rel="noreferrer" className="bg-[#059669] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#047857] transition">{t[lang].lib}</a>
           
