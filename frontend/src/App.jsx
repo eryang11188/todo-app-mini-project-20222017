@@ -82,10 +82,10 @@ function App() {
       : "text-white/70 hover:text-white hover:bg-white/10");
   };
 
-  // ✅ 다국어 사전 (분실물 센터 및 교육과정 추가)
+  // ✅ 다국어 사전 
   const t = {
-    ko: { market: "MARKET", lost: "분실물 센터", todo: "TODO", gpa: "GPA 계산기", curriculum: "교육과정↗", copykiller: "카피킬러↗", food: "학식↗", lib: " 도서관↗", insta: "📸 인스타" },
-    en: { market: "MARKET", lost: "Lost&Found", todo: "TODO", gpa: "GPA Calc", curriculum: "Curriculum↗", copykiller: "CopyKiller↗", food: "Food↗", lib: " Library↗", insta: "📸 Insta" }
+    ko: { market: "MARKET", lost: "분실물 센터", todo: "TODO", gpa: "GPA 계산기", copykiller: "카피킬러↗", food: "학식↗", lib: " 도서관↗", insta: "📸 인스타" },
+    en: { market: "MARKET", lost: "Lost&Found", todo: "TODO", gpa: "GPA Calc", copykiller: "CopyKiller↗", food: "Food↗", lib: " Library↗", insta: "📸 Insta" }
   };
 
   return (
@@ -116,12 +116,7 @@ function App() {
 
         <div className="flex gap-2 md:gap-3 items-center w-full md:w-auto justify-center md:justify-end">
           
-          {/* ✅ 교육과정 바로가기 */}
-          <a href="https://www.changwon.ac.kr/haksa/cm/cntnts/cntntsView.do?mi=18077&cntntsId=6530" target="_blank" rel="noreferrer" className="bg-[#2563eb] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#1d4ed8] transition">
-            📚 {t[lang].curriculum}
-          </a>
-
-          {/* ✅ 카피킬러 버튼 */}
+          {/* ✅ 카피킬러 버튼 (교육과정 버튼 제거 완료) */}
           <a href="https://changwongrad.copykiller.com/welcome" target="_blank" rel="noreferrer" className="bg-[#be123c] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#9f1239] transition">
             📝 {t[lang].copykiller}
           </a>
