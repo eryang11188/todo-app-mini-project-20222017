@@ -134,6 +134,19 @@ function MarketPage({ lang }) {
   };
   const current = t[lang];
 
+  // ⭐ 작성 시간 포맷팅 함수 추가 (방금 전, 1분 전 등 당근마켓 스타일)
+  const formatTimeAgo = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return lang === 'ko' ? '방금 전' : 'Just now';
+    if (diff < 3600) return lang === 'ko' ? `${Math.floor(diff / 60)}분 전` : `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return lang === 'ko' ? `${Math.floor(diff / 3600)}시간 전` : `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 2592000) return lang === 'ko' ? `${Math.floor(diff / 86400)}일 전` : `${Math.floor(diff / 86400)}d ago`;
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+  };
+
   useEffect(() => { 
     fetchItems(); 
     if (MARKET_QUOTES[lang]?.length > 0) {
@@ -580,11 +593,9 @@ function MarketPage({ lang }) {
               <div key={item._id} className={`p-6 md:p-8 rounded-3xl md:rounded-[3rem] border-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col relative overflow-hidden ${item.completed ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-blue-50 bg-white dark:bg-gray-800'}`}> 
                 {item.completed && <div className="absolute -right-10 top-10 bg-red-500 text-white font-black text-xs py-1 px-12 rotate-45 shadow-lg z-10">{current.soldOut}</div>}
                 
-                {/* 👇 ✅ 실시간 미리보기 + 모든 정보 수정 폼 (레전드 UX - 블루 테마) */}
                 {editingId === item._id ? (
                   <div className="flex flex-col gap-4 z-10 w-full animate-[slide-up_0.2s_ease-out]">
                     
-                    {/* 실시간 미리보기 카드 */}
                     <div className="border-2 border-blue-300 border-dashed p-4 rounded-2xl bg-blue-50/50 dark:bg-gray-800/50 relative pointer-events-none opacity-90 shadow-sm mt-2">
                       <div className="absolute -top-3 left-4 bg-blue-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm">👀 실시간 수정 미리보기</div>
                       <div className="flex justify-between items-start mb-3 mt-1"><h3 className="text-lg font-black text-gray-800 dark:text-gray-100">{editForm.title || '제목을 입력하세요'}</h3></div> 
@@ -602,7 +613,6 @@ function MarketPage({ lang }) {
                       </div>
                     </div>
 
-                    {/* 모든 필드 수정 폼 */}
                     <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-2xl border border-gray-200 dark:border-gray-600 flex flex-col gap-2.5 shadow-inner pointer-events-auto">
                       <input className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800 p-2 rounded-xl text-xs font-bold w-full outline-none focus:border-blue-400 transition-colors" placeholder={current.phTitle} value={editForm.title} onChange={e=>setEditForm({...editForm, title: e.target.value})} />
                       <div className="flex gap-2">
@@ -628,7 +638,11 @@ function MarketPage({ lang }) {
                   </div>
                 ) : (
                   <>
-                    <div className="flex justify-between items-start mb-4 z-10"><h3 className={`text-xl font-black flex-grow pr-10 ${item.completed ? 'text-red-600 line-through opacity-70' : 'text-gray-800 dark:text-gray-100'}`}>{item.title}</h3></div> 
+                    <div className="flex justify-between items-start mb-4 z-10">
+                      <h3 className={`text-xl font-black flex-grow pr-4 ${item.completed ? 'text-red-600 line-through opacity-70' : 'text-gray-800 dark:text-gray-100'}`}>{item.title}</h3>
+                      {/* ⭐ 시간 표시 추가 */}
+                      {item.createdAt && <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap pt-1 ml-2">{formatTimeAgo(item.createdAt)}</span>}
+                    </div> 
                     <div className="flex justify-between items-center mb-6 z-10 relative">
                       <p className={`text-2xl md:text-3xl font-black ${item.completed ? 'text-red-400 opacity-70' : 'text-blue-700 dark:text-blue-400'}`}>{item.price === 0 ? current.freeBadge : `${Number(item.price).toLocaleString()}${current.currency}`}</p>
                       <button type="button" onClick={() => handleLike(item._id)} className={`flex flex-col items-center hover:scale-110 transition-transform ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-200'}`}><span className="text-2xl drop-shadow-md">♥</span><span className="text-[10px] font-black mt-[-4px]">{item.likes}</span></button>
@@ -703,11 +717,15 @@ function MarketPage({ lang }) {
                       </div>
                     </td>
                     <td className="p-4 font-black text-sm text-blue-600 dark:text-blue-400">{item.price === 0 ? current.freeBadge : `${Number(item.price).toLocaleString()}${current.currency}`}</td>
-                    <td className="p-4 font-bold text-gray-500 dark:text-gray-400 text-xs">{item.sellerName} <br/><span className="text-[10px] text-gray-400">{item.phone}</span></td>
+                    <td className="p-4 font-bold text-gray-500 dark:text-gray-400 text-xs">
+                      {item.sellerName} <br/><span className="text-[10px] text-gray-400">{item.phone}</span>
+                      {/* ⭐ 테이블 뷰 시간 표시 */}
+                      {item.createdAt && <div className="text-[9px] text-gray-400 mt-1 font-medium">{formatTimeAgo(item.createdAt)}</div>}
+                    </td>
                     <td className="p-4"><span className={`px-4 py-1 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-red-500 text-white' : 'bg-blue-600 text-white'}`}>{item.completed ? current.stDone : current.stSale}</span></td>
                     <td className="p-4 flex flex-col items-center gap-1">
                       <button type="button" onClick={() => {
-                        setViewType('card'); // 테이블 뷰에서 수정 눌러도 카드뷰로 부드럽게 넘어가게
+                        setViewType('card');
                         setEditingId(item._id); 
                         setEditForm({
                           ...item, 

@@ -11,8 +11,7 @@ const PLACEHOLDERS = {
   en: ["What great mission will you undertake?", "Add a small habit for growth", "The moment you write down a goal, it's half success.", "Enter your core goal for today here.", "What do you want to finish first?", "One small mission to make today fruitful!", "What is your first task today to change the world?", "That assignment you've been putting off, let's finish it today!", "Write them down slowly, starting with small things.", "The more specific the goal, the doubled the execution."]
 };
 
-// 🔴 [명언 배열]
-const QUOTES = [// 🎬 영화 명언 (한국어 '中', 영어 'from' 추가 완료)
+const QUOTES = [
   { ko: "어제는 역사, 내일은 미스터리, 오늘은 선물. 그래서 우리는 현재(Present)라고 부른다. - 우그웨이 (쿵푸팬더 中)", en: "Yesterday is history, tomorrow is a mystery, today is a gift. That's why we call it the present. - Oogway (from Kung Fu Panda)" },
   { ko: "하거나, 하지 않거나 둘 중 하나다. '해본다'는 건 없다. - 요다 (스타워즈 中)", en: "Do or do not. There is no try. - Yoda (from Star Wars)" },
   { ko: "인생은 초콜릿 상자와 같다. 네가 무엇을 고를지 아무도 모르니까. - 포레스트 검프 (포레스트 검프 中)", en: "Life was like a box of chocolates. You never know what you're gonna get. - Forrest Gump (from Forrest Gump)" },
@@ -34,7 +33,6 @@ const QUOTES = [// 🎬 영화 명언 (한국어 '中', 영어 'from' 추가 완
   { ko: "지금 이 순간 당신이 무엇을 하느냐가 차이를 만든다. - 사라 코너 (터미네이터 中)", en: "It's what you do right now that makes a difference. - Sarah Connor (from Terminator)" },
   { ko: "내가 누구인지는 내가 하는 행동이 말해준다. - 브루스 웨인 (다크 나이트 中)", en: "It is not who I am underneath, but what I do that defines me. - Bruce Wayne (from The Dark Knight)" },
 
-  // 📖 속담 및 격언 (여기서부터는 그대로 유지)
   { ko: "천 리 길도 한 걸음부터. - 한국 속담", en: "A journey of a thousand miles begins with a single step. - Proverb" },
   { ko: "고생 끝에 낙이 온다. - 한국 속담", en: "No pain, no gain. - Proverb" },
   { ko: "시작이 반이다. - 한국 속담", en: "Well begun is half done. - Proverb" },
@@ -51,7 +49,6 @@ const QUOTES = [// 🎬 영화 명언 (한국어 '中', 영어 'from' 추가 완
   { ko: "죽음을 기억하라. (Memento mori) - 라틴어 격언", en: "Remember that you must die. (Memento mori) - Latin Proverb" },
   { ko: "이 또한 지나가리라. - 페르시아 격언", en: "This too shall pass. - Persian Proverb" },
 
-  // 🔥 동기부여 및 철학 (위인, 리더, 작가 등)
   { ko: "천재는 1%의 영감과 99%의 노력으로 이루어진다. - 토머스 에디슨", en: "Genius is one percent inspiration and ninety-nine percent perspiration. - Thomas Edison" },
   { ko: "내일의 할 일을 오늘 하라. - 벤저민 프랭클린", en: "Do not put off until tomorrow what you can do today. - Benjamin Franklin" },
   { ko: "끝날 때까지는 끝난 게 아니다. - 요기 베라", en: "It ain't over till it's over. - Yogi Berra" },
@@ -175,6 +172,19 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   };
   const current = t[lang];
 
+  // ⭐ 작성 시간 포맷팅 함수 (방금 전, 2시간 전 등)
+  const formatTimeAgo = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return lang === 'ko' ? '방금 전' : 'Just now';
+    if (diff < 3600) return lang === 'ko' ? `${Math.floor(diff / 60)}분 전` : `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return lang === 'ko' ? `${Math.floor(diff / 3600)}시간 전` : `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 2592000) return lang === 'ko' ? `${Math.floor(diff / 86400)}일 전` : `${Math.floor(diff / 86400)}d ago`;
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+  };
+
   useEffect(() => { fetchTodos(); handleRandomize(); }, [])
   useEffect(() => { const intervalId = setInterval(() => setNow(new Date()), 50); return () => clearInterval(intervalId); }, []);
   useEffect(() => { const intervalId = setInterval(() => { setTitleMentionIndex(p => (p + 1) % TITLE_MENTIONS[lang].length); setPlaceholderIndex(p => (p + 1) % PLACEHOLDERS[lang].length); }, 6000); return () => clearInterval(intervalId); }, [lang]);
@@ -192,12 +202,10 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       const el = document.getElementById(current.tourSteps[tourIndex].targetId);
       if (el) { 
         el.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
-        // 💡 테두리 색상을 마켓과 통일된 blue로 변경
         el.classList.add('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
         return () => el.classList.remove('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tourIndex, timerMode, lang]);
 
   const fetchTodos = async () => { try { const res = await axios.get(API_URL); setTodos(res.data) } catch(e){} }
@@ -300,9 +308,9 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   }
   else if (sortBy === 'time') {
     filteredTodos.sort((a, b) => {
-      if (!a.todoDeadline) return 1;  // 기한이 없으면 맨 뒤로 보냄
-      if (!b.todoDeadline) return -1; // 기한이 없으면 맨 뒤로 보냄
-      return new Date(a.todoDeadline) - new Date(b.todoDeadline); // 마감이 가까운 순서대로(오름차순)
+      if (!a.todoDeadline) return 1;  
+      if (!b.todoDeadline) return -1; 
+      return new Date(a.todoDeadline) - new Date(b.todoDeadline); 
     });
   }
   
@@ -321,19 +329,16 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         @keyframes slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
         @keyframes shoot-up { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1); opacity: 0; } }
         .emoji-burst { position: absolute; animation: shoot-up 1.5s ease-out forwards; z-index: 9999; pointer-events: none; }
-        /* 💡 드래그 테두리 색상도 파란색(blue) 계열로 통일 */
         .drag-over-top { border-top: 4px solid #3b82f6 !important; transform: translateY(2px); transition: all 0.2s; }
         .drag-over-bottom { border-bottom: 4px solid #3b82f6 !important; transform: translateY(-2px); transition: all 0.2s; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        /* 💡 스크롤바 썸 색상도 마켓과 동일하게 */
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 10px; }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; }
       `}</style>
 
       {tourIndex >= 0 && (
         <div className="fixed z-[100] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-blue-400 dark:border-blue-500 w-[92%] max-w-[350px] bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
-          {/* 💡 모달창 텍스트 색상 파란색(blue)으로 통일 */}
           <h3 className="text-blue-600 dark:text-blue-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{current.tourSteps.length})</h3>
           <h2 className="text-lg md:text-xl font-black mb-2 md:mb-3 dark:text-white">{current.tourSteps[tourIndex].title}</h2>
           <p className="text-gray-600 dark:text-gray-300 text-xs md:text-sm font-bold mb-4 md:mb-5">{current.tourSteps[tourIndex].desc}</p>
@@ -482,7 +487,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
           </div>
         </div>
 
-        {/* 💡 투두 폼과 챗봇 색상도 파란색(blue)으로 전부 통일 */}
         <form id="tour-add" onSubmit={addTodo} className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-3xl shadow-lg border border-blue-50 dark:border-gray-700 flex flex-col mb-6 relative">
           
           <div className="flex flex-col md:flex-row flex-wrap gap-3 w-full items-center">
@@ -582,7 +586,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
           )}
         </form>
 
-        {/* 검색창도 파란색 테마로 통일 */}
         <div className="mb-6 w-full relative z-10">
           <input 
             type="text" placeholder={current.searchP} value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} 
@@ -649,6 +652,8 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   <div className={`font-black text-gray-800 dark:text-gray-100 text-sm md:text-lg break-words whitespace-pre-wrap ${expandedTodos[todo._id] ? '' : 'line-clamp-2'}`}>
     {todo.title}
   </div>
+  {/* ⭐ 작성 시간 추가 (테이블 뷰) */}
+  {todo.createdAt && <div className="text-[9px] text-gray-400 mt-1 font-medium">{formatTimeAgo(todo.createdAt)}</div>}
   {todo.title.length > 20 && (
     <button 
       onClick={(e) => { e.preventDefault(); setExpandedTodos(prev => ({...prev, [todo._id]: !prev[todo._id]})) }} 
@@ -723,6 +728,9 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   <span className={`font-black text-gray-800 dark:text-gray-100 text-lg md:text-xl break-words whitespace-pre-wrap ${expandedTodos[todo._id] ? '' : 'line-clamp-2'}`}>
     {todo.title}
   </span>
+  {/* ⭐ 작성 시간 추가 (카드 뷰/리스트 뷰) */}
+  {todo.createdAt && <span className="text-[10px] text-gray-400 font-bold mt-1">{formatTimeAgo(todo.createdAt)}</span>}
+  
   {todo.title.length > 20 && (
     <button 
       onClick={(e) => { e.preventDefault(); setExpandedTodos(prev => ({...prev, [todo._id]: !prev[todo._id]})) }} 
@@ -771,18 +779,15 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       </div>
 
 <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
-  {/* 1. 학과 정보 */}
   <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
     {current.footerDept}
   </p>
 
-  {/* 2. 저작권 문구 + 툴팁 기능이 있는 깃허브 아이콘 */}
   <div className="flex items-center justify-center gap-4 mt-2 md:mt-3">
     <p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold">
       {current.footerCopy}
     </p>
     
-    {/* 💡 툴팁 구현을 위한 group 클래스 추가 */}
     <div className="relative group flex flex-col items-center">
       <a 
         href="https://github.com/eryang11188/todo-app-mini-project-20222017.git" 
@@ -790,7 +795,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         rel="noopener noreferrer"
         className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-all hover:scale-110"
       >
-        {/* 요청하신 사이즈 35px 적용 */}
         <svg 
           height="35" 
           width="35" 
@@ -802,12 +806,10 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         </svg>
       </a>
 
-      {/* ✨ 마우스를 올리면(hover) 나타나는 툴팁 박스 */}
       <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center animate-bounce">
         <span className="relative z-10 p-2 text-xs leading-none text-white whitespace-no-wrap bg-gray-800 dark:bg-gray-700 shadow-lg rounded-md font-bold">
           Github 
         </span>
-        {/* 삼각형 꼬리 */}
         <div className="w-3 h-3 -mt-2 rotate-45 bg-gray-800 dark:bg-gray-700"></div>
       </div>
     </div>

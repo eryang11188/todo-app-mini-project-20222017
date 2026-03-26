@@ -47,7 +47,6 @@ function LostPage({ lang }) {
   const chatContainerRef = useRef(null);
   const textareaRef = useRef(null); 
 
-  // ✅ 업데이트 내역 모달 관련 상태 추가
   const [showVersionInfo, setShowVersionInfo] = useState(false)
   const [showModalConfetti, setShowModalConfetti] = useState(false)
 
@@ -72,7 +71,6 @@ function LostPage({ lang }) {
       thItem: "Item", thPrice: "Reward", thSeller: "Author", thStatus: "Status", thAction: "Action", stDone: "해결됨", stSale: "찾는중",
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
       
-      // ✅ 분실물 센터 전용 모달 텍스트
       modalTitle: "Lost & Found 신규 오픈!", modalSub: "마켓의 강력한 기능을 그대로 이식한 똑똑한 분실물 센터",
       modalPrevTitle: "🤔 이전 분실물 찾기 방식", modalPrev1: "❌ 에브리타임, 와글 등 이곳저곳 분산된 정보", modalPrev2: "❌ 직관적이지 않은 텍스트 위주 게시판", modalPrev3: "❌ AI 도움 없이 일일이 작성해야 하는 불편함",
       modalCurTitle: "✨ CWNU 전용 분실물 센터", modalCur1: "✅ 마켓과 통일된 예쁘고 직관적인 카드 UI!", modalCur2: "✅ 대충 말해도 AI가 찰떡같이 찾아주는 폼 자동완성!", modalCur3: "✅ 해결 완료 / 찾는 중 직관적인 상태 관리!", modalCur4: "✅ 실시간 미리보기로 완벽한 수정 기능 지원!", modalCur5: "🤖 캠퍼스 통합 데이터베이스 연동 완료!",
@@ -112,6 +110,19 @@ function LostPage({ lang }) {
   };
   const current = t[lang];
 
+  // ⭐ 작성 시간 포맷팅 함수 추가 (방금 전, 1분 전 등)
+  const formatTimeAgo = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return lang === 'ko' ? '방금 전' : 'Just now';
+    if (diff < 3600) return lang === 'ko' ? `${Math.floor(diff / 60)}분 전` : `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return lang === 'ko' ? `${Math.floor(diff / 3600)}시간 전` : `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 2592000) return lang === 'ko' ? `${Math.floor(diff / 86400)}일 전` : `${Math.floor(diff / 86400)}d ago`;
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+  };
+
   useEffect(() => { 
     fetchItems(); 
     if (LOST_QUOTES[lang]?.length > 0) {
@@ -126,10 +137,8 @@ function LostPage({ lang }) {
     if (chatContainerRef.current) { chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight; }
   }, [chatHistory, isGenerating]);
 
-  // ✅ 모달 폭죽 효과
   useEffect(() => { if (showVersionInfo) { setShowModalConfetti(true); setTimeout(() => setShowModalConfetti(false), 2500); } }, [showVersionInfo]);
 
-  // ✅ 도움말 튜토리얼 포커스
   useEffect(() => {
     if (tourIndex >= 0 && tourIndex < current.tourSteps.length) {
       const el = document.getElementById(current.tourSteps[tourIndex].targetId);
@@ -285,7 +294,6 @@ function LostPage({ lang }) {
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #f97316; }
       `}</style>
       
-      {/* ✅ 도움말 튜토리얼 팝업 */}
       {tourIndex >= 0 && (
         <div className="fixed z-[100] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-orange-400 dark:border-orange-500 w-[92%] max-w-[350px] bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col pointer-events-auto">
           <h3 className="text-orange-600 dark:text-orange-400 font-black mb-1 text-[10px] uppercase tracking-widest">Guide ({tourIndex + 1}/{current.tourSteps.length})</h3>
@@ -298,7 +306,6 @@ function LostPage({ lang }) {
         </div>
       )}
 
-      {/* ✅ 업데이트 내역 모달창 (오렌지 테마) */}
       {showVersionInfo && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[150] p-4 backdrop-blur-sm" onClick={() => setShowVersionInfo(false)}>
           <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-3xl md:rounded-[2rem] max-w-3xl w-full shadow-2xl transform transition-all border-4 border-orange-50 dark:border-gray-700 max-h-[90vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
@@ -346,17 +353,14 @@ function LostPage({ lang }) {
 
       <div className="flex-grow">
         
-        {/* ✅ 헤더 (타이틀, 도움말, NEW 배지) */}
         <div id="tour-header" className="text-center mb-6 md:mb-8 relative mt-4 md:mt-0">
           <div className="flex items-center justify-center gap-4 mb-2">
             <h2 className="text-3xl md:text-5xl font-black text-orange-600 dark:text-orange-400 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
               LOST & FOUND 
-              {/* ✅ NEW 배지 추가 */}
               <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-4 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">
                 NEW
               </span>
             </h2>
-            {/* ✅ 도움말 버튼 추가 */}
             <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
               {current.help}
             </button>
@@ -373,7 +377,6 @@ function LostPage({ lang }) {
           )}
         </div>
 
-        {/* 폼 (생략 없이 전체 포함) */}
         <form onSubmit={addItem} className="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl mb-6 md:mb-10 flex flex-col gap-3 md:gap-5 border border-orange-100 dark:border-gray-700 relative z-10 mt-4">
           <div id="tour-ai-btn" className="w-full mb-2">
             {!showAiBox ? (
@@ -506,7 +509,11 @@ function LostPage({ lang }) {
                   </div>
                 ) : (
                   <>
-                    <div className="flex justify-between items-start mb-4 z-10"><h3 className={`text-xl font-black ${item.completed ? 'text-gray-500 line-through' : 'text-gray-800 dark:text-gray-100'}`}>{item.title}</h3></div> 
+                    <div className="flex justify-between items-start mb-4 z-10">
+                      <h3 className={`text-xl font-black ${item.completed ? 'text-gray-500 line-through' : 'text-gray-800 dark:text-gray-100'}`}>{item.title}</h3>
+                      {/* ⭐ 새로 추가된 작성 시간 표시 기능 */}
+                      {item.createdAt && <span className="text-[10px] text-gray-400 font-bold ml-2 whitespace-nowrap pt-1">{formatTimeAgo(item.createdAt)}</span>}
+                    </div> 
                     <div className="flex justify-between items-center mb-6 z-10 relative">
                       <p className={`text-2xl font-black ${item.completed ? 'text-gray-400' : 'text-orange-600'}`}>{item.price === 0 ? current.freeBadge : `사례금 ${Number(item.price).toLocaleString()}${current.currency}`}</p>
                       <button type="button" onClick={() => handleLike(item._id)} className={`flex flex-col items-center hover:scale-110 ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-200'}`}><span className="text-2xl drop-shadow-md">👀</span><span className="text-[10px] font-black">{item.likes}</span></button>
@@ -563,7 +570,11 @@ function LostPage({ lang }) {
                       </div>
                     </td>
                     <td className="p-4 font-black text-sm text-orange-600 dark:text-orange-400">{item.price === 0 ? current.freeBadge : `${Number(item.price).toLocaleString()}${current.currency}`}</td>
-                    <td className="p-4 font-bold text-gray-500 dark:text-gray-400 text-xs">{item.sellerName}</td>
+                    <td className="p-4 font-bold text-gray-500 dark:text-gray-400 text-xs">
+                      {item.sellerName}
+                      {/* ⭐ 테이블 뷰에도 작성 시간 추가 */}
+                      {item.createdAt && <div className="text-[9px] text-gray-400 mt-1 font-medium">{formatTimeAgo(item.createdAt)}</div>}
+                    </td>
                     <td className="p-4"><span className={`px-4 py-1 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-gray-500 text-white' : 'bg-orange-500 text-white'}`}>{item.completed ? current.stDone : current.stSale}</span></td>
                     <td className="p-4 flex gap-1 justify-center">
                       <button type="button" onClick={() => {

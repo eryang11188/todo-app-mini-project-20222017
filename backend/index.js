@@ -12,10 +12,31 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// [1] MongoDB 연결
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB 연결 성공'))
-  .catch(err => console.error('❌ MongoDB 연결 실패:', err));
+// ⭐ [1] MongoDB 연결 (Vercel Serverless 맞춤형)
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) {
+    return;
+  }
+  if (!process.env.MONGODB_URI) {
+    console.error('🚨 에러: MONGODB_URI 환경변수가 없습니다!');
+    return;
+  }
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    isConnected = true;
+    console.log('✅ MongoDB 연결 성공 (서버리스 최적화)');
+  } catch (error) {
+    console.error('❌ MongoDB 연결 실패:', error);
+  }
+};
+
+// 모든 API 요청이 들어오기 전에 무조건 DB 연결 상태를 확인하고 살려냅니다!
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // [2] 데이터 스키마
 const itemSchema = new mongoose.Schema({
@@ -58,13 +79,11 @@ app.get('/api/food', async (req, res) => {
         }
       });
 
-      // ⭐ 수정 포인트: 표가 5개가 아니어도 융통성 있게 요일 가져오기
       if (bongrimTables.length > 0) {
         let targetTable = bongrimTables[0];
         
         if (today >= 1 && today <= 5) {
           let targetIdx = today - 1;
-          // 만약 표 개수가 모자라서 에러가 날 상황이면 가장 마지막 표라도 가져오도록 방어
           if (targetIdx >= bongrimTables.length) {
             targetIdx = bongrimTables.length - 1;
           }
@@ -153,7 +172,6 @@ app.get('/api/food', async (req, res) => {
     // 💡 3. 데이터 클리닝
     const cleanedData = foodData.map(item => {
       let cleanMenu = item.menu
-        // ⭐ 핵심: 사림관처럼 "우동장국(5.6)" 붙어있는 걸 "우동장국\n(5.6)"으로 강제로 찢어버림!
         .replace(/([^\n])(\([\d.,\s]+\))/g, '$1\n$2')
         .split('\n')
         .map(line => line.trim())
@@ -185,6 +203,8 @@ app.post('/api/lost', async (req, res) => { const newItem = new Item({ ...req.bo
 app.patch('/api/items/:id/like', async (req, res) => res.json(await Item.findByIdAndUpdate(req.params.id, { $inc: { likes: req.body.value || 1 } }, { returnDocument: 'after' })));
 app.put('/api/items/:id', async (req, res) => res.json(await Item.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' })));
 app.delete('/api/items/:id', async (req, res) => { await Item.findByIdAndDelete(req.params.id); res.json({ message: '삭제 완료' }); });
+
+// AI 생성 API
 app.post('/api/ai/generate', async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -196,5 +216,11 @@ app.post('/api/ai/generate', async (req, res) => {
   } catch (error) { res.status(500).json({ error: "AI 에러" }); }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`🚀 서버 실행 중: http://localhost:${PORT}`));
+// 로컬 환경에서만 포트 오픈 (Vercel에서는 실행 안 됨)
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 로컬 서버 실행 중: http://localhost:${PORT}`));
+}
+
+// ⭐ Vercel 환경을 위해 무조건 모듈로 내보내기!
+module.exports = app;
