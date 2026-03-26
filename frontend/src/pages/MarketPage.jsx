@@ -1,40 +1,61 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 
+// ⭐ 1. 마켓 명언 대량 추가 (총 50개)
 const MARKET_QUOTES = {
   ko: [
-    "안 쓰는 물건, 누군가에겐 보물입니다.", 
-    "빠른 쿨거래가 창대인의 매너를 만듭니다.", 
-    "네고는 둥글게, 거래는 확실하게!", 
-    "오늘 비운 공간, 내일의 여유가 됩니다.", 
-    "신뢰는 최고의 거래 조건입니다.",
-    "자취방 이사 전 필수 코스! 방 빼기 전 물건부터 빼세요.",
-    "오늘 안 쓰는 전공책 팔아서 내일 치킨 시켜 먹자!",
-    "잠수는 사절! 쿨거래는 창대인의 기본 소양입니다.",
-    "선배의 손때 묻은 전공책, 후배에겐 A+의 열쇠!",
-    "통장 잔고가 위험할 때, 책상 서랍을 열어보세요.",
-    "충동구매의 최후... 눈물을 머금고 반값에 올립니다.",
-    "버리면 쓰레기, 나누면 지구를 살리는 에코 라이프!",
-    "따뜻한 인사 한마디가 기분 좋은 거래를 만듭니다.",
-    "가성비 넘치는 대학 생활의 비밀 무기, 마켓 직거래.",
-    "판매자에겐 쏠쏠한 용돈을, 구매자에겐 짜릿한 득템을!"
+    "안 쓰는 물건, 누군가에겐 보물입니다.", "빠른 쿨거래가 창대인의 매너를 만듭니다.", "네고는 둥글게, 거래는 확실하게!", 
+    "오늘 비운 공간, 내일의 여유가 됩니다.", "신뢰는 최고의 거래 조건입니다.", "자취방 이사 전 필수 코스! 방 빼기 전 물건부터 빼세요.",
+    "오늘 안 쓰는 전공책 팔아서 내일 치킨 시켜 먹자!", "잠수는 사절! 쿨거래는 창대인의 기본 소양입니다.",
+    "선배의 손때 묻은 전공책, 후배에겐 A+의 열쇠!", "통장 잔고가 위험할 때, 책상 서랍을 열어보세요.",
+    "충동구매의 최후... 눈물을 머금고 반값에 올립니다.", "버리면 쓰레기, 나누면 지구를 살리는 에코 라이프!",
+    "따뜻한 인사 한마디가 기분 좋은 거래를 만듭니다.", "가성비 넘치는 대학 생활의 비밀 무기, 마켓 직거래.",
+    "판매자에겐 쏠쏠한 용돈을, 구매자에겐 짜릿한 득템을!",
+    "소유물이 당신을 소유하게 만들지 마라. - 타일러 더든", "가장 적게 가진 사람이 가장 부유하다. - 소크라테스",
+    "버릴 줄 아는 용기가 새로운 것을 채울 공간을 만든다.", "지구 환경을 지키는 가장 쉬운 방법, 중고 거래.",
+    "새것의 반짝임보다 중고의 스토리가 더 아름다울 때가 있다.", "물건에 집착하지 마라. 당신은 물건 그 이상이다.",
+    "필요 없는 물건 3개를 팔면 내일의 커피가 공짜!", "미니멀리즘의 시작은 당신의 옷장부터.",
+    "기숙사 짐 뺄 때 버리지 말고 마켓에 양보하세요.", "사용하지 않는 전자기기는 마켓에서 새 생명을 얻습니다.",
+    "필요한 누군가에게 가면 잡동사니도 예술품이 된다.", "나눔과 판매, 캠퍼스 안에서 도는 착한 사이클.",
+    "당신의 책장에 잠든 책이 누군가의 미래를 열어줍니다.", "가장 좋은 물건은 '내게 필요한 물건'이다.",
+    "쇼핑의 즐거움은 새것을 살 때만 있는 것이 아니다.", "돈으로 살 수 없는 매너, 거래로 증명하세요.",
+    "중고 거래는 신뢰로 시작해 웃음으로 끝난다.", "버리는 데도 돈이 듭니다. 팔면 돈이 됩니다.",
+    "내가 쓰지 않는 물건의 진짜 가치를 찾아주세요.", "쿨거래의 핵심: 명확한 사진, 솔직한 설명.",
+    "택배비 아끼고 캠퍼스에서 5분 만에 직거래!", "에눌 요청은 조심스럽게, 거절은 젠틀하게.",
+    "시간은 금이다. 잠수 타지 말고 쿨하게 거래하자.", "좋은 물건은 기다려주지 않습니다. 지금 바로 채팅하세요!",
+    "자취생의 로망, 당근마켓 부럽지 않은 CWNU 마켓.", "이별한 연인의 물건... 마켓에서 새 인연을 찾아주세요.",
+    "충동구매 인증샷? 아니, 마켓 판매 인증샷!", "가치 있는 물건을 알아보는 당신의 안목을 믿습니다.",
+    "쓸데없는 소유를 줄이고 진정한 가치에 투자하세요.", "빈 방이 당신에게 평화를 가져다줄 것입니다.",
+    "물건을 비우면 마음이 채워진다. - 법정 스님", "우리가 소유한 것이 우리를 짓누른다. - 니체",
+    "오늘의 절약이 내일의 풍요를 만든다.", "최고의 재테크는 쓰지 않는 물건을 파는 것이다.",
+    "마켓에 올라온 꿀매물, 놓치고 후회하지 마세요!"
   ],
   en: [
-    "An unused item is someone else's treasure.", 
-    "Quick and cool deals make CWNU manners.", 
-    "Negotiate smoothly, deal surely!", 
-    "Space emptied today becomes tomorrow's leisure.", 
-    "Trust is the best deal condition.",
-    "A must before moving out! Empty your items before emptying the room.",
-    "Sell unused textbooks today, order fried chicken tomorrow!",
-    "No ghosting! Cool deals are the basics for CWNU students.",
-    "A senior's well-used textbook is a junior's key to an A+!",
-    "When your bank balance is low, open your desk drawer.",
-    "The end of impulse buying... selling at half price with tears.",
-    "Trash if thrown away, eco-life saving the earth if shared!",
-    "A warm greeting makes a pleasant transaction.",
-    "The secret weapon for cost-effective college life, direct market deals.",
-    "Sweet pocket money for the seller, thrilling finds for the buyer!"
+    "An unused item is someone else's treasure.", "Quick and cool deals make CWNU manners.", "Negotiate smoothly, deal surely!", 
+    "Space emptied today becomes tomorrow's leisure.", "Trust is the best deal condition.", "A must before moving out! Empty your items before emptying the room.",
+    "Sell unused textbooks today, order fried chicken tomorrow!", "No ghosting! Cool deals are the basics for CWNU students.",
+    "A senior's well-used textbook is a junior's key to an A+!", "When your bank balance is low, open your desk drawer.",
+    "The end of impulse buying... selling at half price with tears.", "Trash if thrown away, eco-life saving the earth if shared!",
+    "A warm greeting makes a pleasant transaction.", "The secret weapon for cost-effective college life, direct market deals.",
+    "Sweet pocket money for the seller, thrilling finds for the buyer!",
+    "The things you own end up owning you. - Tyler Durden", "He is richest who is content with the least. - Socrates",
+    "The courage to throw away creates space for new things.", "The easiest way to save the planet: Second-hand trading.",
+    "Sometimes the story of a used item is more beautiful than the shine of a new one.", "Don't cling to things. You are more than your possessions.",
+    "Sell 3 useless items, get free coffee tomorrow!", "Minimalism starts in your closet.",
+    "Don't throw it away when moving out, share it on the Market.", "Unused electronics find new life in the market.",
+    "Junk becomes art when it goes to someone who needs it.", "Sharing and selling, a virtuous cycle within the campus.",
+    "A book sleeping on your shelf opens someone's future.", "The best item is the one you 'need'.",
+    "The joy of shopping is not just in buying new things.", "Manners you can't buy with money, prove it through trading.",
+    "Second-hand trading starts with trust and ends with a smile.", "Throwing away costs money. Selling makes money.",
+    "Find the true value of the things you don't use.", "Key to a cool deal: Clear photos, honest descriptions.",
+    "Save shipping costs, trade directly on campus in 5 mins!", "Ask for discounts carefully, decline gently.",
+    "Time is money. No ghosting, let's trade cool.", "Good items don't wait. Chat right now!",
+    "A student's dream, CWNU Market rivals any local market app.", "An ex's belongings... find them a new home in the market.",
+    "Impulse buy pic? No, Market sale pic!", "Trust your eye for recognizing valuable items.",
+    "Reduce useless possessions and invest in true value.", "An empty room will bring you peace.",
+    "Emptying things fills the mind. - Beopjeong", "What we own weighs us down. - Nietzsche",
+    "Today's savings create tomorrow's abundance.", "The best financial tech is selling what you don't use.",
+    "Don't miss the sweet deals on the market and regret it later!"
   ]
 };
 
@@ -91,13 +112,12 @@ function MarketPage({ lang }) {
       btnDescShow: "💬 상세 설명 보기", btnDescHide: "설명 닫기", descEmpty: "등록된 상세 설명이 없습니다.",
       thItem: "Item", thPrice: "Price", thSeller: "Seller", thStatus: "Status", thAction: "Action", stDone: "거래완료", stSale: "판매중",
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
-      
-      modalTitle: "Market V6 6.0 ver 업데이트 내역", modalSub: "25년 1학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
+      modalTitle: "Market V6.5 ver 업데이트 내역", modalSub: "25년 1학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
       modalPrevTitle: "🤔 이전 버전 (todos_v4)", modalPrev1: "❌ 새로고침하면 데이터 소실", modalPrev2: "❌ 단순한 텍스트 위주의 투박한 디자인", modalPrev3: "❌ 찜하기 등 거래 부가 기능 전무",
-      modalCurTitle: "✨ 현재 버전 (V6 6.0)", modalCur1: "✅ MongoDB 연동으로 데이터 보존!", modalCur2: "✅ 트렌디한 카드 UI 및 정렬 기능", modalCur3: "✅ 실시간 찜하기 및 마켓 검색 기능 추가!", modalCur4: "✅ 글로벌 다국어(KOR/ENG) 완벽 지원!", modalCur5: "🤖 AI 판매글 폼 자동완성 기능 도입!",
+      modalCurTitle: "✨ 현재 버전 (V6.5)", modalCur1: "✅ MongoDB 연동으로 데이터 보존!", modalCur2: "✅ 검색 기능 및 테이블 뷰 버그 완벽 패치!", modalCur3: "✅ 실시간 찜하기 및 마켓 검색 기능 추가!", modalCur4: "✅ 글로벌 다국어(KOR/ENG) 완벽 지원!", modalCur5: "🤖 AI 판매글 폼 자동완성 기능 도입!",
       modalHistTitle: "🛠️ CWNU PORTAL 발전 과정",
       modalHistV1: "물품 등록 및 기본적인 목록 조회 시스템 구축", modalHistV2: "사용자 도움말 투어 및 거래 편의 기능 추가", modalHistV3: "실시간 찜하기 기능 및 카드/테이블 뷰 전환 도입", modalHistV4: "MongoDB 연동 데이터 보존 및 통합 검색 기능 강화", modalHistV5: "글로벌 다국어 완벽 지원 및 UI 고도화",
-      modalHistV6: "🤖 대화형 Gemini AI 비서 및 폼 자동완성 전격 도입",
+      modalHistV6: "🤖 대화형 Gemini AI 비서 및 각종 사용성 버그 완벽 패치 완료",
       modalFreeTitle: "\"근데 이거 유료라고요?\"", modalFreeDesc1: "아닙니다! 창대인을 위한 완전 무료 서비스입니다!", modalFreeDesc2: "쿨거래로 학우 간 따뜻한 정을 나눠보세요!", modalBtn: "확인 완료!",
       aiOpenBtn: " AI 비서에게 판매글 쓰기 맡기기", aiLoading: "⏳ 폼을 분석하고 채우는 중...", aiEmpty: "채팅창에 정보를 입력해주세요!", aiFollowUpP: "물품명, 가격, 장소 등을 말해주면 폼을 채워드려요!", aiClear: "대화 초기화", aiClose: "AI 닫기", aiApply: "이 글로 설명 채우기",
       aiConfirm: "✨ 이 정보를 폼에 추가하시겠습니까?", btnYes: "예, 추가하기", btnNo: "아니오"
@@ -120,13 +140,12 @@ function MarketPage({ lang }) {
       btnDescShow: "💬 View Details", btnDescHide: "Close Desc", descEmpty: "No detailed description provided.",
       thItem: "Item", thPrice: "Price", thSeller: "Seller", thStatus: "Status", thAction: "Action", stDone: "Done", stSale: "On Sale",
       footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
-      
-      modalTitle: "Market V6 6.0 ver Updates", modalSub: "The ultimate evolution of the Spring '25 Web Programming final project `todos_v4`!",
+      modalTitle: "Market V6.5 ver Updates", modalSub: "The ultimate evolution of the Spring '25 Web Programming final project `todos_v4`!",
       modalPrevTitle: "🤔 Previous Version (todos_v4)", modalPrev1: "❌ Data lost on refresh", modalPrev2: "❌ Clunky text-based design", modalPrev3: "❌ No extra features like 'Like'",
-      modalCurTitle: "✨ Current Version (V6 6.0)", modalCur1: "✅ Data preserved with MongoDB!", modalCur2: "✅ Trendy card UI & sorting", modalCur3: "✅ Real-time 'Like' & Market search!", modalCur4: "✅ Global bilingual (KOR/ENG) support!", modalCur5: "🤖 AI Form Auto-fill Feature added!",
+      modalCurTitle: "✨ Current Version (V6.5)", modalCur1: "✅ Data preserved with MongoDB!", modalCur2: "✅ Search and Table View bugs perfectly patched!", modalCur3: "✅ Real-time 'Like' & Market search!", modalCur4: "✅ Global bilingual (KOR/ENG) support!", modalCur5: "🤖 AI Form Auto-fill Feature added!",
       modalHistTitle: "🛠️ CWNU PORTAL Evolution",
       modalHistV1: "Basic item registration & list view system", modalHistV2: "User guide tour & trade convenience features", modalHistV3: "Real-time Like & Card/Table view toggle", modalHistV4: "MongoDB integration & advanced search", modalHistV5: "Full bilingual support & UI enhancement",
-      modalHistV6: "🤖 Interactive Gemini AI & Auto-fill Form integrated",
+      modalHistV6: "🤖 Interactive Gemini AI & All usability bugs perfectly patched",
       modalFreeTitle: "\"Wait, is this paid?\"", modalFreeDesc1: "No! It's a completely free service for CWNU students!", modalFreeDesc2: "Share warmth through cool deals!", modalBtn: "Confirmed!",
       aiOpenBtn: " Let AI write the sales post", aiLoading: "⏳ Analyzing and filling form...", aiEmpty: "Please type something in the chat!", aiFollowUpP: "Tell me item, price, location, etc.", aiClear: "Clear", aiClose: "Close AI", aiApply: "Apply to Description",
       aiConfirm: "✨ Do you want to apply this info to the form?", btnYes: "Yes, apply", btnNo: "No"
@@ -134,7 +153,6 @@ function MarketPage({ lang }) {
   };
   const current = t[lang];
 
-  // ⭐ 작성 시간 포맷팅 함수 추가 (방금 전, 1분 전 등 당근마켓 스타일)
   const formatTimeAgo = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -173,7 +191,7 @@ function MarketPage({ lang }) {
         return () => { el.classList.remove('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); }; 
       }
     }
-  }, [tourIndex, lang]);
+  }, [tourIndex, lang, current.tourSteps]);
 
   const handleQuoteRefresh = () => { 
     if (MARKET_QUOTES[lang]?.length > 0) {
@@ -323,6 +341,7 @@ function MarketPage({ lang }) {
     }
   };
   
+  // ⭐ 2. 검색 시 전체 페이지에서 검색되도록 처리 (버그 해결)
   const filteredItems = items.filter((item) => {
     return (
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -405,7 +424,7 @@ function MarketPage({ lang }) {
                 <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V3.5:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV3}</span></p>
                 <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V4.0:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV4}</span></p>
                 <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V5.0:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV5}</span></p>
-                <p className="flex items-center gap-3 font-bold bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V6.0:</span><span className="text-slate-800 dark:text-gray-200 italic">{current.modalHistV6}</span></p>
+                <p className="flex items-center gap-3 font-bold bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V6.5:</span><span className="text-slate-800 dark:text-gray-200 italic">{current.modalHistV6}</span></p>
               </div>
             </div>
 
@@ -422,7 +441,7 @@ function MarketPage({ lang }) {
         <div id="tour-header" className="text-center mb-6 md:mb-8 relative mt-4 md:mt-0">
           <div className="flex items-center justify-center gap-4 mb-2">
             <h2 className="text-3xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
-              MARKET <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-4 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">6.0</span>
+              MARKET <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-4 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">6.5</span>
             </h2>
             <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
               {current.help}
@@ -574,7 +593,8 @@ function MarketPage({ lang }) {
         </form>
 
         <div className="mb-4 md:mb-6 w-full relative z-10">
-          <input type="text" placeholder={current.searchP} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 md:p-4 border-2 text-sm md:text-base border-blue-100 rounded-xl md:rounded-2xl shadow-sm focus:outline-none focus:border-blue-400 dark:bg-gray-800 dark:text-white transition-all font-bold text-gray-700"/>
+          {/* ⭐ 3. 검색 이벤트 수정 (키력 시 1페이지 리셋) */}
+          <input type="text" placeholder={current.searchP} value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} className="w-full p-3 md:p-4 border-2 text-sm md:text-base border-blue-100 rounded-xl md:rounded-2xl shadow-sm focus:outline-none focus:border-blue-400 dark:bg-gray-800 dark:text-white transition-all font-bold text-gray-700"/>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6 relative z-10">
@@ -593,8 +613,9 @@ function MarketPage({ lang }) {
               <div key={item._id} className={`p-6 md:p-8 rounded-3xl md:rounded-[3rem] border-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col relative overflow-hidden ${item.completed ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-blue-50 bg-white dark:bg-gray-800'}`}> 
                 {item.completed && <div className="absolute -right-10 top-10 bg-red-500 text-white font-black text-xs py-1 px-12 rotate-45 shadow-lg z-10">{current.soldOut}</div>}
                 
+                {/* ⭐ 4. 다크모드 시 애니메이션 증발 방지를 위해 애니메이션 클래스 단순화 */}
                 {editingId === item._id ? (
-                  <div className="flex flex-col gap-4 z-10 w-full animate-[slide-up_0.2s_ease-out]">
+                  <div className="flex flex-col gap-4 z-10 w-full transition-all duration-300">
                     
                     <div className="border-2 border-blue-300 border-dashed p-4 rounded-2xl bg-blue-50/50 dark:bg-gray-800/50 relative pointer-events-none opacity-90 shadow-sm mt-2">
                       <div className="absolute -top-3 left-4 bg-blue-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm">👀 실시간 수정 미리보기</div>
@@ -640,7 +661,6 @@ function MarketPage({ lang }) {
                   <>
                     <div className="flex justify-between items-start mb-4 z-10">
                       <h3 className={`text-xl font-black flex-grow pr-4 ${item.completed ? 'text-red-600 line-through opacity-70' : 'text-gray-800 dark:text-gray-100'}`}>{item.title}</h3>
-                      {/* ⭐ 시간 표시 추가 */}
                       {item.createdAt && <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap pt-1 ml-2">{formatTimeAgo(item.createdAt)}</span>}
                     </div> 
                     <div className="flex justify-between items-center mb-6 z-10 relative">
@@ -699,13 +719,21 @@ function MarketPage({ lang }) {
                     <td className="p-4 text-left font-black text-sm relative">
                       {item.completed && <div className="absolute top-0 left-0 bg-red-500 text-white font-black text-[8px] px-2 py-0.5 rounded-br-lg shadow-sm">{current.soldOut}</div>}
                       <span className={item.completed ? 'line-through' : 'text-gray-800 dark:text-gray-200'}>{item.title}</span> 
-                      <button type="button" onClick={() => handleLike(item._id)} className={`ml-2 text-[10px] font-black ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-300'}`}>♥{item.likes}</button>
                       
-                      <div className="mt-2">
+                      {/* ⭐ 5. 테이블 뷰 찜하기 버튼 클릭 버그 해결 (pointer-events-auto, relative z-20 추가) */}
+                      <button 
+                        type="button" 
+                        onClick={(e) => { e.stopPropagation(); handleLike(item._id); }} 
+                        className={`ml-2 text-[10px] font-black relative z-20 pointer-events-auto cursor-pointer ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-300'}`}
+                      >
+                        ♥{item.likes}
+                      </button>
+                      
+                      <div className="mt-2 relative z-10 pointer-events-auto">
                         <button 
                           type="button"
-                          onClick={() => setExpandedId(expandedId === item._id ? null : item._id)} 
-                          className="text-[10px] text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 font-bold flex items-center gap-1"
+                          onClick={(e) => { e.stopPropagation(); setExpandedId(expandedId === item._id ? null : item._id); }} 
+                          className="text-[10px] text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 font-bold flex items-center gap-1 cursor-pointer relative z-20"
                         >
                           {expandedId === item._id ? current.btnDescHide : current.btnDescShow}
                         </button>
@@ -719,11 +747,10 @@ function MarketPage({ lang }) {
                     <td className="p-4 font-black text-sm text-blue-600 dark:text-blue-400">{item.price === 0 ? current.freeBadge : `${Number(item.price).toLocaleString()}${current.currency}`}</td>
                     <td className="p-4 font-bold text-gray-500 dark:text-gray-400 text-xs">
                       {item.sellerName} <br/><span className="text-[10px] text-gray-400">{item.phone}</span>
-                      {/* ⭐ 테이블 뷰 시간 표시 */}
                       {item.createdAt && <div className="text-[9px] text-gray-400 mt-1 font-medium">{formatTimeAgo(item.createdAt)}</div>}
                     </td>
-                    <td className="p-4"><span className={`px-4 py-1 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-red-500 text-white' : 'bg-blue-600 text-white'}`}>{item.completed ? current.stDone : current.stSale}</span></td>
-                    <td className="p-4 flex flex-col items-center gap-1">
+                    <td className="p-4 relative z-10"><span className={`px-4 py-1 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-red-500 text-white' : 'bg-blue-600 text-white'}`}>{item.completed ? current.stDone : current.stSale}</span></td>
+                    <td className="p-4 flex flex-col items-center gap-1 relative z-20 pointer-events-auto">
                       <button type="button" onClick={() => {
                         setViewType('card');
                         setEditingId(item._id); 
@@ -734,9 +761,9 @@ function MarketPage({ lang }) {
                           phone: item.phone || '', 
                           description: item.description || ''
                         });
-                      }} className="text-blue-400 hover:text-blue-500 bg-blue-50 px-3 py-1 rounded-full font-black text-[9px]">수정</button>
-                      <button type="button" onClick={async() => {await axios.put(`${COMMON_URL}/${item._id}`,{completed: !item.completed}); fetchItems()}} className="text-[9px] font-black uppercase text-blue-500 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full w-20">{current.btnDone}/{current.btnUndo}</button>
-                      <button type="button" onClick={async() => {await axios.delete(`${COMMON_URL}/${item._id}`); fetchItems()}} className="text-red-400 hover:text-red-500 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-full font-black text-[9px] uppercase w-20">{current.btnDel}</button>
+                      }} className="text-blue-400 hover:text-blue-500 bg-blue-50 px-3 py-1 rounded-full font-black text-[9px] cursor-pointer">수정</button>
+                      <button type="button" onClick={async(e) => {e.stopPropagation(); await axios.put(`${COMMON_URL}/${item._id}`,{completed: !item.completed}); fetchItems()}} className="text-[9px] font-black uppercase text-blue-500 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full w-20 cursor-pointer">{current.btnDone}/{current.btnUndo}</button>
+                      <button type="button" onClick={async(e) => {e.stopPropagation(); await axios.delete(`${COMMON_URL}/${item._id}`); fetchItems()}} className="text-red-400 hover:text-red-500 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-full font-black text-[9px] uppercase w-20 cursor-pointer">{current.btnDel}</button>
                     </td>
                   </tr> 
                 ))}

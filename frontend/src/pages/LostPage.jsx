@@ -1,20 +1,41 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 
+// ⭐ 1. 분실물 센터 명언 대량 추가 (총 30개)
 const LOST_QUOTES = {
   ko: [
-    "작은 관심이 누군가에겐 큰 기적이 됩니다.", 
-    "잃어버린 물건, 창대인이 함께 찾아줍니다.", 
-    "소중한 추억이 담긴 물건일지도 모릅니다.", 
-    "습득물 신고는 가장 따뜻한 매너입니다.", 
-    "물건을 잃어버렸나요? 너무 걱정하지 마세요!"
+    "작은 관심이 누군가에겐 큰 기적이 됩니다.", "잃어버린 물건, 창대인이 함께 찾아줍니다.", "소중한 추억이 담긴 물건일지도 모릅니다.", 
+    "습득물 신고는 가장 따뜻한 매너입니다.", "물건을 잃어버렸나요? 너무 걱정하지 마세요!",
+    "지갑을 주웠다면, 내 지갑을 잃어버렸을 때를 생각해보세요.", "돌아온 물건 하나가 캠퍼스의 온도를 1도 올립니다.",
+    "우연히 발견한 에어팟, 누군가의 소중한 음악창고입니다.", "선행은 부메랑이 되어 돌아옵니다.",
+    "창대인의 양심을 믿습니다.", "작은 친절이 모여 위대한 학교를 만듭니다.",
+    "주인을 찾아주는 당신의 손길, 아주 멋집니다.", "잃어버린 전공책, 내일 모레가 시험일지도 몰라요!",
+    "당신의 신고 한 번이 누군가의 하루를 구원합니다.", "정직함은 보이지 않는 곳에서 더욱 빛납니다.",
+    "돌려준 물건, 돌아오는 미소.", "학생증을 주웠나요? 그 사람의 대학 생활을 지켜주신 겁니다.",
+    "분실물 센터는 우리의 양심 보관소입니다.", "오늘 베푼 선의는 내일의 행운으로 돌아올 것입니다.",
+    "물건은 잃어버려도 희망은 잃지 마세요.", "기억하세요, 누군가 애타게 찾고 있습니다.",
+    "당신의 작은 행동이 누군가의 밤잠을 편안하게 합니다.", "정직은 가장 확실한 수익을 가져다주는 투자다. - 벤저민 프랭클린",
+    "양심은 누군가 보고 있지 않을 때 하는 행동이다. - 알도 레오폴드", "친절은 귀머거리도 들을 수 있고 시각장애인도 볼 수 있는 언어다. - 마크 트웨인",
+    "선행을 베풀 기회를 놓치지 마라.", "돌려주는 기쁨은 줍는 기쁨보다 큽니다.",
+    "물건을 찾아준 당신, 오늘 캠퍼스의 영웅입니다.", "우리가 남긴 착한 발자취는 결코 지워지지 않습니다.",
+    "눈앞의 작은 이익보다 평생의 당당함을 선택하세요."
   ],
   en: [
-    "A small attention can be a great miracle to someone.", 
-    "CWNU students will help you find your lost items.", 
-    "It might be an item full of precious memories.", 
-    "Reporting a found item is the warmest manners.", 
-    "Lost something? Don't worry too much!"
+    "A small attention can be a great miracle to someone.", "CWNU students will help you find your lost items.", "It might be an item full of precious memories.", 
+    "Reporting a found item is the warmest manners.", "Lost something? Don't worry too much!",
+    "If you found a wallet, think about when you lost yours.", "One returned item raises the campus temperature by 1 degree.",
+    "That randomly found AirPods is someone's precious music vault.", "A good deed returns like a boomerang.",
+    "We believe in the conscience of CWNU students.", "Small acts of kindness make a great university.",
+    "Your helping hand to find the owner is awesome.", "That lost textbook? They might have an exam the day after tomorrow!",
+    "Your single report saves someone's entire day.", "Honesty shines brightest where no one is looking.",
+    "A returned item, a returning smile.", "Found a student ID? You just saved their college life.",
+    "The Lost & Found is our conscience repository.", "The goodwill you show today will return as luck tomorrow.",
+    "You may lose an item, but don't lose hope.", "Remember, someone is desperately looking for it.",
+    "Your small action brings someone a peaceful night's sleep.", "Honesty is the best policy. - Benjamin Franklin",
+    "Conscience is what you do when no one is looking. - Aldo Leopold", "Kindness is the language which the deaf can hear and the blind can see. - Mark Twain",
+    "Never miss an opportunity to do a good deed.", "The joy of returning is greater than the joy of finding.",
+    "You who returned the item, you are today's campus hero.", "The good footprints we leave are never erased.",
+    "Choose lifelong pride over a small immediate gain."
   ]
 };
 
@@ -110,7 +131,6 @@ function LostPage({ lang }) {
   };
   const current = t[lang];
 
-  // ⭐ 작성 시간 포맷팅 함수 추가 (방금 전, 1분 전 등)
   const formatTimeAgo = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -258,7 +278,8 @@ function LostPage({ lang }) {
         setChatHistory(prev => [...prev, { sender: 'ai', text: res.data.text }]);
       }
     } catch (error) {
-      setChatHistory(prev => [...prev, { sender: 'ai', text: (lang === 'ko' ? "❌ 서버 통신 중 오류가 발생했습니다." : "❌ Error.") }]);
+      // ⭐ AI 토큰 에러 메시지 보완
+      setChatHistory(prev => [...prev, { sender: 'ai', text: (lang === 'ko' ? "❌ 서버 통신 중 오류가 발생했습니다. (AI 한도 초과 등)" : "❌ Error connecting to server. (API Limit etc.)") }]);
     } finally {
       setIsGenerating(false);
     }
@@ -446,7 +467,8 @@ function LostPage({ lang }) {
         </form>
 
         <div className="mb-4 w-full relative z-10">
-          <input type="text" placeholder={current.searchP} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 border-2 border-orange-100 rounded-xl shadow-sm focus:outline-none focus:border-orange-400 font-bold dark:bg-gray-800"/>
+          {/* ⭐ 2. 검색 시 setCurrentPage(1) 추가하여 버그 해결 */}
+          <input type="text" placeholder={current.searchP} value={searchTerm} onChange={(e) => {setSearchTerm(e.target.value); setCurrentPage(1);}} className="w-full p-3 border-2 border-orange-100 rounded-xl shadow-sm focus:outline-none focus:border-orange-400 font-bold dark:bg-gray-800"/>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6 relative z-10">
@@ -465,8 +487,9 @@ function LostPage({ lang }) {
               <div key={item._id} className={`p-6 md:p-8 rounded-[3rem] border-4 hover:-translate-y-1 hover:shadow-2xl flex flex-col relative overflow-hidden ${item.completed ? 'border-gray-400 bg-gray-50' : 'border-orange-50 bg-white dark:bg-gray-800'}`}> 
                 {item.completed && <div className="absolute -right-10 top-10 bg-gray-500 text-white font-black text-xs py-1 px-12 rotate-45 shadow-lg z-10">{current.soldOut}</div>}
                 
+                {/* ⭐ 3. 다크모드 시 애니메이션 증발 방지를 위해 단순화 */}
                 {editingId === item._id ? (
-                  <div className="flex flex-col gap-4 z-10 w-full animate-[slide-up_0.2s_ease-out]">
+                  <div className="flex flex-col gap-4 z-10 w-full transition-all duration-300">
                     <div className="border-2 border-orange-300 border-dashed p-4 rounded-2xl bg-orange-50/50 dark:bg-gray-800/50 relative pointer-events-none opacity-90 shadow-sm mt-2">
                       <div className="absolute -top-3 left-4 bg-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm">👀 실시간 수정 미리보기</div>
                       <div className="flex justify-between items-start mb-3 mt-1"><h3 className="text-lg font-black text-gray-800 dark:text-gray-100">{editForm.title || '제목을 입력하세요'}</h3></div> 
@@ -511,7 +534,6 @@ function LostPage({ lang }) {
                   <>
                     <div className="flex justify-between items-start mb-4 z-10">
                       <h3 className={`text-xl font-black ${item.completed ? 'text-gray-500 line-through' : 'text-gray-800 dark:text-gray-100'}`}>{item.title}</h3>
-                      {/* ⭐ 새로 추가된 작성 시간 표시 기능 */}
                       {item.createdAt && <span className="text-[10px] text-gray-400 font-bold ml-2 whitespace-nowrap pt-1">{formatTimeAgo(item.createdAt)}</span>}
                     </div> 
                     <div className="flex justify-between items-center mb-6 z-10 relative">
@@ -563,27 +585,42 @@ function LostPage({ lang }) {
                   <tr key={item._id} className="border-b dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors">
                     <td className="p-4 text-left font-black text-sm relative">
                       <span className={item.completed ? 'line-through text-gray-400' : 'text-gray-800 dark:text-gray-200'}>{item.title}</span>
-                      <button type="button" onClick={() => handleLike(item._id)} className={`ml-2 text-[10px] font-black ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-300'}`}>👀{item.likes}</button>
-                      <div className="mt-2">
-                        <button type="button" onClick={() => setExpandedId(expandedId === item._id ? null : item._id)} className="text-[10px] text-orange-500 hover:text-orange-700 dark:hover:text-orange-300 font-bold flex items-center gap-1">{expandedId === item._id ? current.btnDescHide : current.btnDescShow}</button>
+                      
+                      {/* ⭐ 4. 테이블 뷰 눈알 버튼 클릭 버그 해결 */}
+                      <button 
+                        type="button" 
+                        onClick={(e) => { e.stopPropagation(); handleLike(item._id); }} 
+                        className={`ml-2 text-[10px] font-black relative z-20 pointer-events-auto cursor-pointer ${likedItems.has(item._id) ? 'text-red-500' : 'text-gray-300'}`}
+                      >
+                        👀{item.likes}
+                      </button>
+                      
+                      <div className="mt-2 relative z-10 pointer-events-auto">
+                        <button 
+                          type="button" 
+                          onClick={(e) => { e.stopPropagation(); setExpandedId(expandedId === item._id ? null : item._id); }} 
+                          className="text-[10px] text-orange-500 hover:text-orange-700 dark:hover:text-orange-300 font-bold flex items-center gap-1 relative z-20 cursor-pointer"
+                        >
+                          {expandedId === item._id ? current.btnDescHide : current.btnDescShow}
+                        </button>
                         {expandedId === item._id && ( <div className="mt-1 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 whitespace-pre-wrap shadow-inner border border-gray-100 dark:border-gray-600 leading-relaxed">{item.description || <span className="text-gray-400 italic">{current.descEmpty}</span>}</div> )}
                       </div>
                     </td>
                     <td className="p-4 font-black text-sm text-orange-600 dark:text-orange-400">{item.price === 0 ? current.freeBadge : `${Number(item.price).toLocaleString()}${current.currency}`}</td>
                     <td className="p-4 font-bold text-gray-500 dark:text-gray-400 text-xs">
                       {item.sellerName}
-                      {/* ⭐ 테이블 뷰에도 작성 시간 추가 */}
                       {item.createdAt && <div className="text-[9px] text-gray-400 mt-1 font-medium">{formatTimeAgo(item.createdAt)}</div>}
                     </td>
-                    <td className="p-4"><span className={`px-4 py-1 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-gray-500 text-white' : 'bg-orange-500 text-white'}`}>{item.completed ? current.stDone : current.stSale}</span></td>
-                    <td className="p-4 flex gap-1 justify-center">
-                      <button type="button" onClick={() => {
+                    <td className="p-4 relative z-10"><span className={`px-4 py-1 rounded-full text-[10px] font-black shadow-sm ${item.completed ? 'bg-gray-500 text-white' : 'bg-orange-500 text-white'}`}>{item.completed ? current.stDone : current.stSale}</span></td>
+                    <td className="p-4 flex gap-1 justify-center relative z-20 pointer-events-auto">
+                      <button type="button" onClick={(e) => {
+                        e.stopPropagation();
                         setViewType('card');
                         setEditingId(item._id); 
                         setEditForm({...item});
-                      }} className="text-orange-400 hover:text-orange-500 bg-orange-50 px-3 py-1 rounded-full font-black text-[9px]">수정</button>
-                      <button type="button" onClick={async() => {await axios.put(`${COMMON_URL}/${item._id}`,{completed: !item.completed}); fetchItems()}} className="text-[9px] font-black uppercase text-orange-500 hover:text-orange-700 bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-full w-20">{current.btnDone}/{current.btnUndo}</button>
-                      <button type="button" onClick={async() => {await axios.delete(`${COMMON_URL}/${item._id}`); fetchItems()}} className="text-red-400 hover:text-red-500 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-full font-black text-[9px] uppercase w-20">{current.btnDel}</button>
+                      }} className="text-orange-400 hover:text-orange-500 bg-orange-50 px-3 py-1 rounded-full font-black text-[9px] cursor-pointer">수정</button>
+                      <button type="button" onClick={async(e) => {e.stopPropagation(); await axios.put(`${COMMON_URL}/${item._id}`,{completed: !item.completed}); fetchItems()}} className="text-[9px] font-black uppercase text-orange-500 hover:text-orange-700 bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-full w-20 cursor-pointer">{current.btnDone}/{current.btnUndo}</button>
+                      <button type="button" onClick={async(e) => {e.stopPropagation(); await axios.delete(`${COMMON_URL}/${item._id}`); fetchItems()}} className="text-red-400 hover:text-red-500 bg-red-50 dark:bg-red-900/30 px-3 py-1 rounded-full font-black text-[9px] uppercase w-20 cursor-pointer">{current.btnDel}</button>
                     </td>
                   </tr> 
                 ))}

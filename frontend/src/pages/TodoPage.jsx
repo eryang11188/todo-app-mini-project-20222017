@@ -11,7 +11,9 @@ const PLACEHOLDERS = {
   en: ["What great mission will you undertake?", "Add a small habit for growth", "The moment you write down a goal, it's half success.", "Enter your core goal for today here.", "What do you want to finish first?", "One small mission to make today fruitful!", "What is your first task today to change the world?", "That assignment you've been putting off, let's finish it today!", "Write them down slowly, starting with small things.", "The more specific the goal, the doubled the execution."]
 };
 
+
 const QUOTES = [
+  // 🎬 영화 명언
   { ko: "어제는 역사, 내일은 미스터리, 오늘은 선물. 그래서 우리는 현재(Present)라고 부른다. - 우그웨이 (쿵푸팬더 中)", en: "Yesterday is history, tomorrow is a mystery, today is a gift. That's why we call it the present. - Oogway (from Kung Fu Panda)" },
   { ko: "하거나, 하지 않거나 둘 중 하나다. '해본다'는 건 없다. - 요다 (스타워즈 中)", en: "Do or do not. There is no try. - Yoda (from Star Wars)" },
   { ko: "인생은 초콜릿 상자와 같다. 네가 무엇을 고를지 아무도 모르니까. - 포레스트 검프 (포레스트 검프 中)", en: "Life was like a box of chocolates. You never know what you're gonna get. - Forrest Gump (from Forrest Gump)" },
@@ -33,6 +35,7 @@ const QUOTES = [
   { ko: "지금 이 순간 당신이 무엇을 하느냐가 차이를 만든다. - 사라 코너 (터미네이터 中)", en: "It's what you do right now that makes a difference. - Sarah Connor (from Terminator)" },
   { ko: "내가 누구인지는 내가 하는 행동이 말해준다. - 브루스 웨인 (다크 나이트 中)", en: "It is not who I am underneath, but what I do that defines me. - Bruce Wayne (from The Dark Knight)" },
 
+  // 📖 속담 및 격언
   { ko: "천 리 길도 한 걸음부터. - 한국 속담", en: "A journey of a thousand miles begins with a single step. - Proverb" },
   { ko: "고생 끝에 낙이 온다. - 한국 속담", en: "No pain, no gain. - Proverb" },
   { ko: "시작이 반이다. - 한국 속담", en: "Well begun is half done. - Proverb" },
@@ -49,6 +52,7 @@ const QUOTES = [
   { ko: "죽음을 기억하라. (Memento mori) - 라틴어 격언", en: "Remember that you must die. (Memento mori) - Latin Proverb" },
   { ko: "이 또한 지나가리라. - 페르시아 격언", en: "This too shall pass. - Persian Proverb" },
 
+  // 🔥 동기부여 및 철학
   { ko: "천재는 1%의 영감과 99%의 노력으로 이루어진다. - 토머스 에디슨", en: "Genius is one percent inspiration and ninety-nine percent perspiration. - Thomas Edison" },
   { ko: "내일의 할 일을 오늘 하라. - 벤저민 프랭클린", en: "Do not put off until tomorrow what you can do today. - Benjamin Franklin" },
   { ko: "끝날 때까지는 끝난 게 아니다. - 요기 베라", en: "It ain't over till it's over. - Yogi Berra" },
@@ -95,7 +99,6 @@ const QUOTES = [
   { ko: "성공은 최종적인 것이 아니며, 실패는 치명적인 것이 아니다. 중요한 것은 계속하려는 용기이다. - 윈스턴 처칠", en: "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill" },
   { ko: "위대한 일을 할 수 없다면 작은 일을 위대하게 하라. - 나폴레옹 힐", en: "If you cannot do great things, do small things in a great way. - Napoleon Hill" }
 ];
-
 function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, timerIsRunning, setTimerIsRunning }) {
   const [todos, setTodos] = useState([]);
   const [title, setTitle] = useState(''); const [importance, setImportance] = useState('보통'); const [todoDeadline, setTodoDeadline] = useState('');
@@ -129,18 +132,18 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         { title: "🤖 AI 챗봇 비서", desc: "질문이나 할 일을 적고 AI 버튼을 눌러 스마트한 답변을 받아보세요!", targetId: "tour-add" }, 
         { title: "📝 자유로운 뷰", desc: "목록, 그리드, 테이블 형태로 관리가 가능합니다.", targetId: "tour-list-buttons" }
       ],
-      tourSkip: "건너뛰기", tourNext: "다음 보기 ▶", tourEnd: "투어 종료 🎉", help: "💡 도움말", verCheck: "(버전 클릭 시 업데이트 내역 확인)",
+      tourSkip: "건너뛰기", tourNext: "다음 보기 ▶", tourEnd: "투어 종료 🎉", help: "💡 도움말", verCheck: "(NEW 클릭 시 업데이트 내역 확인)",
       alarm: "30분 전 알람", focus: "집중 타이머", stop: "스톱워치", reset: "RESET", searchP: "찾으시는 할 일을 검색해보세요!",
       addBtn: "추가하기", newQuote: "새로고침", remainDay: "일", remainLeft: "남음", expired: "만료됨", expiredIcon: "만료",
       thImp: "순서/우선순위", thTitle: "미션명", thRemain: "남은 시간", thAct: "관리", btnSave: "저장", btnCancel: "취소", btnEdit: "수정", btnDel: "삭제",
       impObj: { '긴급': '긴급', '보통': '보통', '낮음': '낮음' },
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
-      modalTitle: "Todo V6 6.0 ver 업데이트 내역", modalSub: "25년 1학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
+      modalTitle: "Todo V6.5 ver 업데이트 내역", modalSub: "25년 1학기 웹프로그래밍 기말대체 과제 `todos_v4`의 최종 진화형!",
       modalPrevTitle: "🤔 이전 버전", modalPrev1: "❌ 타이머 및 스톱워치 부재", modalPrev2: "❌ 마감 기한 시각화 기능 부재",
-      modalCurTitle: "✨ 현재 버전 (V6 6.0)", modalCur1: "✅ 집중 타이머 & 스톱워치 탑재", modalCur2: "✅ 30분 전 알람 및 실시간 카운트다운", modalCur3: "✅ 할 일 통합 검색 기능 추가", modalCur4: "✅ 글로벌 다국어(KOR/ENG) 완벽 지원!",
+      modalCurTitle: "✨ 현재 버전 (V6.5)", modalCur1: "✅ 집중 타이머 & 스톱워치 탑재", modalCur2: "✅ 검색 기능 및 테이블 뷰 버그 완벽 패치!", modalCur3: "✅ 할 일 통합 검색 기능 추가", modalCur4: "✅ 글로벌 다국어(KOR/ENG) 완벽 지원!",
       modalCur5: "🤖 대화형 Gemini AI 비서 전격 도입!", 
       modalHistTitle: "🛠️ CWNU PORTAL 발전 과정",
-      modalHistV1: "할 일 등록 및 기본적인 체크리스트 기능 구현", modalHistV2: "중요도 분류 시스템 및 마감 기한 설정 도입", modalHistV3: "리스트/그리드/테이블 다중 뷰 모드 지원", modalHistV4: "정밀 집중 타이머 및 30분 전 스마트 알림 통합", modalHistV5: "글로벌 다국어 완벽 지원 및 UI 고도화",modalHistV6: " 목표 달성을 도와주는 대화형 Gemini AI 비서 전격 도입",
+      modalHistV1: "할 일 등록 및 기본적인 체크리스트 기능 구현", modalHistV2: "중요도 분류 시스템 및 마감 기한 설정 도입", modalHistV3: "리스트/그리드/테이블 다중 뷰 모드 지원", modalHistV4: "정밀 집중 타이머 및 30분 전 스마트 알림 통합", modalHistV5: "글로벌 다국어 완벽 지원 및 UI 고도화",modalHistV6: " 목표 달성을 도와주는 대화형 Gemini AI 비서 및 버그 패치 완료",
       modalFreeTitle: "\"아... 유료인가요?\"", modalFreeDesc1: "아닙니다! 창대인을 위한 완전 무료 서비스입니다!", modalFreeDesc2: "철저한 시간 관리로 당신의 꿈을 앞당기세요!", modalBtn: "확인 완료!",
       aiBtn: "✨ AI 비서", aiLoading: "⏳ 생각 중...", aiEmpty: "질문이나 할 일을 먼저 적어주세요!", aiFollowUpP: "AI에게 추가로 물어보세요...", aiClear: "초기화", aiClose: "닫기",
       sortDefault: "기본 정렬", sortImp: "🔥 중요도순", sortTime: "만료 임박순"
@@ -153,18 +156,18 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         { title: "🤖 AI Assistant", desc: "Enter a task and click the AI button for smart advice!", targetId: "tour-add" }, 
         { title: "📝 Free View", desc: "Manage in list, grid, or table formats.", targetId: "tour-list-buttons" }
       ],
-      tourSkip: "Skip", tourNext: "Next ▶", tourEnd: "End Tour 🎉", help: "💡 Guide", verCheck: "(Click version to check updates)",
+      tourSkip: "Skip", tourNext: "Next ▶", tourEnd: "End Tour 🎉", help: "💡 Guide", verCheck: "(Click NEW to check updates)",
       alarm: "30m Alert", focus: "Focus Timer", stop: "Stopwatch", reset: "RESET", searchP: "Search for tasks you are looking for!",
       addBtn: "Add Task", newQuote: "New Quote", remainDay: "d", remainLeft: "left", expired: "Expired", expiredIcon: " Expired",
       thImp: "Order/Priority", thTitle: "Mission", thRemain: "Remaining Time", thAct: "Action", btnSave: "Save", btnCancel: "Cancel", btnEdit: "Edit", btnDel: "Del",
       impObj: { '긴급': 'Urgent', '보통': 'Normal', '낮음': 'Low' },
       footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
-      modalTitle: "Todo V6 6.0 ver Updates", modalSub: "The ultimate evolution of the Spring '25 Web Programming final project `todos_v4`!",
+      modalTitle: "Todo V6.5 ver Updates", modalSub: "The ultimate evolution of the Spring '25 Web Programming final project `todos_v4`!",
       modalPrevTitle: "🤔 Previous Version", modalPrev1: "❌ No timer and stopwatch", modalPrev2: "❌ No visual deadline tracking",
-      modalCurTitle: "✨ Current Version (V6 6.0)", modalCur1: "✅ Focus Timer & Stopwatch included", modalCur2: "✅ 30-min alert & real-time countdown", modalCur3: "✅ Integrated task search added", modalCur4: "✅ Global bilingual (KOR/ENG) support!",
+      modalCurTitle: "✨ Current Version (V6.5)", modalCur1: "✅ Focus Timer & Stopwatch included", modalCur2: "✅ Search and Table View bugs perfectly patched!", modalCur3: "✅ Integrated task search added", modalCur4: "✅ Global bilingual (KOR/ENG) support!",
       modalCur5: "🤖 Interactive Gemini AI Assistant integrated!", 
       modalHistTitle: "🛠️ CWNU PORTAL Evolution",
-      modalHistV1: "Task registration & basic checklist", modalHistV2: "Priority system & deadline settings", modalHistV3: "List/Grid/Table multi-view support", modalHistV4: "Precision focus timer & smart alerts", modalHistV5: "Full bilingual support & UI enhancement",modalHistV6: " Interactive Gemini AI Assistant integrated for goal achievement",
+      modalHistV1: "Task registration & basic checklist", modalHistV2: "Priority system & deadline settings", modalHistV3: "List/Grid/Table multi-view support", modalHistV4: "Precision focus timer & smart alerts", modalHistV5: "Full bilingual support & UI enhancement",modalHistV6: " Interactive Gemini AI Assistant & Bug patches completed",
       modalFreeTitle: "\"Wait, is this paid?\"", modalFreeDesc1: "No! It's a completely free service for CWNU students!", modalFreeDesc2: "Advance your dreams with thorough time management!", modalBtn: "Confirmed!",
       aiBtn: "✨ AI", aiLoading: "⏳ Thinking...", aiEmpty: "Please enter a task or question first!", aiFollowUpP: "Ask follow-up questions...", aiClear: "Clear", aiClose: "Close",
       sortDefault: "Default Sort", sortImp: "🔥 By Priority", sortTime: "Deadline Soon"
@@ -172,7 +175,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   };
   const current = t[lang];
 
-  // ⭐ 작성 시간 포맷팅 함수 (방금 전, 2시간 전 등)
   const formatTimeAgo = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -206,7 +208,7 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         return () => el.classList.remove('ring-[6px]', 'ring-blue-500', 'ring-offset-2', 'dark:ring-offset-gray-900', 'z-[80]', 'transition-all', 'rounded-3xl'); 
       }
     }
-  }, [tourIndex, timerMode, lang]);
+  }, [tourIndex, timerMode, lang, current.tourSteps]);
 
   const fetchTodos = async () => { try { const res = await axios.get(API_URL); setTodos(res.data) } catch(e){} }
   const handleRandomize = () => { if(QUOTES.length > 0) setQuoteIndex(Math.floor(Math.random() * QUOTES.length)); setPlaceholderIndex(Math.floor(Math.random() * PLACEHOLDERS[lang].length)); }
@@ -295,12 +297,14 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
       setChatHistory(prev => [...prev, { sender: 'ai', text: aiResult }]);
     } catch (error) {
       console.error("AI Generation Error:", error);
-      setChatHistory(prev => [...prev, { sender: 'ai', text: (lang === 'ko' ? "❌ 통신 중 오류가 발생했습니다." : "❌ Error connecting to server.") }]);
+      // ⭐ AI 에러 메시지 구체화 (서버 한도 등)
+      setChatHistory(prev => [...prev, { sender: 'ai', text: (lang === 'ko' ? "❌ 통신 중 오류가 발생했습니다. (AI 한도 초과 등)" : "❌ Error connecting to server. (API Limit etc.)") }]);
     } finally {
       setIsGenerating(false);
     }
   };
 
+  // ⭐ 검색 시 1페이지로 리셋 처리
   let filteredTodos = todos.filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
   if (sortBy === 'importance') {
     const impWeight = { '긴급': 3, '보통': 2, '낮음': 1 };
@@ -382,7 +386,7 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                 <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V3.5:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV3}</span></p>
                 <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V4.0:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV4}</span></p>
                 <p className="flex items-center gap-3 font-medium bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V5.0:</span><span className="text-slate-600 dark:text-gray-400">{current.modalHistV5}</span></p>
-              <p className="flex items-center gap-3 font-bold bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V6.0:</span><span className="text-slate-800 dark:text-gray-200 italic">{current.modalHistV6}</span></p>
+              <p className="flex items-center gap-3 font-bold bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm"><span className="text-blue-600 font-black min-w-[45px]">V6.5:</span><span className="text-slate-800 dark:text-gray-200 italic">{current.modalHistV6}</span></p>
               </div>
             </div>
 
@@ -399,7 +403,7 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         <div id="tour-header" className="text-center mb-6 relative mt-4 md:mt-0">
           <div className="flex items-center justify-center gap-4 mb-2">
             <h2 className="text-4xl md:text-5xl font-black text-[#002f6c] dark:text-blue-300 tracking-tighter flex justify-center items-center cursor-pointer mt-4 md:mt-0">
-            TODO <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">6.0</span>
+            TODO <span onClick={() => setShowVersionInfo(true)} className="inline-block ml-2 md:ml-3 px-2 py-1 text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-500 italic drop-shadow-lg text-2xl md:text-4xl animate-[pulse_2s_ease-in-out_infinite] opacity-90">6.5</span>
             </h2>
             <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-xs shadow-md items-center gap-1 hover:bg-yellow-600 hover:-translate-y-0.5 transition-all mt-4 md:mt-0">
               {current.help}
@@ -618,7 +622,7 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                   return ( 
                   <tr key={todo._id} draggable={searchTerm === '' && sortBy === 'default'} onDragStart={(e) => handleDragStart(e, index)} onDragEnter={(e) => handleDragEnter(e, index)} onDragEnd={handleDragEnd} onDragOver={(e) => e.preventDefault()} className={`border-b dark:border-gray-700 hover:bg-blue-50/30 transition-colors ${(searchTerm === '' && sortBy === 'default') ? 'cursor-move' : ''} ${dragItemIndex === index ? 'opacity-40 bg-gray-50 dark:bg-gray-800' : ''} ${dragOverItemIndex === index && dragItemIndex !== null ? (dragItemIndex < dragOverItemIndex ? 'drag-over-bottom' : 'drag-over-top') : ''}`}> 
                     {editingId === todo._id ? (
-                      <td colSpan="4" className="p-3 md:p-4 bg-blue-50/50 dark:bg-blue-900/20">
+                      <td colSpan="4" className="p-3 md:p-4 bg-blue-50/50 dark:bg-blue-900/20 transition-all duration-300">
                         <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                           <select value={editForm.importance} onChange={e=>setEditForm({...editForm, importance: e.target.value})} className="w-full sm:w-auto p-2 border dark:border-gray-600 dark:bg-gray-700 rounded-xl font-bold text-xs"><option value="긴급">{current.impObj['긴급']}</option><option value="보통">{current.impObj['보통']}</option><option value="낮음">{current.impObj['낮음']}</option></select>
                           
@@ -652,7 +656,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   <div className={`font-black text-gray-800 dark:text-gray-100 text-sm md:text-lg break-words whitespace-pre-wrap ${expandedTodos[todo._id] ? '' : 'line-clamp-2'}`}>
     {todo.title}
   </div>
-  {/* ⭐ 작성 시간 추가 (테이블 뷰) */}
   {todo.createdAt && <div className="text-[9px] text-gray-400 mt-1 font-medium">{formatTimeAgo(todo.createdAt)}</div>}
   {todo.title.length > 20 && (
     <button 
@@ -680,9 +683,9 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   )}
 </td>
                         
-                        <td className="p-3 md:p-5 flex justify-center gap-1.5">
-                          <button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="text-[10px] font-black uppercase text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-full transition">{current.btnEdit}</button>
-                          <button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="text-[10px] font-black uppercase text-red-500 dark:text-red-400 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 rounded-full transition">{current.btnDel}</button>
+                        <td className="p-3 md:p-5 flex justify-center gap-1.5 relative z-20 pointer-events-auto">
+                          <button onClick={() => {setEditingId(todo._id); setEditForm(todo)}} className="text-[10px] font-black uppercase text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-full transition cursor-pointer">{current.btnEdit}</button>
+                          <button onClick={async ()=>{await axios.delete(`${COMMON_URL}/${todo._id}`); fetchTodos()}} className="text-[10px] font-black uppercase text-red-500 dark:text-red-400 hover:bg-red-500 hover:text-white dark:hover:bg-red-600 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 rounded-full transition cursor-pointer">{current.btnDel}</button>
                         </td> 
                       </>
                     )}
@@ -696,7 +699,7 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
                 return ( 
                 <div key={todo._id} draggable={searchTerm === '' && sortBy === 'default'} onDragStart={(e) => handleDragStart(e, index)} onDragEnter={(e) => handleDragEnter(e, index)} onDragEnd={handleDragEnd} onDragOver={(e) => e.preventDefault()} className={`bg-white dark:bg-gray-800 p-5 md:p-7 rounded-3xl md:rounded-[2.5rem] shadow-md border border-gray-100 dark:border-gray-700 flex flex-col group transition-all hover:-translate-y-1 ${(searchTerm === '' && sortBy === 'default') ? 'cursor-move' : ''} ${dragItemIndex === index ? 'opacity-40 bg-gray-50 dark:bg-gray-800 scale-[0.98]' : ''} ${dragOverItemIndex === index && dragItemIndex !== null ? (dragItemIndex < dragOverItemIndex ? 'drag-over-bottom' : 'drag-over-top') : ''}`}> 
                   {editingId === todo._id ? (
-                    <div className="flex flex-col gap-2 md:gap-3">
+                    <div className="flex flex-col gap-2 md:gap-3 transition-all duration-300">
                       <select value={editForm.importance} onChange={e=>setEditForm({...editForm, importance: e.target.value})} className="p-2 border-2 border-blue-100 dark:border-gray-600 dark:bg-gray-700 rounded-xl font-bold text-xs"><option value="긴급">{current.impObj['긴급']}</option><option value="보통">{current.impObj['보통']}</option><option value="낮음">{current.impObj['낮음']}</option></select>
                      
                      
@@ -728,7 +731,6 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
   <span className={`font-black text-gray-800 dark:text-gray-100 text-lg md:text-xl break-words whitespace-pre-wrap ${expandedTodos[todo._id] ? '' : 'line-clamp-2'}`}>
     {todo.title}
   </span>
-  {/* ⭐ 작성 시간 추가 (카드 뷰/리스트 뷰) */}
   {todo.createdAt && <span className="text-[10px] text-gray-400 font-bold mt-1">{formatTimeAgo(todo.createdAt)}</span>}
   
   {todo.title.length > 20 && (

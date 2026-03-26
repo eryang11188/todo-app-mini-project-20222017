@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const getWeatherInfo = (code, lang) => {
-  if (code === 0) return { icon: '☀️', text: lang === 'ko' ? '맑음' : 'Clear' };
-  if (code === 1 || code === 2 || code === 3) return { icon: '⛅', text: lang === 'ko' ? '구름조금' : 'Partly Cloudy' };
+  const currentHour = new Date().getHours();
+  // ⭐ 저녁 6시 ~ 아침 6시 사이면 밤으로 간주
+  const isNight = currentHour >= 18 || currentHour < 6;
+
+  if (code === 0) return { icon: isNight ? '🌙' : '☀️', text: lang === 'ko' ? '맑음' : 'Clear' };
+  // 💡 구름 조금일 때도 밤이면 해(⛅) 대신 구름(☁️)만 뜨도록 수정 완료!
+  if (code === 1 || code === 2 || code === 3) return { icon: isNight ? '☁️' : '⛅', text: lang === 'ko' ? '구름조금' : 'Partly Cloudy' };
   if (code >= 45 && code <= 48) return { icon: '🌫️', text: lang === 'ko' ? '안개' : 'Fog' };
   if (code >= 51 && code <= 67) return { icon: '🌧️', text: lang === 'ko' ? '비' : 'Rain' };
   if (code >= 71 && code <= 77) return { icon: '❄️', text: lang === 'ko' ? '눈' : 'Snow' };
@@ -61,7 +66,6 @@ function MainPage({ lang }) {
       serviceGo: "바로가기 →",
       noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE", noticeBtn1: "창원대학교 공지사항", noticeBtn2: "와글 (포털)", shortcutTitle: "CAMPUS SHORTCUTS",
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
-      // ⭐ 도움말 투어 한국어
       tourSteps: [
         { title: "👋 반가워요!", desc: "창원대 포털의 주요 기능을 안내해 드릴게요.", targetId: "tour-main-header" },
         { title: "🍚 학식 서랍", desc: "왼쪽의 버튼을 누르면 오늘 학식이 짠! 하고 나타납니다.", targetId: "tour-side-btns" },
@@ -92,7 +96,6 @@ function MainPage({ lang }) {
       serviceGo: "GO →",
       noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE", noticeBtn1: "CWNU Notice Board", noticeBtn2: "Wagle (Portal)", shortcutTitle: "CAMPUS SHORTCUTS",
       footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
-      // ⭐ 도움말 투어 영어 (추가됨!)
       tourSteps: [
         { title: "👋 Welcome!", desc: "Let me guide you through the main features of the CWNU Portal.", targetId: "tour-main-header" },
         { title: "🍚 Meal Drawer", desc: "Click the buttons on the left to see today's campus meals!", targetId: "tour-side-btns" },
@@ -123,7 +126,6 @@ function MainPage({ lang }) {
   const weatherData = weather ? getWeatherInfo(weather.weather_code, lang) : null;
   const dustData = dust ? getDustStatus(dust.pm10, lang) : null;
 
-  // 도움말 투어 효과
   useEffect(() => {
     if (tourIndex >= 0 && tourIndex < current.tourSteps.length) {
       const el = document.getElementById(current.tourSteps[tourIndex].targetId);
@@ -190,7 +192,6 @@ function MainPage({ lang }) {
         @keyframes slide-down { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
-      {/* 🧭 도움말 팝업 (다국어 반영) */}
       {tourIndex >= 0 && (
         <div className="fixed z-[300] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-blue-400 w-[92%] max-w-[350px] bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col">
           <h3 className="text-blue-600 dark:text-blue-400 font-black mb-1 text-[10px] uppercase">Guide ({tourIndex + 1}/{current.tourSteps.length})</h3>
@@ -203,7 +204,6 @@ function MainPage({ lang }) {
         </div>
       )}
 
-      {/* 왼쪽 서랍 버튼 */}
       <div id="tour-side-btns" className="fixed left-0 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-3">
         <button onClick={() => setIsBongrimOpen(true)} className="bg-blue-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-lg hover:bg-blue-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-blue-400">
           <span className="text-2xl group-hover:scale-110">🍚</span>
@@ -219,7 +219,6 @@ function MainPage({ lang }) {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[190] transition-opacity duration-300" onClick={() => { setIsBongrimOpen(false); setIsSarimOpen(false); }}></div>
       )}
       
-      {/* [봉림관 서랍] */}
       <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 flex flex-col ${isBongrimOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex flex-col gap-4 shadow-sm z-10">
           <div className="flex justify-between items-center">
@@ -234,7 +233,6 @@ function MainPage({ lang }) {
         <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900"><AllergyGuideBox />{renderFoodCard(`봉림관 ${bongrimTab}`)}</div>
       </div>
 
-      {/* [사림관 서랍] */}
       <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 flex flex-col ${isSarimOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shadow-sm z-10 gap-2">
           <h2 className="text-lg font-black text-indigo-600 flex items-center gap-2">🍱 {lang === 'ko' ? '사림관 식단' : 'Sarim Menu'}</h2>
@@ -243,7 +241,6 @@ function MainPage({ lang }) {
         <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900"><AllergyGuideBox />{renderFoodCard('사림관')}</div>
       </div>
 
-      {/* ---------------- 메인 컨텐츠 ---------------- */}
       <div className="relative max-w-7xl mx-auto w-full px-5 md:px-10 flex-grow flex flex-col justify-center mt-4 md:mt-0">
         
         <div className="flex justify-center mb-6 md:mb-8 pt-4">
@@ -310,7 +307,7 @@ function MainPage({ lang }) {
         </div>
       </div>
 
-     <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
+      <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
   <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
     {current.footerDept}
   </p>

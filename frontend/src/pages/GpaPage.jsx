@@ -390,18 +390,18 @@ function GpaPage({ lang }) {
           </div>
         </div>
 
+        {/* ⭐ 1. 작성란(select, input) focus 색상 다크모드 대응 패치 완료 */}
         <form id="tour-form" onSubmit={addCourse} className="bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl md:rounded-[2.5rem] shadow-lg border border-gray-100 dark:border-gray-700 grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 mb-8 md:mb-10 items-center relative z-10 w-full">
-          <select value={form.semester} onChange={e=>setForm({...form, semester: e.target.value})} className="md:col-span-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl font-black text-sm text-gray-700 dark:text-white outline-none border border-gray-100 focus:ring-2 ring-emerald-200 w-full">
-            {/* 데이터 처리는 무조건 한글 원본(s)으로, 보이는 것만 displaySem 처리 */}
+          <select value={form.semester} onChange={e=>setForm({...form, semester: e.target.value})} className="md:col-span-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl font-black text-sm text-gray-700 dark:text-white outline-none border border-gray-100 dark:border-gray-600 focus:bg-emerald-50 dark:focus:bg-emerald-900/50 transition-colors w-full">
             {SEMESTERS.map(s => <option key={s} value={s}>{displaySem(s, lang)}</option>)}
           </select>
-          <input placeholder={current.formName} value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="md:col-span-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl outline-none font-black text-gray-800 dark:text-white focus:bg-emerald-50 transition-colors text-sm border border-gray-100 focus:border-emerald-200 w-full"/>
+          <input placeholder={current.formName} value={form.name} onChange={e=>setForm({...form, name: e.target.value})} className="md:col-span-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl outline-none font-black text-gray-800 dark:text-white focus:bg-emerald-50 dark:focus:bg-emerald-900/50 transition-colors text-sm border border-gray-100 dark:border-gray-600 w-full"/>
           <div className="md:col-span-4 grid grid-cols-2 gap-3 md:gap-4">
-            <select value={form.credit} onChange={e=>setForm({...form, credit: e.target.value})} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-xl font-black text-sm text-gray-700 dark:text-white outline-none border border-gray-100">{CREDIT_OPTIONS.map(c => <option key={c} value={c}>{c}{current.formCredit}</option>)}</select>
+            <select value={form.credit} onChange={e=>setForm({...form, credit: e.target.value})} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-xl font-black text-sm text-gray-700 dark:text-white outline-none border border-gray-100 dark:border-gray-600 focus:bg-emerald-50 dark:focus:bg-emerald-900/50 transition-colors">{CREDIT_OPTIONS.map(c => <option key={c} value={c}>{c}{current.formCredit}</option>)}</select>
             <select value={form.grade} onChange={e=>setForm({...form, grade: e.target.value})} className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl font-black text-sm text-emerald-700 outline-none border border-emerald-100 focus:ring-2 ring-emerald-300">{Object.keys(GRADE_POINTS).map(g => <option key={g} value={g}>{g}</option>)}</select>
           </div>
           <div className="md:col-span-2 grid grid-cols-2 gap-3 md:gap-4 md:h-full">
-            <label className="flex items-center justify-center gap-2 cursor-pointer bg-gray-50 dark:bg-gray-700 p-3 rounded-xl border border-gray-100 h-full"><input type="checkbox" checked={form.isMajor} onChange={e=>setForm({...form, isMajor: e.target.checked})} className="w-4 h-4 accent-emerald-500 rounded cursor-pointer"/><span className="font-black text-xs text-gray-600 dark:text-gray-300">{current.formMajor}</span></label>
+            <label className="flex items-center justify-center gap-2 cursor-pointer bg-gray-50 dark:bg-gray-700 p-3 rounded-xl border border-gray-100 dark:border-gray-600 h-full"><input type="checkbox" checked={form.isMajor} onChange={e=>setForm({...form, isMajor: e.target.checked})} className="w-4 h-4 accent-emerald-500 rounded cursor-pointer"/><span className="font-black text-xs text-gray-600 dark:text-gray-300">{current.formMajor}</span></label>
             <button className="bg-emerald-600 text-white p-3 rounded-xl font-black text-sm hover:bg-emerald-700 transition shadow-lg tracking-widest h-full">{current.formBtn}</button>
           </div>
         </form>
@@ -469,18 +469,15 @@ function GpaPage({ lang }) {
       </div>
       
 <footer className="py-8 md:py-12 text-center border-t border-gray-200 dark:border-gray-800 mt-16 md:mt-24 relative z-10 transition-colors">
-  {/* 1. 학과 정보 */}
   <p className="text-gray-600 dark:text-gray-400 font-black text-[10px] md:text-sm uppercase tracking-widest mb-1.5 md:mb-2 break-keep leading-relaxed">
     {current.footerDept}
   </p>
 
-  {/* 2. 저작권 문구 + 툴팁 기능이 있는 깃허브 아이콘 */}
   <div className="flex items-center justify-center gap-4 mt-2 md:mt-3">
     <p className="text-gray-400 dark:text-gray-500 text-[10px] md:text-sm font-bold">
       {current.footerCopy}
     </p>
     
-    {/* 💡 툴팁 구현을 위한 group 클래스 추가 */}
     <div className="relative group flex flex-col items-center">
       <a 
         href="https://github.com/eryang11188/todo-app-mini-project-20222017.git" 
@@ -488,7 +485,6 @@ function GpaPage({ lang }) {
         rel="noopener noreferrer"
         className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-all hover:scale-110"
       >
-        {/* 요청하신 사이즈 35px 적용 */}
         <svg 
           height="35" 
           width="35" 
@@ -500,12 +496,10 @@ function GpaPage({ lang }) {
         </svg>
       </a>
 
-      {/* ✨ 마우스를 올리면(hover) 나타나는 툴팁 박스 */}
       <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center animate-bounce">
         <span className="relative z-10 p-2 text-xs leading-none text-white whitespace-no-wrap bg-gray-800 dark:bg-gray-700 shadow-lg rounded-md font-bold">
           Github
         </span>
-        {/* 삼각형 꼬리 */}
         <div className="w-3 h-3 -mt-2 rotate-45 bg-gray-800 dark:bg-gray-700"></div>
       </div>
     </div>
