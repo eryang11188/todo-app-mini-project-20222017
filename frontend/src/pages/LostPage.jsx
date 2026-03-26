@@ -239,13 +239,14 @@ function LostPage({ lang }) {
     setFollowUpInput(''); 
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
-    try {
+   try {
       let promptContext = lang === 'ko' 
         ? `너는 대학 분실물 센터 게시글 폼을 자동으로 채워주는 AI 비서야.
            사용자의 대화 내용을 분석해서 [습득/분실] 여부와 물품명, 사례금(없으면 free), 장소, 일시, 학번, 작성자명, 연락처, 상세 설명을 추출해.
-           [절대 규칙 1]: 답변은 반드시 아래 형태의 순수한 JSON 구조로만 반환해! 이모지 절대 금지.
+           [절대 규칙 1]: 답변은 반드시 아래 형태의 순수한 JSON 구조로만 반환해!
+           [절대 규칙 2]: 사용자가 인사만 하거나 물품 정보가 아예 없다면, extracted 안의 모든 값을 무조건 빈 문자열("")로 남겨둬!
            {
-             "message": "요청하신 정보를 바탕으로 폼에 들어갈 내용을 준비했습니다! 아래 버튼을 눌러보세요.",
+             "message": "요청하신 정보를 바탕으로 폼에 들어갈 내용을 준비했습니다! (인사말이면 자연스럽게 대답)",
              "extracted": {
                "title": "[분실] 검은색 에어팟",
                "price": "50000",
@@ -257,7 +258,7 @@ function LostPage({ lang }) {
                "description": "케이스에 스누피 스티커가 붙어있습니다."
              }
            }\n[대화 내역]\n`
-        : `You are an AI assistant for a Lost & Found board. Output ONLY pure JSON.\n[Chat History]\n`;
+        : `You are an AI assistant for a Lost & Found board. Output ONLY pure JSON. If no item details, leave all extracted fields as "".\n[Chat History]\n`;
       
       newHistory.forEach(msg => { promptContext += `${msg.sender === 'user' ? 'User' : 'AI'}: ${msg.text}\n`; });
       promptContext += "AI: ";
@@ -272,14 +273,25 @@ function LostPage({ lang }) {
       try {
         const parsed = JSON.parse(jsonString);
         const ext = parsed.extracted;
-        const hasActualData = ext && (ext.title || ext.price || ext.location || ext.deadline || ext.studentId || ext.sellerName || ext.phone || ext.description);
+        
+        // ⭐ 핵심 패치: 데이터가 빈칸(" ")이 아니고 진짜 글자가 들어있을 때만 true로 인정!
+        const hasActualData = ext && (
+          (ext.title && ext.title.trim() !== "") || 
+          (ext.price && String(ext.price).trim() !== "") || 
+          (ext.location && ext.location.trim() !== "") || 
+          (ext.deadline && ext.deadline.trim() !== "") || 
+          (ext.studentId && ext.studentId.trim() !== "") || 
+          (ext.sellerName && ext.sellerName.trim() !== "") || 
+          (ext.phone && ext.phone.trim() !== "") || 
+          (ext.description && ext.description.trim() !== "")
+        );
+
         setChatHistory(prev => [...prev, { sender: 'ai', text: parsed.message, pendingData: hasActualData ? ext : null }]);
       } catch (parseError) {
         setChatHistory(prev => [...prev, { sender: 'ai', text: res.data.text }]);
       }
     } catch (error) {
-      // ⭐ AI 토큰 에러 메시지 보완
-      setChatHistory(prev => [...prev, { sender: 'ai', text: (lang === 'ko' ? "❌ 서버 통신 중 오류가 발생했습니다. (AI 한도 초과 등)" : "❌ Error connecting to server. (API Limit etc.)") }]);
+      setChatHistory(prev => [...prev, { sender: 'ai', text: (lang === 'ko' ? "❌ 서버 통신 중 오류가 발생했습니다. (AI 한도 초과 등)" : "❌ Error connecting to server.") }]);
     } finally {
       setIsGenerating(false);
     }

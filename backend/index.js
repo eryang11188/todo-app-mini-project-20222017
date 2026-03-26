@@ -207,16 +207,53 @@ app.patch('/api/items/:id/like', async (req, res) => res.json(await Item.findByI
 app.put('/api/items/:id', async (req, res) => res.json(await Item.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' })));
 app.delete('/api/items/:id', async (req, res) => { await Item.findByIdAndDelete(req.params.id); res.json({ message: '삭제 완료' }); });
 
-// AI 생성 API
+// [5] AI 생성 API (가장 똑똑한 모델부터 서열별 자동 탐색 도입)
+// ⭐ [5] AI 생성 API (무료 티어 생존 최적화 서열 적용 완료)
 app.post('/api/ai/generate', async (req, res) => {
   try {
     const { prompt } = req.body;
+    
+    // 1. 다중 API 키 로드밸런싱
     const apiKeys = (process.env.GEMINI_API_KEY || "").split(',').map(k => k.trim());
-    const genAI = new GoogleGenerativeAI(apiKeys[0]);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const selectedApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
+    
+    if (!selectedApiKey) throw new Error("API 키가 설정되지 않았습니다.");
+
+    // 2. 동적 모델 선택 로직 (사용 가능한 모델 긁어오기)
+    const modelRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${selectedApiKey}`);
+    const modelData = await modelRes.json();
+    
+    if (!modelRes.ok) throw new Error(`API 인증 실패: ${modelData.error?.message}`);
+
+    const availableModels = modelData.models.filter(m => m.supportedGenerationMethods.includes("generateContent"));
+    
+    // ⭐ 무료 API 티어 생존 전략: 한도가 빵빵한(1분 15회) Flash를 무조건 1~3순위로!
+    // 한도가 0이거나 1분 2회인 Pro 모델은 최후의 보루(4~6순위)로 뺍니다.
+    const safeModel = 
+      availableModels.find(m => m.name.includes("gemini-2.5-flash")) || // 최신 Flash
+      availableModels.find(m => m.name.includes("gemini-2.0-flash")) || // 안정적 최신 Flash
+      availableModels.find(m => m.name.includes("gemini-1.5-flash")) || // 검증된 무료 깡패
+      availableModels.find(m => m.name.includes("gemini-2.5-pro")) ||   // (여기서부턴 한도 0일 확률 높음)
+      availableModels.find(m => m.name.includes("gemini-2.0-pro")) ||
+      availableModels.find(m => m.name.includes("gemini-1.5-pro")) ||
+      availableModels[0]; 
+
+    if (!safeModel) throw new Error("사용 가능한 AI 모델이 없습니다.");
+
+    const targetModelName = safeModel.name.replace('models/', '');
+    console.log(`🤖 [AI 연동] 무료 최적화 모델 채택 완료: ${targetModelName}`);
+
+    // 3. AI 답변 생성
+    const genAI = new GoogleGenerativeAI(selectedApiKey);
+    const model = genAI.getGenerativeModel({ model: targetModelName });
+    
     const result = await model.generateContent(prompt);
     res.json({ text: result.response.text() });
-  } catch (error) { res.status(500).json({ error: "AI 에러" }); }
+    
+  } catch (error) {
+    console.error("🚨 [Gemini API 에러 상세]:", error.message || error);
+    res.status(500).json({ error: "AI 통신 에러", details: error.message });
+  }
 });
 
 // 로컬 환경에서만 포트 오픈 (Vercel에서는 실행 안 됨)
