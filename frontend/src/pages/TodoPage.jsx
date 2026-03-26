@@ -12,8 +12,7 @@ const PLACEHOLDERS = {
 };
 
 
-const QUOTES = [
-  // 🎬 영화 명언
+const QUOTES = [// 🎬 영화 명언
   { ko: "어제는 역사, 내일은 미스터리, 오늘은 선물. 그래서 우리는 현재(Present)라고 부른다. - 우그웨이 (쿵푸팬더 中)", en: "Yesterday is history, tomorrow is a mystery, today is a gift. That's why we call it the present. - Oogway (from Kung Fu Panda)" },
   { ko: "하거나, 하지 않거나 둘 중 하나다. '해본다'는 건 없다. - 요다 (스타워즈 中)", en: "Do or do not. There is no try. - Yoda (from Star Wars)" },
   { ko: "인생은 초콜릿 상자와 같다. 네가 무엇을 고를지 아무도 모르니까. - 포레스트 검프 (포레스트 검프 中)", en: "Life was like a box of chocolates. You never know what you're gonna get. - Forrest Gump (from Forrest Gump)" },
@@ -98,6 +97,7 @@ const QUOTES = [
   { ko: "나는 실패한 적이 없다. 단지 작동하지 않는 10,000가지 방법을 발견했을 뿐이다. - 토머스 에디슨", en: "I have not failed. I've just found 10,000 ways that won't work. - Thomas Edison" },
   { ko: "성공은 최종적인 것이 아니며, 실패는 치명적인 것이 아니다. 중요한 것은 계속하려는 용기이다. - 윈스턴 처칠", en: "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill" },
   { ko: "위대한 일을 할 수 없다면 작은 일을 위대하게 하라. - 나폴레옹 힐", en: "If you cannot do great things, do small things in a great way. - Napoleon Hill" }
+  
 ];
 function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, timerIsRunning, setTimerIsRunning }) {
   const [todos, setTodos] = useState([]);
@@ -330,8 +330,15 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
         .font-cursive-custom { font-family: 'Caveat', 'Nanum Pen Script', cursive; letter-spacing: 0.05em; }
         .font-korean-cursive { font-family: 'Nanum Pen Script', cursive; letter-spacing: 0.1em; }
         .tour-popup { animation: slide-up 0.4s forwards; }
-        @keyframes slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
-        @keyframes shoot-up { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1); opacity: 0; } }
+       @keyframes slide-up { 0% { transform: translate(-50%, 50px); opacity: 0; } 100% { transform: translate(-50%, 0); opacity: 1; } }
+@keyframes todo-ai-fade-in { 
+  from { opacity: 0; transform: translateY(10px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+.todo-ai-anim { 
+  animation: todo-ai-fade-in 0.3s ease-out forwards; 
+}
+   @keyframes shoot-up { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1); opacity: 0; } }
         .emoji-burst { position: absolute; animation: shoot-up 1.5s ease-out forwards; z-index: 9999; pointer-events: none; }
         .drag-over-top { border-top: 4px solid #3b82f6 !important; transform: translateY(2px); transition: all 0.2s; }
         .drag-over-bottom { border-bottom: 4px solid #3b82f6 !important; transform: translateY(-2px); transition: all 0.2s; }
@@ -530,12 +537,12 @@ function TodoPage({ lang, timerMode, setTimerMode, timerTime, setTimerTime, time
             <button className="w-full md:w-auto bg-[#002f6c] dark:bg-blue-800 text-white px-6 py-3 md:px-10 md:py-4 rounded-2xl font-black text-base md:text-lg hover:bg-blue-800 transition shadow-lg z-10">{current.addBtn}</button>
           </div>
 
-          {showAiBox && (
-            <div className="w-full mt-4 p-4 md:p-5 bg-blue-50/50 dark:bg-gray-900/50 rounded-2xl border border-blue-200 dark:border-gray-700 shadow-inner flex flex-col animate-[slide-up_0.3s_ease-out]">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="text-sm font-black text-blue-600 dark:text-blue-400 flex items-center gap-2">
-                  ✨ Gemini AI 비서
-                </h4>
+         {showAiBox && (
+  <div className="w-full mt-4 p-4 md:p-5 bg-blue-50/50 dark:bg-gray-900/50 rounded-2xl border border-blue-200 dark:border-gray-700 shadow-inner flex flex-col todo-ai-anim">
+    <div className="flex justify-between items-center mb-3">
+      <h4 className="text-sm font-black text-blue-600 dark:text-blue-400 flex items-center gap-2">
+        ✨ Gemini AI 비서
+      </h4>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => { setChatHistory([]); askAi(title, true); }} className="text-xs font-bold text-gray-500 hover:text-blue-600 transition bg-white dark:bg-gray-800 px-2 py-1 rounded-md border">{current.aiClear}</button>
                   <button type="button" onClick={() => setShowAiBox(false)} className="text-xs font-bold text-gray-500 hover:text-red-500 transition bg-white dark:bg-gray-800 px-2 py-1 rounded-md border">{current.aiClose}</button>
