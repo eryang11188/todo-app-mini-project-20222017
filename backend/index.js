@@ -38,7 +38,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// [2] 데이터 스키마
+// ⭐ [2] 데이터 스키마 (투두 리스트 버그 픽스 완료!)
 const itemSchema = new mongoose.Schema({
   title: { type: String, required: true },
   completed: { type: Boolean, default: false },
@@ -46,7 +46,10 @@ const itemSchema = new mongoose.Schema({
   type: { type: String, required: true, enum: ['todo', 'market', 'lost'] },
   studentId: String, sellerName: String, phone: String, location: String, description: String,
   likes: { type: Number, default: 0 },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  // 💡 프론트엔드에서 보낸 '중요도'와 '마감기한'이 저장되도록 스키마 추가!
+  importance: { type: String },
+  todoDeadline: { type: String }
 });
 const Item = mongoose.model('Item', itemSchema);
 
