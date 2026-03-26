@@ -20,15 +20,18 @@ const getDustStatus = (pm10, lang) => {
 };
 
 function MainPage({ lang }) {
-  const [tourIndex, setTourIndex] = useState(-1);
   const [weather, setWeather] = useState(null);
   const [dust, setDust] = useState(null);
   const [meals, setMeals] = useState(null);
+  const [shuttles, setShuttles] = useState(null); // 🚌 셔틀버스 데이터 상태 추가
   
+  // 💡 서랍 열림 상태 관리
   const [isBongrimOpen, setIsBongrimOpen] = useState(false);
   const [isSarimOpen, setIsSarimOpen] = useState(false);
+  const [isDormOpen, setIsDormOpen] = useState(false); // 🏠 생활관 서랍 추가
+  const [isShuttleOpen, setIsShuttleOpen] = useState(false); // 🚌 셔틀버스 서랍 추가
+
   const [bongrimTab, setBongrimTab] = useState('1층');
-  
   const [showAllergy, setShowAllergy] = useState(false);
 
   useEffect(() => {
@@ -45,6 +48,12 @@ function MainPage({ lang }) {
         const foodRes = await fetch('http://localhost:5000/api/food');
         const foodData = await foodRes.json();
         setMeals(foodData);
+
+        // 🚌 셔틀버스 데이터 패칭
+        const shuttleRes = await fetch('http://localhost:5000/api/shuttle');
+        const shuttleData = await shuttleRes.json();
+        setShuttles(shuttleData);
+
       } catch (error) {
         console.error("데이터 실패", error);
       }
@@ -57,7 +66,7 @@ function MainPage({ lang }) {
   const t = {
     ko: {
       subtitle: "창원대학교 학우들을 위한 올인원 캠퍼스 솔루션",
-      help: "💡 도움말", weatherPrefix: "📍 현재 창원대 캠퍼스", mealTitle: "🍱 오늘의 학식",
+      weatherPrefix: "📍 현재 창원대 캠퍼스",
       serviceGo: "바로가기 →",
       noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE", noticeBtn1: "창원대학교 공지사항", noticeBtn2: "와글 (포털)", shortcutTitle: "CAMPUS SHORTCUTS",
       footerDept: "컴퓨터공학과 | 소프트웨어공학 프로젝트: CWNU 포털 시스템", footerCopy: "@ 2026 정이량 | Gemini AI 협업 제작",
@@ -75,48 +84,18 @@ function MainPage({ lang }) {
         { name: "드림캐치", url: "https://dreamcatch.changwon.ac.kr/main.do?mi=18316", icon: "🧭" },
         { name: "이뤄드림", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" }
       ]
-    },
-    en: {
-      subtitle: "All-in-one Campus Solution for CWNU Students",
-      help: "💡 Guide", weatherPrefix: "📍 CWNU Campus Now", mealTitle: "🍱 Today's Menu",
-      serviceGo: "GO →",
-      noticeTitle: "OFFICIAL ANNOUNCEMENTS & WAGLE", noticeBtn1: "CWNU Notice Board", noticeBtn2: "Wagle (Portal)", shortcutTitle: "CAMPUS SHORTCUTS",
-      footerDept: "Department of Computer Science | Software Engineering Project: CWNU Portal System", footerCopy: "@ 2026 Jung Yi Ryang | Designed with Gemini AI Collaborative Works",
-      services: [
-        { title: "Flea Market", desc: "Share items happily with peers.", icon: "🏪", path: "/market", color: "from-blue-600 to-indigo-700" },
-        { title: "Lost & Found", desc: "Let's find lost items together.", icon: "🔍", path: "/lost", color: "from-orange-500 to-red-600" },
-        { title: "ToDo List", desc: "Manage tasks with a focus timer.", icon: "📝", path: "/todo", color: "from-indigo-600 to-purple-700" },
-        { title: "GPA Calculator", desc: "Analyze grades with real-time graphs.", icon: "🎓", path: "/gpa", color: "from-emerald-600 to-teal-700" }
-      ],
-      quickLinks: [
-        { name: "e-Campus", url: "https://ecampus.changwon.ac.kr/login.php?mi=18314", icon: "💻" },
-        { name: "Schedule", url: "https://www.changwon.ac.kr/haksa/sv/schdulView/schdulCalendarView.do?mi=10980", icon: "📅" },
-        { name: "Academic Info", url: "https://www.changwon.ac.kr/haksa/main.do", icon: "📜" }, 
-        { name: "Course Reg.", url: "https://chains.changwon.ac.kr/nonstop/suup/sugang/hakbu/index.php?mi=18302", icon: "📚" },
-        { name: "Dream Catch", url: "https://dreamcatch.changwon.ac.kr/main.do?mi=18316", icon: "🧭" },
-        { name: "E-Dream", url: "https://edream.changwon.ac.kr/?mi=18315", icon: "🌟" }
-      ]
     }
   };
-  
-  const current = t[lang] || t.ko;
-  const weatherData = weather ? getWeatherInfo(weather.weather_code, lang) : null;
-  const dustData = dust ? getDustStatus(dust.pm10, lang) : null;
+  const current = t.ko; // 단일 언어 고정
+  const weatherData = weather ? getWeatherInfo(weather.weather_code, 'ko') : null;
+  const dustData = dust ? getDustStatus(dust.pm10, 'ko') : null;
 
   const AllergyToggleBtn = () => (
-    <button
-      onClick={() => setShowAllergy(!showAllergy)}
-      className={`text-[10px] md:text-xs font-black px-3 py-1.5 rounded-xl transition-all border shadow-sm flex items-center gap-1
-        ${showAllergy 
-          ? 'bg-orange-50 border-orange-200 text-orange-600 dark:bg-orange-900/30 dark:border-orange-800 dark:text-orange-400' 
-          : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600'
-        }`}
-    >
+    <button onClick={() => setShowAllergy(!showAllergy)} className={`text-[10px] md:text-xs font-black px-3 py-1.5 rounded-xl transition-all border shadow-sm flex items-center gap-1 ${showAllergy ? 'bg-orange-50 border-orange-200 text-orange-600 dark:bg-orange-900/30 dark:border-orange-800 dark:text-orange-400' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600'}`}>
       {showAllergy ? '🚨 알레르기 켜짐' : '💡 알레르기 보기'}
     </button>
   );
 
-  // ⭐ 알레르기 번호 해독표 콤포넌트
   const AllergyGuideBox = () => {
     if (!showAllergy) return null;
     return (
@@ -158,19 +137,10 @@ function MainPage({ lang }) {
                   lines.map((line, i) => {
                     const trimmedLine = line.trim();
                     const isAllergyLine = /^\([\d.,\s]+\)$/.test(trimmedLine);
-                    
                     if (isAllergyLine && !showAllergy) return null;
 
                     return (
-                      <li key={i} className={`
-                        break-keep leading-relaxed 
-                        ${isAllergyLine 
-                          ? 'text-[10px] text-orange-500 dark:text-orange-400 font-bold tracking-tight mt-0 mb-1' 
-                          : line.startsWith('<') || line.startsWith('[') 
-                            ? 'text-blue-600 dark:text-blue-400 text-[11px] mt-2.5 mb-1 tracking-wider uppercase font-black' 
-                            : 'text-[13px] font-bold text-gray-700 dark:text-gray-200' 
-                        }
-                      `}>
+                      <li key={i} className={`break-keep leading-relaxed ${isAllergyLine ? 'text-[10px] text-orange-500 dark:text-orange-400 font-bold tracking-tight mt-0 mb-1' : line.startsWith('<') || line.startsWith('[') ? 'text-blue-600 dark:text-blue-400 text-[11px] mt-2.5 mb-1 tracking-wider uppercase font-black' : 'text-[13px] font-bold text-gray-700 dark:text-gray-200'}`}>
                         {trimmedLine}
                       </li>
                     );
@@ -184,6 +154,40 @@ function MainPage({ lang }) {
     </div>
   );
 
+  // 🚌 셔틀버스 카드 렌더링
+  const renderShuttleCard = () => (
+    <div className="flex flex-col gap-3 pb-6">
+      {!shuttles ? (
+        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-center text-xs text-gray-400 font-bold animate-pulse">데이터 로딩중...</div>
+      ) : shuttles.length === 0 ? (
+        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-center text-xs text-gray-400 font-bold">운행 정보가 없습니다.</div>
+      ) : (
+        shuttles.map((shuttle, idx) => (
+          <div key={idx} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:border-amber-300 transition-colors">
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-400"></div>
+            <h3 className="text-[13px] font-black text-gray-800 dark:text-white mb-2 pl-3 flex items-center gap-2">
+              <span className="text-amber-500 text-base">📍</span> {shuttle.route}
+            </h3>
+            <div className="pl-3 space-y-1.5 text-[11px] font-bold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/30 p-2.5 rounded-xl ml-2">
+              <p className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-1">
+                <span className="text-gray-400">💵 승차요금</span>
+                <span className="text-amber-600 dark:text-amber-400">{shuttle.fare}원</span>
+              </p>
+              <p className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-1">
+                <span className="text-gray-400">🕒 운행시간</span>
+                <span>{shuttle.schedule}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-gray-400">🚌 운행대수</span>
+                <span>{shuttle.buses}</span>
+              </p>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col transition-colors relative bg-gray-50/30 dark:bg-gray-900 overflow-x-hidden">
       
@@ -193,31 +197,50 @@ function MainPage({ lang }) {
         @keyframes slide-down { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
-      {/* 왼쪽 서랍 버튼 (봉림관 / 사림관) */}
-      <div className="fixed left-0 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-3">
-        <button onClick={() => setIsBongrimOpen(true)} className="bg-blue-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-[4px_0_24px_rgba(37,99,235,0.3)] hover:bg-blue-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-blue-400">
-          <span className="text-2xl group-hover:scale-110 transition-transform drop-shadow-md">🍚</span>
+      {/* ========================================================= */}
+      {/* 👈 좌측 윙 서랍 버튼 (봉림관 / 사림관 / 생활관) */}
+      {/* ========================================================= */}
+      <div className="fixed left-0 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-2">
+        <button onClick={() => setIsBongrimOpen(true)} className="bg-blue-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-lg hover:bg-blue-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-blue-400">
+          <span className="text-xl group-hover:scale-110 transition-transform">🍚</span>
           <span className="text-xs font-black tracking-widest text-blue-50" style={{ writingMode: 'vertical-rl' }}>봉림관 학식</span>
         </button>
 
-        <button onClick={() => setIsSarimOpen(true)} className="bg-indigo-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-[4px_0_24px_rgba(79,70,229,0.3)] hover:bg-indigo-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-indigo-400">
-          <span className="text-2xl group-hover:scale-110 transition-transform drop-shadow-md">🍱</span>
+        <button onClick={() => setIsSarimOpen(true)} className="bg-indigo-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-lg hover:bg-indigo-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-indigo-400">
+          <span className="text-xl group-hover:scale-110 transition-transform">🍱</span>
           <span className="text-xs font-black tracking-widest text-indigo-50" style={{ writingMode: 'vertical-rl' }}>사림관 학식</span>
+        </button>
+
+        <button onClick={() => setIsDormOpen(true)} className="bg-emerald-600 text-white pl-3 pr-4 py-4 rounded-r-2xl shadow-lg hover:bg-emerald-700 transition-all flex flex-col items-center gap-2 group border border-l-0 border-emerald-400">
+          <span className="text-xl group-hover:scale-110 transition-transform">🏠</span>
+          <span className="text-xs font-black tracking-widest text-emerald-50" style={{ writingMode: 'vertical-rl' }}>생활관 학식</span>
         </button>
       </div>
 
-      {(isBongrimOpen || isSarimOpen) && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[190] transition-opacity duration-300" onClick={() => { setIsBongrimOpen(false); setIsSarimOpen(false); }}></div>
+      {/* ========================================================= */}
+      {/* 👉 우측 윙 서랍 버튼 (셔틀버스) */}
+      {/* ========================================================= */}
+      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-2">
+        <button onClick={() => setIsShuttleOpen(true)} className="bg-amber-500 text-white pr-3 pl-4 py-5 rounded-l-2xl shadow-lg hover:bg-amber-600 transition-all flex flex-col items-center gap-2 group border border-r-0 border-amber-300">
+          <span className="text-2xl group-hover:scale-110 transition-transform drop-shadow-sm">🚌</span>
+          <span className="text-xs font-black tracking-widest text-amber-50" style={{ writingMode: 'vertical-rl' }}>셔틀버스</span>
+        </button>
+      </div>
+
+      {/* 서랍 열림 배경 Dimmer */}
+      {(isBongrimOpen || isSarimOpen || isDormOpen || isShuttleOpen) && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[190] transition-opacity duration-300" 
+             onClick={() => { setIsBongrimOpen(false); setIsSarimOpen(false); setIsDormOpen(false); setIsShuttleOpen(false); }}></div>
       )}
       
-      {/* 💡 [봉림관 서랍] */}
+      {/* 💡 [봉림관 서랍] (Left) */}
       <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 ease-out flex flex-col ${isBongrimOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex flex-col gap-4 shadow-sm z-10">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-black text-blue-600 flex items-center gap-2">🍚 봉림관 식단</h2>
             <div className="flex items-center gap-2">
               <AllergyToggleBtn />
-              <button onClick={() => setIsBongrimOpen(false)} className="w-8 h-8 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-300 font-bold transition">✕</button>
+              <button onClick={() => setIsBongrimOpen(false)} className="w-8 h-8 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 font-bold transition">✕</button>
             </div>
           </div>
           <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
@@ -226,25 +249,49 @@ function MainPage({ lang }) {
           </div>
         </div>
         <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900">
-          {/* ⭐ 토글 켰을 때 나오는 알레르기 안내표 추가 */}
           <AllergyGuideBox />
           {renderFoodCard(`봉림관 ${bongrimTab}`)}
         </div>
       </div>
 
-      {/* 💡 [사림관 서랍] */}
+      {/* 💡 [사림관 서랍] (Left) */}
       <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 ease-out flex flex-col ${isSarimOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shadow-sm z-10 flex-wrap gap-2">
           <h2 className="text-lg font-black text-indigo-600 flex items-center gap-2">🍱 사림관 식단</h2>
           <div className="flex items-center gap-2">
             <AllergyToggleBtn />
-            <button onClick={() => setIsSarimOpen(false)} className="w-8 h-8 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-300 font-bold transition">✕</button>
+            <button onClick={() => setIsSarimOpen(false)} className="w-8 h-8 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-full text-gray-500 font-bold transition">✕</button>
           </div>
         </div>
         <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900">
-          {/* ⭐ 토글 켰을 때 나오는 알레르기 안내표 추가 */}
           <AllergyGuideBox />
           {renderFoodCard('사림관')}
+        </div>
+      </div>
+
+      {/* 💡 [생활관 서랍] (Left) */}
+      <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 ease-out flex flex-col ${isDormOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shadow-sm z-10 flex-wrap gap-2">
+          <h2 className="text-lg font-black text-emerald-600 flex items-center gap-2">🏠 생활관 식단</h2>
+          <div className="flex items-center gap-2">
+            <AllergyToggleBtn />
+            <button onClick={() => setIsDormOpen(false)} className="w-8 h-8 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-full text-gray-500 font-bold transition">✕</button>
+          </div>
+        </div>
+        <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900">
+          <AllergyGuideBox />
+          {renderFoodCard('생활관')}
+        </div>
+      </div>
+
+      {/* 💡 [셔틀버스 서랍] (Right) */}
+      <div className={`fixed top-0 right-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-[inset_4px_0_24px_rgba(0,0,0,0.05)] z-[200] transform transition-transform duration-300 ease-out flex flex-col ${isShuttleOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shadow-sm z-10">
+          <h2 className="text-lg font-black text-amber-600 flex items-center gap-2">🚌 셔틀버스 정보</h2>
+          <button onClick={() => setIsShuttleOpen(false)} className="w-8 h-8 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-full text-gray-500 font-bold transition">✕</button>
+        </div>
+        <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900">
+          {renderShuttleCard()}
         </div>
       </div>
 
@@ -252,7 +299,7 @@ function MainPage({ lang }) {
       <div className="relative max-w-7xl mx-auto w-full px-5 md:px-10 flex-grow flex flex-col justify-center mt-4 md:mt-0">
         
         {/* 🌤️ 날씨 위젯 */}
-        <div className="flex justify-center mb-6 md:mb-8 animate-[slide-up_0.5s_ease-out] pt-4">
+        <div className="flex justify-center mb-6 md:mb-8 pt-4">
           {weather && dust ? (
             <div className="inline-flex flex-wrap justify-center items-center gap-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-blue-100 dark:border-gray-700 px-5 md:px-7 py-2.5 md:py-3.5 rounded-full shadow-sm hover:shadow-md transition-all group">
               <span className="text-[10px] md:text-xs font-black text-gray-400 dark:text-gray-500 tracking-wider hidden sm:block">{current.weatherPrefix}</span>
@@ -281,7 +328,7 @@ function MainPage({ lang }) {
         </div>
 
         {/* 메인 타이틀 */}
-        <div id="tour-main-header" className="text-center mb-10 md:mb-14 relative">
+        <div className="text-center mb-10 md:mb-14 relative">
           <div className="flex items-center justify-center gap-4 mb-4">
             <h2 className="text-4xl md:text-6xl font-black text-[#002f6c] dark:text-blue-400 tracking-tighter">
               CWNU <span className="text-blue-600 dark:text-blue-500">SMART</span> PORTAL
@@ -293,7 +340,7 @@ function MainPage({ lang }) {
         </div>
 
         {/* 🚀 서비스 카드 4개 */}
-        <div id="tour-main-services" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-12 md:mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-12 md:mb-20">
           {current.services.map((s, idx) => (
             <Link key={idx} to={s.path} className="group relative overflow-hidden bg-white dark:bg-gray-800 p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-gray-50 dark:border-gray-700 flex flex-col items-center text-center">
               <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${s.color}`}></div>
@@ -309,7 +356,7 @@ function MainPage({ lang }) {
 
         {/* 📢 공지사항 & 퀵 링크 */}
         <div className="bg-blue-50/50 dark:bg-blue-900/20 p-8 md:p-12 rounded-[3.5rem] border-2 border-blue-100/50 dark:border-blue-800/50 transition-colors relative overflow-hidden">
-          <div id="tour-main-notices" className="text-center mb-16 relative z-10">
+          <div className="text-center mb-16 relative z-10">
             <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-8 transition-colors">
               {current.noticeTitle}
             </h4>
@@ -322,7 +369,7 @@ function MainPage({ lang }) {
               </a>
             </div>
           </div>
-          <div id="tour-main-shortcuts" className="relative z-10">
+          <div className="relative z-10">
             <h4 className="text-sm md:text-base font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest text-center mb-8 transition-colors">
               {current.shortcutTitle}
             </h4>
