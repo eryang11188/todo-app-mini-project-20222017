@@ -162,7 +162,7 @@ function MainPage({ lang }) {
               <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
               <div className="flex justify-between items-center mb-2 pl-3 border-b border-gray-50 dark:border-gray-700 pb-2">
                 <span className="text-[12px] font-black text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-1.5 rounded-lg">{displayName}</span>
-                {meal.menu.includes("원") && ( <span className="text-[9px] font-bold text-orange-500 bg-orange-50 dark:bg-gray-700 px-1.5 py-0.5 rounded">PREMIUM</span> )}
+                {meal.menu.includes("원") && ( <span className="text-[9px] font-bold text-orange-500 bg-orange-50 dark:bg-gray-700 px-1.5 py-0.5 rounded"></span> )}
               </div>
               <ul className="pl-3 space-y-1 mt-2">
                 {meal.menu.includes("운영중지") ? ( <li className="text-red-500 text-[11px] font-bold py-1">⚠️ {lang === 'ko' ? '운영중지' : 'Closed'}</li> ) : (
