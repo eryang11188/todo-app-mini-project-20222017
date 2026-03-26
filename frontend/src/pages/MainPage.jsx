@@ -266,7 +266,10 @@ function MainPage({ lang }) {
             <h2 className="text-4xl md:text-6xl font-black text-[#002f6c] dark:text-blue-400 tracking-tighter">
               CWNU <span className="text-blue-600 dark:text-blue-500">SMART</span> PORTAL
             </h2>
-            <button onClick={() => setTourIndex(0)} className="bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1 hover:bg-yellow-600 transition-all hover:scale-105 h-fit mt-1 md:mt-3">
+
+
+
+            <button onClick={() => setTourIndex(0)} className="hidden md:flex bg-yellow-500 text-white px-3 py-1.5 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1 hover:bg-yellow-600 transition-all hover:scale-105 h-fit mt-1 md:mt-3">
               {current.help}
             </button>
           </div>

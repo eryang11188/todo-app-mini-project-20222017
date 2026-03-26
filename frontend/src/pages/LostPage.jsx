@@ -67,6 +67,19 @@ function LostPage({ lang }) {
   const [followUpInput, setFollowUpInput] = useState('');
   const chatContainerRef = useRef(null);
   const textareaRef = useRef(null); 
+  useEffect(() => {
+    // 채팅이 아예 없거나(0), 처음 인사말만 덩그러니 있을 때(1) 언어에 맞게 세팅!
+    if (chatHistory.length === 0 || chatHistory.length === 1) {
+      setChatHistory([
+        { 
+          sender: 'ai', 
+          text: lang === 'ko' 
+            ? "무엇을 잃어버리셨나요? 혹은 주우셨나요?\n(예: \"도서관 2층에서 에어팟 주웠습니다. 갈색 케이스고요 사례금은 필요없습니다. 제 이름은 정이량이고요. 이 번호 010-1234-1234로 연락주세요\")" 
+            : "What did you lose or find?\n(e.g., \"I found AirPods on the 2nd floor of the library. Brown case. No reward needed. My name is Jung Yiryang, contact me at 010-1234-1234.\")" 
+        }
+      ]);
+    }
+  }, [lang]);
 
   const [showVersionInfo, setShowVersionInfo] = useState(false)
   const [showModalConfetti, setShowModalConfetti] = useState(false)

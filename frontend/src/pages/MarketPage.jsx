@@ -90,6 +90,19 @@ function MarketPage({ lang }) {
   const [followUpInput, setFollowUpInput] = useState('');
   const chatContainerRef = useRef(null);
   const textareaRef = useRef(null); 
+  useEffect(() => {
+    // 채팅이 아예 없거나(0), 처음 인사말만 덩그러니 있을 때(1) 언어에 맞게 세팅!
+    if (chatHistory.length === 0 || chatHistory.length === 1) {
+      setChatHistory([
+        { 
+          sender: 'ai', 
+          text: lang === 'ko' 
+            ? "어떤 물건을 얼마에 팔고 싶으신가요? 편하게 말씀해주세요!\n(예: \"12월 31일까지, 학번 20222017, 정이량, 010-1234-1234 아이패드 50만원에 정문직거래\")" 
+            : "What item do you want to sell and for how much? Feel free to tell me!\n(e.g., \"Selling an iPad for 500,000 KRW, main gate, until Dec 31st. ID: 20222017, Jung Yiryang, 010-1234-1234\")" 
+        }
+      ]);
+    }
+  }, [lang]);
 
   const API_URL = '/api/market'; const COMMON_URL = '/api/items'
 
