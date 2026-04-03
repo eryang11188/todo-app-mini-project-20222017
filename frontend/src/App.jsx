@@ -6,7 +6,7 @@ import TodoPage from './pages/TodoPage';
 import GpaPage from './pages/GpaPage';
 import LostPage from './pages/LostPage';
 function App() {
-  const isOff = window.location.hostname !== 'localhost' && true ;
+  const isOff = window.location.hostname !== 'localhost' && false ;
   if (isOff) {
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center text-white text-center p-5 z-[9999] relative">
