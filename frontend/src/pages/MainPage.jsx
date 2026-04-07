@@ -18,6 +18,14 @@ const getDustStatus = (pm10, lang) => {
   if (pm10 <= 150) return { icon: '🟡', text: lang === 'ko' ? '미세먼지 나쁨' : 'Dust Bad', color: 'text-yellow-500' };
   return { icon: '🔴', text: lang === 'ko' ? '미세먼지 매우나쁨' : 'Dust Very Bad', color: 'text-red-500' };
 };
+
+const weatherHelpTexts = {
+  ko: "외부 날씨 API의 일시적인 문제로 정보를 가져오지 못하고 있습니다. 서비스 이용에 참고 부탁드립니다.",
+  en: "Weather information is temporarily unavailable due to issues with the external API. We appreciate your understanding."
+};
+
+
+
 function MainPage({ lang }) {
   const [tourIndex, setTourIndex] = useState(-1);
   const [weather, setWeather] = useState(null);
@@ -28,43 +36,52 @@ function MainPage({ lang }) {
   const [bongrimTab, setBongrimTab] = useState('1층');
   const [showAllergy, setShowAllergy] = useState(false);
   useEffect(() => {
-   const fetchData = async () => {
     
+    const fetchWeather = async () => {
       try {
-        const weatherRes = await fetch('/proxy/weather?latitude=35.2422&longitude=128.6946&current=temperature_2m,relative_humidity_2m,weather_code&timezone=Asia%2FSeoul');
-        
-      
-        if (!weatherRes.ok) throw new Error(`서버 에러 상태 코드: ${weatherRes.status}`);
-        
-        const weatherData = await weatherRes.json();
-        setWeather(weatherData.current);
+        const res = await fetch('/proxy/weather?latitude=35.2422&longitude=128.6946&current=temperature_2m,relative_humidity_2m,weather_code&timezone=Asia%2FSeoul');
+        if (!res.ok) throw new Error(`서버 에러 상태 코드: ${res.status}`);
+        const data = await res.json();
+        setWeather(data.current);
       } catch (error) {
         console.error("날씨 실패:", error);
       }
+    };
 
-      
+   
+    const fetchDust = async () => {
       try {
-        const dustRes = await fetch('/proxy/dust?latitude=35.2422&longitude=128.6946&current=pm10,pm2_5');
-        
-        if (!dustRes.ok) throw new Error(`서버 에러 상태 코드: ${dustRes.status}`);
-        
-        const dustData = await dustRes.json();
-        setDust(dustData.current);
+        const res = await fetch('/proxy/dust?latitude=35.2422&longitude=128.6946&current=pm10,pm2_5');
+        if (!res.ok) throw new Error(`서버 에러 상태 코드: ${res.status}`);
+        const data = await res.json();
+        setDust(data.current);
       } catch (error) {
         console.error("미세먼지 실패:", error);
       }
+    };
+
     
+    const fetchFood = async () => {
       try {
-        const foodRes = await fetch('/api/food'); 
-        const foodData = await foodRes.json();
-        setMeals(foodData);
+        const res = await fetch('/api/food'); 
+        const data = await res.json();
+        setMeals(data);
       } catch (error) {
         console.error("학식 실패:", error);
       }
     };
 
-    fetchData();
-    const interval = setInterval(fetchData, 600000);
+    
+    fetchWeather();
+    fetchDust();
+    fetchFood();
+
+    const interval = setInterval(() => {
+      fetchWeather();
+      fetchDust();
+      fetchFood();
+    }, 600000);
+
     return () => clearInterval(interval);
   }, []);
   const t = {
@@ -191,6 +208,25 @@ function MainPage({ lang }) {
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
         @keyframes slide-down { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .tooltip-container { position: relative; display: inline-block; }
+        .tooltip-text {
+          visibility: hidden; width: 250px; background-color: rgba(0, 0, 0, 0.9); color: #fff;
+          text-align: center; border-radius: 8px; padding: 12px; position: absolute;
+          z-index: 1000; 
+          top: 150%; 
+          left: 50%; margin-left: -125px; opacity: 0;
+          transition: opacity 0.3s; font-size: 11px; font-weight: 500; line-height: 1.5;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+        .tooltip-arrow {
+          position: absolute; 
+          bottom: 100%; 
+          left: 50%; margin-left: -5px;
+          border-width: 5px; border-style: solid; 
+          border-color: transparent transparent rgba(0,0,0,0.9) transparent; 
+        }
+
       `}</style>
       {tourIndex >= 0 && (
         <div className="fixed z-[300] bg-white dark:bg-gray-800 p-5 md:p-6 rounded-3xl shadow-2xl border-[3px] border-blue-400 w-[92%] max-w-[350px] bottom-10 left-1/2 -translate-x-1/2 tour-popup flex flex-col">
@@ -237,23 +273,47 @@ function MainPage({ lang }) {
         <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900"><AllergyGuideBox />{renderFoodCard('사림관')}</div>
       </div>
       <div className="relative max-w-7xl mx-auto w-full px-5 md:px-10 flex-grow flex flex-col justify-center mt-4 md:mt-0">
-        <div className="flex justify-center mb-6 md:mb-8 pt-4">
-          {weather && dust ? (
-            <div className="inline-flex flex-wrap justify-center items-center gap-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-blue-100 dark:border-gray-700 px-5 md:px-7 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all group">
-              <span className="text-[10px] md:text-xs font-black text-gray-400 dark:text-gray-500 tracking-wider hidden sm:block">{current.weatherPrefix}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xl md:text-2xl animate-float">{weatherData.icon}</span>
-                <span className="text-base md:text-lg font-black text-gray-800 dark:text-white">{weather.temperature_2m}°C</span>
-                <span className="text-[10px] md:text-xs font-bold text-gray-500">{weatherData.text}</span>
-              </div>
-              <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-600 pl-3">
-                <span className="text-base md:text-lg">{dustData.icon}</span>
-                <span className={`text-[11px] md:text-xs font-black ${dustData.color}`}>{dustData.text}</span>
-                <span className="text-[10px] font-bold text-gray-400 hidden xs:inline-block">({dust.pm10}㎍/㎥)</span>
-              </div>
+       
+     
+        <div className="flex justify-center mb-6 md:mb-8 pt-4 relative z-[150]">
+          <div className="inline-flex flex-wrap justify-center items-center gap-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-blue-100 dark:border-gray-700 px-5 md:px-7 py-2.5 rounded-full shadow-sm hover:shadow-md transition-all group">
+            <span className="text-[10px] md:text-xs font-black text-gray-400 dark:text-gray-500 tracking-wider hidden sm:block">{current.weatherPrefix}</span>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-xl md:text-2xl animate-float flex items-center">
+               
+                {weatherData ? weatherData.icon : (
+                  <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                )}
+              </span>
+              <span className="text-base md:text-lg font-black text-gray-800 dark:text-white">{weather ? `${weather.temperature_2m}°C` : '-°C'}</span>
+              <span className="text-[10px] md:text-xs font-bold text-gray-500">{weatherData ? weatherData.text : (lang === 'ko' ? '로딩중...' : 'Loading...')}</span>
             </div>
-          ) : ( <div className="inline-flex items-center gap-2 bg-gray-50 dark:bg-gray-800 px-5 py-3 rounded-full text-xs font-bold text-gray-400 animate-pulse mt-4">⏳ {lang === 'ko' ? '로딩 중...' : 'Loading...'}</div> )}
+            
+            {!weather && (
+              <div className="tooltip-container ml-1 cursor-help">
+                <button className="text-lg md:text-xl text-gray-400 hover:text-blue-500 transition-colors">❓</button>
+                <span className="tooltip-text break-keep">
+                  {weatherHelpTexts[lang]}
+                  <span className="tooltip-arrow"></span>
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-600 pl-3">
+              <span className="text-base md:text-lg flex items-center">
+               
+                {dustData ? dustData.icon : (
+                  <svg className="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                )}
+              </span>
+              <span className={`text-[11px] md:text-xs font-black ${dustData ? dustData.color : 'text-gray-400'}`}>{dustData ? dustData.text : (lang === 'ko' ? '로딩중...' : 'Loading...')}</span>
+              <span className="text-[10px] font-bold text-gray-400 hidden xs:inline-block">({dust ? dust.pm10 : '-'}㎍/㎥)</span>
+            </div>
+          </div>
         </div>
+
+        
         <div id="tour-main-header" className="text-center mb-10 md:mb-14 relative">
           <div className="flex items-center justify-center gap-4 mb-4">
             <h2 className="text-4xl md:text-6xl font-black text-[#002f6c] dark:text-blue-400 tracking-tighter">

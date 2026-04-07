@@ -5,6 +5,31 @@ import MarketPage from './pages/MarketPage';
 import TodoPage from './pages/TodoPage';
 import GpaPage from './pages/GpaPage';
 import LostPage from './pages/LostPage';
+
+const formatDateTime = (langCode, is12Hour) => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const date = String(now.getDate()).padStart(2, '0');
+  const dayOfWeek = langCode === 'ko'
+    ? ['일', '월', '화', '수', '목', '금', '토'][now.getDay()]
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
+  
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+
+  if (is12Hour) {
+    const ampm = hours >= 12 ? (langCode === 'ko' ? '오후' : 'PM') : (langCode === 'ko' ? '오전' : 'AM');
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${year}. ${month}. ${date} (${dayOfWeek}) ${ampm} ${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
+  }
+
+  return `${year}. ${month}. ${date} (${dayOfWeek}) ${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
+};
+
+
 function App() {
   const isOff = window.location.hostname !== 'localhost' && false ;
   if (isOff) {
@@ -28,6 +53,22 @@ function App() {
   const [lang, setLang] = useState(() => {
     return localStorage.getItem('cwnu_lang') || 'ko';
   });
+  const [is12Hour, setIs12Hour] = useState(() => {
+    return localStorage.getItem('cwnu_is12Hour') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('cwnu_is12Hour', is12Hour);
+  }, [is12Hour]);
+  const [currentDateTime, setCurrentDateTime] = useState("");
+    
+ useEffect(() => {
+    const updateDateTime = () => setCurrentDateTime(formatDateTime(lang, is12Hour));
+    updateDateTime();
+    const timerId = setInterval(updateDateTime, 1000);
+    return () => clearInterval(timerId);
+  }, [lang, is12Hour]);
+
   useEffect(() => {
     localStorage.setItem('cwnu_lang', lang);
   }, [lang]);
@@ -71,6 +112,22 @@ function App() {
   };
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark' : ''} bg-white dark:bg-gray-900 transition-colors`}>
+      <style>{`
+        @keyframes clock-sweep {
+          to { transform: rotate(360deg); }
+        }
+        .animate-clock-hour {
+          animation: clock-sweep 43200s linear infinite;
+          transform-origin: bottom center;
+        }
+        .animate-clock-minute {
+          animation: clock-sweep 3600s linear infinite;
+          transform-origin: bottom center;
+        }
+        .group:hover .animate-clock-hour { animation-duration: 10s; }
+        .group:hover .animate-clock-minute { animation-duration: 2s; }
+      `}</style>
+      
       <header className="bg-[#002f6c] dark:bg-gray-950 text-white p-3 md:p-5 shadow-lg flex flex-col md:flex-row justify-between items-center transition-colors sticky top-0 z-[100] gap-3 md:gap-0">
         <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
           <h1 className="text-xl md:text-2xl font-black tracking-tighter cursor-pointer" onClick={() => navigate('/')}>
@@ -92,6 +149,37 @@ function App() {
           </nav>
         )}
         <div className="flex gap-2 md:gap-3 items-center w-full md:w-auto justify-center md:justify-end">
+        
+   {currentDateTime && (
+  <div 
+    onClick={() => setIs12Hour(!is12Hour)}
+    className="hidden lg:flex items-center gap-6 mr-6 px-6 py-3 rounded-2xl transition hover:bg-white/10 group cursor-pointer border border-white/5 active:scale-95"
+  >
+    <div className="relative w-14 h-14 flex items-center justify-center rounded-full border-2 border-emerald-400 text-white shadow-[0_0_20px_rgba(52,211,153,0.2)] transition-all group-hover:scale-110">
+      <div 
+        className="absolute top-[14px] left-[26.5px] w-[3px] h-[14px] bg-amber-400 rounded-full animate-clock-hour" 
+        style={{animationDuration: '43200s'}}
+      ></div>
+      <div 
+        className="absolute top-[6px] left-[27px] w-[2px] h-[22px] bg-sky-300 rounded-full animate-clock-minute" 
+        style={{animationDuration: '3600s'}}
+      ></div>
+      <div 
+        className="absolute top-[3px] left-[27.5px] w-[1px] h-[25px] bg-red-500 rounded-full" 
+        style={{animation: 'clock-sweep 60s linear infinite', transformOrigin: 'bottom center'}}
+      ></div>
+      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 z-10 shadow-sm border border-black/10"></div>
+    </div>
+    <div className="flex flex-col text-right font-mono tracking-tighter">
+      <span className="text-sm text-white/60 font-bold">
+        {currentDateTime.split(')')[0]})
+      </span>
+      <span className="text-3xl text-white font-black leading-none mt-1 drop-shadow-[0_2px_2px_rgba(0,0,0,0.4)]">
+        {currentDateTime.split(')')[1]}
+      </span>
+    </div>
+  </div>
+)}
           <a href="https://changwongrad.copykiller.com/welcome" target="_blank" rel="noreferrer" className="bg-[#be123c] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#9f1239] transition">
             📝 {t[lang].copykiller}
           </a>
