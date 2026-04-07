@@ -11,22 +11,28 @@ const formatDateTime = (langCode, is12Hour) => {
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const date = String(now.getDate()).padStart(2, '0');
+  const dayIndex = now.getDay();
   const dayOfWeek = langCode === 'ko'
-    ? ['일', '월', '화', '수', '목', '금', '토'][now.getDay()]
-    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
+    ? ['일', '월', '화', '수', '목', '금', '토'][dayIndex]
+    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
   
-  let hours = now.getHours();
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
 
-  if (is12Hour) {
-    const ampm = hours >= 12 ? (langCode === 'ko' ? '오후' : 'PM') : (langCode === 'ko' ? '오전' : 'AM');
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    return `${year}. ${month}. ${date} (${dayOfWeek}) ${ampm} ${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
-  }
-
-  return `${year}. ${month}. ${date} (${dayOfWeek}) ${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
+  const ampm = hours >= 12 ? (langCode === 'ko' ? '오후' : 'PM') : (langCode === 'ko' ? '오전' : 'AM');
+  const displayHours = is12Hour ? (hours % 12 || 12) : hours;
+  
+  return {
+    dateStr: `${year}. ${month}. ${date}`,
+    dayStr: `(${dayOfWeek})`,
+    isWeekend: dayIndex === 0 || dayIndex === 6,
+    ampm: is12Hour ? ampm : '',
+    timeStr: `${String(displayHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+    hDeg: ((hours % 12) * 30) + (minutes * 0.5),
+    mDeg: (minutes * 6) + (seconds * 0.1),
+    sDeg: seconds * 6
+  };
 };
 
 
@@ -151,35 +157,40 @@ function App() {
         <div className="flex gap-2 md:gap-3 items-center w-full md:w-auto justify-center md:justify-end">
         
    {currentDateTime && (
-  <div 
-    onClick={() => setIs12Hour(!is12Hour)}
-    className="hidden lg:flex items-center gap-6 mr-6 px-6 py-3 rounded-2xl transition hover:bg-white/10 group cursor-pointer border border-white/5 active:scale-95"
-  >
-    <div className="relative w-14 h-14 flex items-center justify-center rounded-full border-2 border-emerald-400 text-white shadow-[0_0_20px_rgba(52,211,153,0.2)] transition-all group-hover:scale-110">
-      <div 
-        className="absolute top-[14px] left-[26.5px] w-[3px] h-[14px] bg-amber-400 rounded-full animate-clock-hour" 
-        style={{animationDuration: '43200s'}}
-      ></div>
-      <div 
-        className="absolute top-[6px] left-[27px] w-[2px] h-[22px] bg-sky-300 rounded-full animate-clock-minute" 
-        style={{animationDuration: '3600s'}}
-      ></div>
-      <div 
-        className="absolute top-[3px] left-[27.5px] w-[1px] h-[25px] bg-red-500 rounded-full" 
-        style={{animation: 'clock-sweep 60s linear infinite', transformOrigin: 'bottom center'}}
-      ></div>
-      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 z-10 shadow-sm border border-black/10"></div>
-    </div>
-    <div className="flex flex-col text-right font-mono tracking-tighter">
-      <span className="text-sm text-white/60 font-bold">
-        {currentDateTime.split(')')[0]})
-      </span>
-      <span className="text-3xl text-white font-black leading-none mt-1 drop-shadow-[0_2px_2px_rgba(0,0,0,0.4)]">
-        {currentDateTime.split(')')[1]}
-      </span>
-    </div>
-  </div>
-)}
+            <div 
+              onClick={() => setIs12Hour(!is12Hour)}
+              className="hidden lg:flex items-center gap-6 mr-6 px-6 py-3 rounded-2xl transition hover:bg-white/10 group cursor-pointer border border-white/5 active:scale-95"
+            >
+              <div className="relative w-14 h-14 flex items-center justify-center rounded-full border-2 border-emerald-400 text-white shadow-[0_0_20px_rgba(52,211,153,0.2)] transition-all group-hover:scale-110">
+                <div 
+                  className="absolute top-[14px] left-[26.5px] w-[3.5px] h-[14px] bg-amber-400 rounded-full" 
+                  style={{ transform: `rotate(${currentDateTime.hDeg}deg)`, transformOrigin: 'bottom center' }}
+                ></div>
+                <div 
+                  className="absolute top-[6px] left-[27px] w-[2.5px] h-[22px] bg-sky-300 rounded-full" 
+                  style={{ transform: `rotate(${currentDateTime.mDeg}deg)`, transformOrigin: 'bottom center' }}
+                ></div>
+                <div 
+                  className="absolute top-[3px] left-[27.5px] w-[1px] h-[25px] bg-red-500 rounded-full" 
+                  style={{ transform: `rotate(${currentDateTime.sDeg}deg)`, transformOrigin: 'bottom center' }}
+                ></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 z-10 shadow-sm border border-black/10"></div>
+              </div>
+
+              <div className="flex flex-col text-right font-mono tracking-tighter">
+                <span className="text-base text-white/60 font-bold leading-tight">
+                  {currentDateTime.dateStr} 
+                  <span className={currentDateTime.isWeekend ? 'text-red-400 ml-1' : 'text-white/60 ml-1'}>
+                    {currentDateTime.dayStr}
+                  </span>
+                </span>
+                <span className="text-3xl text-white font-black leading-none mt-1 drop-shadow-[0_2px_2px_rgba(0,0,0,0.4)] flex items-end justify-end gap-1">
+                  {currentDateTime.ampm && <span className="text-sm font-bold mb-0.5">{currentDateTime.ampm}</span>}
+                  <span>{currentDateTime.timePart || currentDateTime.timeStr}</span>
+                </span>
+              </div>
+            </div>
+          )}
           <a href="https://changwongrad.copykiller.com/welcome" target="_blank" rel="noreferrer" className="bg-[#be123c] text-white px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl font-black text-[10px] md:text-xs shadow-md flex items-center gap-1.5 hover:bg-[#9f1239] transition">
             📝 {t[lang].copykiller}
           </a>
