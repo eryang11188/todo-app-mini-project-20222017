@@ -333,7 +333,12 @@ function MarketPage({ lang }) {
       }
     } catch (error) {
       console.error("AI Generation Error:", error);
-      setChatHistory(prev => [...prev, { sender: 'ai', text: (lang === 'ko' ? "❌ 서버 통신 중 오류가 발생했습니다. (1분 뒤 다시 시도해주세요.)" : "❌ Error connecting to server. (Try again in 1 min)") }]);
+      setChatHistory(prev => [...prev, { 
+  sender: 'ai', 
+  text: (lang === 'ko' 
+    ? "⚠️ 포털의 일일 AI 토큰 이용량이 모두 소모되어 응답이 지연되고 있습니다. 예비 AI 모델로 우회하여 연결 중이니 약 1분 뒤에 다시 질문해 주세요." 
+    : "⚠️ Response delayed due to the daily AI token limit. We are rerouting to an alternative AI model, please try again in about 1 minute.") 
+}]);
     } finally {
       setIsGenerating(false);
     }
