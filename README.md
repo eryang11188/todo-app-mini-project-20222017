@@ -3,7 +3,8 @@
 - [Github 원격 저장소 바로가기](https://github.com/jeongiryang/todo-app-mini-project-20222017.git)
  
 - [Vercel 배포 사이트 바로가기](https://todo-app-mini-project-20222017.vercel.app/)
-  - [![GitHub release (latest by date)](https://img.shields.io/github/v/release/jeongiryang/todo-app-mini-project-20222017)](https://github.com/jeongiryang/todo-app-mini-project-20222017/releases/latest)
+  - **Latest Update:** `v1.1.0` 
+  - [![GitHub release (latest by date)](https://img.shields.io/github/v/release/jeongiryang/todo-app-mini-project-20222017?color=blue&label=v1.1.0%20Latest)](https://github.com/jeongiryang/todo-app-mini-project-20222017/releases/latest)
 
 ## 기획
 - 과거 _웹프로그래밍_(25-1학기) 기말 과제 `todos_v4`의 데이터 휘발성 한계를 극복하고, 나아가 창원대학교 학우들의 편의성을 위해 개발된 **실시간 클라우드 DB 연동 및 CWNU 스마트 포털 구축 프로젝트**
