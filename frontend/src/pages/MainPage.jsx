@@ -160,8 +160,9 @@ function MainPage({ lang }) {
     }
   }, [tourIndex, current.tourSteps]);
   const AllergyToggleBtn = () => (
-    <button onClick={() => setShowAllergy(!showAllergy)} className={`text-[10px] md:text-xs font-black px-3 py-1.5 rounded-xl transition-all border shadow-sm flex items-center gap-1 ${showAllergy ? 'bg-orange-50 border-orange-200 text-orange-600 dark:bg-orange-900/30 dark:border-orange-800 dark:text-orange-400' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600'}`}>{showAllergy ? (lang === 'ko' ? '🚨 알레르기 켜짐' : '🚨 Allergy ON') : (lang === 'ko' ? '💡 알레르기 보기' : '💡 Show Allergy')}</button>
+    <button onClick={() => setShowAllergy(prev => !prev)} className={`text-[10px] md:text-xs font-black px-3 py-1.5 rounded-xl transition-all border shadow-sm flex items-center gap-1 ${showAllergy ? 'bg-orange-50 border-orange-200 text-orange-600 dark:bg-orange-900/30 dark:border-orange-800 dark:text-orange-400' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600'}`}>{showAllergy ? (lang === 'ko' ? '🚨 알레르기 켜짐' : '🚨 Allergy ON') : (lang === 'ko' ? '💡 알레르기 보기' : '💡 Show Allergy')}</button>
   );
+  
   const AllergyGuideBox = () => {
     if (!showAllergy) return null;
     return (
@@ -256,21 +257,21 @@ function MainPage({ lang }) {
         <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex flex-col gap-4 shadow-sm z-10">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-black text-blue-600 flex items-center gap-2">🍚 {lang === 'ko' ? '봉림관 식단' : 'Bongrim Menu'}</h2>
-            <div className="flex items-center gap-2"><AllergyToggleBtn /><button onClick={() => setIsBongrimOpen(false)} className="w-8 h-8 flex justify-center bg-gray-100 dark:bg-gray-700 rounded-full text-gray-500 font-bold transition">✕</button></div>
+            <div className="flex items-center gap-2">{AllergyToggleBtn()}<button onClick={() => setIsBongrimOpen(false)} className="w-8 h-8 flex justify-center bg-gray-100 dark:bg-gray-700 rounded-full text-gray-500 font-bold transition">✕</button></div>
           </div>
           <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
             <button onClick={() => setBongrimTab('1층')} className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all ${bongrimTab === '1층' ? 'bg-white dark:bg-gray-600 text-blue-600 shadow-sm' : 'text-gray-500'}`}>{lang === 'ko' ? '1층 (MOSS1)' : '1F (MOSS1)'}</button>
             <button onClick={() => setBongrimTab('2층')} className={`flex-1 py-1.5 rounded-lg text-xs font-black transition-all ${bongrimTab === '2층' ? 'bg-white dark:bg-gray-600 text-blue-600 shadow-sm' : 'text-gray-500'}`}>{lang === 'ko' ? '2층 (MOSS2)' : '2F (MOSS2)'}</button>
           </div>
         </div>
-        <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900"><AllergyGuideBox />{renderFoodCard(`봉림관 ${bongrimTab}`)}</div>
+        <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900">{AllergyGuideBox()}{renderFoodCard(`봉림관 ${bongrimTab}`)}</div>
       </div>
       <div className={`fixed top-0 left-0 h-full w-[300px] md:w-[350px] bg-gray-50 dark:bg-gray-900 shadow-2xl z-[200] transform transition-transform duration-300 flex flex-col ${isSarimOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shadow-sm z-10 gap-2">
           <h2 className="text-lg font-black text-indigo-600 flex items-center gap-2">🍱 {lang === 'ko' ? '사림관 식단' : 'Sarim Menu'}</h2>
-          <div className="flex items-center gap-2"><AllergyToggleBtn /><button onClick={() => setIsSarimOpen(false)} className="w-8 h-8 flex justify-center bg-gray-100 dark:bg-gray-700 rounded-full text-gray-500 font-bold transition">✕</button></div>
+          <div className="flex items-center gap-2">{AllergyToggleBtn()}<button onClick={() => setIsSarimOpen(false)} className="w-8 h-8 flex justify-center bg-gray-100 dark:bg-gray-700 rounded-full text-gray-500 font-bold transition">✕</button></div>
         </div>
-        <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900"><AllergyGuideBox />{renderFoodCard('사림관')}</div>
+        <div className="p-4 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900">{AllergyGuideBox()}{renderFoodCard('사림관')}</div>
       </div>
       <div className="relative max-w-7xl mx-auto w-full px-5 md:px-10 flex-grow flex flex-col justify-center mt-4 md:mt-0">
        
